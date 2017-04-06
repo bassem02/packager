@@ -1,13 +1,15 @@
 package tn.wevioo.entities;
 // Generated 28 mars 2017 22:31:56 by Hibernate Tools 5.2.1.Final
 
+import static javax.persistence.GenerationType.IDENTITY;
+
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -20,6 +22,10 @@ import javax.persistence.UniqueConstraint;
 @Table(name = "delivery_template", catalog = "nn_packager_management_recette", uniqueConstraints = @UniqueConstraint(columnNames = "template_name"))
 public class DeliveryTemplate implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8372414990566199947L;
 	private Integer id;
 	private String templateName;
 	private Set<DeliveryTemplateConfiguration> deliveryTemplateConfigurations = new HashSet<DeliveryTemplateConfiguration>(

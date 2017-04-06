@@ -18,6 +18,10 @@ import javax.persistence.Table;
 @Table(name = "packager_instance_product_instance", catalog = "nn_packager_management_recette")
 public class PackagerInstanceProductInstance implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private PackagerInstanceProductInstanceId id;
 	private PackagerInstance packagerInstance;
 	private ProductInstance productInstance;

@@ -20,6 +20,10 @@ import javax.persistence.UniqueConstraint;
 		"id_packager_model_from", "id_packager_model_to" }))
 public class PackagerModelPossibleTransformations implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private PackagerModelPossibleTransformationsId id;
 	private PackagerModel packagerModelByIdPackagerModelTo;
 	private PackagerModel packagerModelByIdPackagerModelFrom;

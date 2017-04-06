@@ -10,6 +10,10 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class PackagerInstanceProductInstanceId implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int idPackagerInstance;
 	private int idProductInstance;
 
