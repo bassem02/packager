@@ -3,12 +3,14 @@ package tn.wevioo.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import tn.wevioo.dao.RetailerDAO;
 import tn.wevioo.dto.RetailerDTO;
 import tn.wevioo.entities.Retailer;
 import tn.wevioo.service.RetailerService;
 
+@Service("retailerService")
 public class RetailerServiceImpl implements RetailerService {
 
 	@Autowired

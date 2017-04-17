@@ -13,10 +13,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import tn.wevioo.authentication.service.ServerService;
+
 @Configuration
 @EnableGlobalMethodSecurity(securedEnabled = true)
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+	@Autowired
+	public ServerService serverService;
 
 	@Autowired
 	@Qualifier("authenticationDatasource")
@@ -40,7 +45,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().antMatchers(HttpMethod.OPTIONS, "/*").permitAll();
 		http.httpBasic();
 		http.csrf().disable();
-		http.addFilterAfter(new CustomFilter(), BasicAuthenticationFilter.class);
+		http.addFilterAfter(customFilter(), BasicAuthenticationFilter.class);
+	}
+
+	private CustomFilter customFilter() {
+		return new CustomFilter(serverService);
 	}
 
 }

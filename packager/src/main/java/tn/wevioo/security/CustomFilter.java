@@ -14,50 +14,33 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.common.util.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
 import org.springframework.web.filter.GenericFilterBean;
 
-import tn.wevioo.authentication.dao.UsersDAO;
+import tn.wevioo.authentication.service.ServerService;
 
 @EnableAutoConfiguration(exclude = JpaRepositoriesAutoConfiguration.class)
 public class CustomFilter extends GenericFilterBean {
 
 	private static final Log LOGGER = LogFactory.getLog(CustomFilter.class);
 
-	/**
-	 * Localhosot ipv6
-	 */
 	private static final String LOCALHOST_IPV6 = "0:0:0:0:0:0:0:1";
 
-	/**
-	 * Localhosot ipv4
-	 */
 	private static final String LOCALHOST_IPV4 = "127.0.0.1";
 
-	/**
-	 * AUTHENTICATION_HEADER.
-	 */
 	public static final String AUTHENTICATION_HEADER = "Authorization";
 
-	/**
-	 * WADL file.
-	 */
 	public static final String WADL = "_wadl";
 
-	@Autowired
-	public UsersDAO usersDAO;
+	private final ServerService serverService;
 
-	private static String formatPathInfo(String pathInfo) {
-		String result = pathInfo;
-		if (result.indexOf("/") != -1) {
-			result = result.substring(result.indexOf("/") + 1, result.length());
-		}
-		if (result.indexOf("/") != -1) {
-			result = result.substring(0, result.indexOf("/"));
-		}
-		return result;
+	public CustomFilter(ServerService serverService) {
+		this.serverService = serverService;
+	}
+
+	public ServerService getServerService() {
+		return serverService;
 	}
 
 	public boolean authenticate(HttpServletRequest httpServletRequest) {
@@ -82,26 +65,20 @@ public class CustomFilter extends GenericFilterBean {
 		if (!tokenizer.hasMoreElements()) {
 			return false;
 		}
-		// NECESSARY - DO NOT DELETE tokenizer.nextToken() !!
 		final String user = tokenizer.nextToken();
 		LOGGER.debug("Authenticating user : " + user);
 		final String password = tokenizer.nextToken();
 		final String ip = LOCALHOST_IPV6.equals(httpServletRequest.getRemoteAddr()) ? LOCALHOST_IPV4
 				: httpServletRequest.getRemoteAddr();
-		// final String pathInfo =
-		// formatPathInfo(httpServletRequest.getPathInfo());
-
 		checkAuthentication = checkAuthentication(user, password, ip);
-
-		/*
-		 * try { checkAuthentication =
-		 * this.authenticationModule.checkAuthentication(password, ip,
-		 * pathInfo);
-		 * 
-		 * } catch (NotRespectedRulesException e) { LOGGER.debug(e); }
-		 */
-
 		return checkAuthentication;
+	}
+
+	private boolean checkAuthentication(String username, String password, String ip) {
+
+		// return usersDAO.checkUserPass(username, password);
+		return (serverService.findByIp(ip) != null);
+
 	}
 
 	@Override
@@ -122,12 +99,6 @@ public class CustomFilter extends GenericFilterBean {
 				}
 			}
 		}
-	}
-
-	private boolean checkAuthentication(String username, String password, String ip) {
-
-		return usersDAO.checkUserPass(username, password);
-
 	}
 
 }

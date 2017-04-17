@@ -18,7 +18,6 @@ import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
 import nordnet.architecture.exceptions.implicit.NullException;
 import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import nordnet.drivers.contract.exceptions.DriverException;
-import tn.wevioo.authentication.dao.UsersDAO;
 import tn.wevioo.dto.PackagerInstanceDTO;
 import tn.wevioo.entities.PackagerActionHistory;
 import tn.wevioo.entities.PackagerInstance;
@@ -45,9 +44,6 @@ public class PackagerController extends AbstractFacade {
 	@Autowired
 	private PackagerActionHistoryService packagerActionHistoryService;
 
-	@Autowired
-	public UsersDAO usersDAO;
-
 	@RequestMapping(value = "/createPackager", method = RequestMethod.POST)
 	public PackagerInstanceDTO createPackager(@RequestBody PackagerRequest request) {
 
@@ -64,7 +60,6 @@ public class PackagerController extends AbstractFacade {
 
 	@RequestMapping(value = "/getPackagerInstance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public PackagerInstanceDTO getPackagerInstance(@QueryParam("retailerPackagerId") String retailerPackagerId) {
-		System.out.println(usersDAO.checkUserPass("adin", "admin"));
 		return packagerInstanceService
 				.convertToDTO(packagerInstanceService.findByRetailerPackagerId(retailerPackagerId));
 	}

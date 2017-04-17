@@ -17,26 +17,23 @@ public class UsersServiceImpl implements UsersService {
 
 	@Override
 	public Users saveOrUpdate(Users users) {
-		// TODO Auto-generated method stub
-		return null;
+		return usersDAO.saveAndFlush(users);
 	}
 
 	@Override
 	public void delete(Users users) {
-		// TODO Auto-generated method stub
+		usersDAO.delete(users);
 
 	}
 
 	@Override
 	public Users findById(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		return usersDAO.findOne(id);
 	}
 
 	@Override
 	public List<Users> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+		return usersDAO.findAll();
 	}
 
 	@Override
