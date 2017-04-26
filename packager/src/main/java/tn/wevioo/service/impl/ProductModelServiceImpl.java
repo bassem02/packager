@@ -11,6 +11,7 @@ import tn.wevioo.service.ProductModelService;
 
 @Service("productModelService")
 public class ProductModelServiceImpl implements ProductModelService {
+
 	@Autowired
 	public ProductModelDao productModelDao;
 

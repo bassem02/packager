@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -24,7 +25,6 @@ import javax.persistence.Transient;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import nordnet.architecture.exceptions.explicit.DataSourceException;
 import nordnet.architecture.exceptions.explicit.MalformedXMLException;
@@ -36,11 +36,14 @@ import nordnet.architecture.exceptions.implicit.UnsupportedActionException;
 import nordnet.architecture.exceptions.utils.ErrorCode;
 import nordnet.drivers.contract.exceptions.DriverException;
 import nordnet.drivers.contract.types.State;
+import tn.wevioo.ManualDriverFactory;
 import tn.wevioo.exceptions.PackagerException;
 import tn.wevioo.model.packager.action.PackagerInstanceAction;
 import tn.wevioo.model.request.PackagerRequest;
 import tn.wevioo.model.request.ProductRequest;
 import tn.wevioo.service.PackagerActionHistoryService;
+import tn.wevioo.service.ProductModelService;
+import tn.wevioo.service.WebServiceUserService;
 import tn.wevioo.tools.logging.AdminLogger;
 
 /**
@@ -60,15 +63,14 @@ public class PackagerInstance implements java.io.Serializable {
 	private Date creationDate;
 	private Date lastUpdate;
 	private String toto;
-	private Set<ProductInstance> products;
 
 	@Transient
 	public Set<ProductInstance> getProducts() {
-		return products;
-	}
-
-	public void setProducts(Set<ProductInstance> products) {
-		this.products = products;
+		Set<ProductInstance> result = new HashSet<ProductInstance>();
+		for (PackagerInstanceProductInstance packagerInstanceProductInstance : packagerInstanceProductInstances) {
+			result.add(packagerInstanceProductInstance.getProductInstance());
+		}
+		return result;
 	}
 
 	private Set<ShippingDemand> shippingDemands = new HashSet<ShippingDemand>(0);
@@ -191,7 +193,7 @@ public class PackagerInstance implements java.io.Serializable {
 		this.failedShippingDemands = failedShippingDemands;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "packagerInstance")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "packagerInstance")
 	public Set<PackagerInstanceProductInstance> getPackagerInstanceProductInstances() {
 		return this.packagerInstanceProductInstances;
 	}
@@ -207,19 +209,21 @@ public class PackagerInstance implements java.io.Serializable {
 			throw new NullException(NullCases.NULL, "instance parameter");
 		}
 
-		if (this.products == null) {
-			this.products = new HashSet<ProductInstance>();
+		if (this.packagerInstanceProductInstances == null) {
+			this.packagerInstanceProductInstances = new HashSet<PackagerInstanceProductInstance>();
 		}
 
-		this.products.add(productInstance);
-		productInstance.setPackager(this);
+		PackagerInstanceProductInstance packagerInstanceProductInstance = new PackagerInstanceProductInstance();
+		packagerInstanceProductInstance.setPackagerInstance(this);
+		packagerInstanceProductInstance.setProductInstance(productInstance);
+		this.packagerInstanceProductInstances.add(packagerInstanceProductInstance);
+		// productInstance.setPackager(this);
 	}
 
-	@Autowired
-	PackagerActionHistoryService packagerActionHistoryService;
-
-	public void cancel(PackagerRequest request) throws NotRespectedRulesException, DriverException, NotFoundException,
-			MalformedXMLException, PackagerException, DataSourceException {
+	public void cancel(PackagerRequest request, ProductModelService productModelService,
+			ManualDriverFactory manualDriverFactory, PackagerActionHistoryService packagerActionHistoryService,
+			WebServiceUserService webServiceUserService) throws NotRespectedRulesException, DriverException,
+			NotFoundException, MalformedXMLException, PackagerException, DataSourceException {
 
 		request.validate(PackagerInstanceAction.CANCEL);
 		List<ProductRequest> asList = new ArrayList<ProductRequest>(request.getProducts());
@@ -227,9 +231,10 @@ public class PackagerInstance implements java.io.Serializable {
 		asList = completeProductModels(asList);
 		request.setProducts(new HashSet<ProductRequest>(asList));
 
-		PackagerModel.verifyXmlProperties(PackagerInstanceAction.CANCEL, asList);
+		PackagerModel.verifyXmlProperties(PackagerInstanceAction.CANCEL, asList, productModelService,
+				manualDriverFactory);
 
-		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.CANCEL);
+		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.CANCEL, webServiceUserService);
 
 		if (this.packagerModel.isMultithreadedActions()) {
 
@@ -242,16 +247,17 @@ public class PackagerInstance implements java.io.Serializable {
 			 */
 
 		} else {
-			for (ProductInstance productInstance : this.products) {
+			for (ProductInstance productInstance : getProducts()) {
 				if (!productInstance.getCurrentState().equals(State.CANCELED)) {
 					ProductRequest productRequest = this.getProductRequest(request,
 							productInstance.getIdProductInstance());
 
 					if (productRequest == null) {
-						productInstance.cancel(null, history);
+						// productInstance.cancel(null, history);
 
 					} else {
-						productInstance.cancel(productRequest.getProperties(), history);
+						// productInstance.cancel(productRequest.getProperties(),
+						// history);
 
 					}
 				}
@@ -318,7 +324,7 @@ public class PackagerInstance implements java.io.Serializable {
 			throw new NullException(NullCases.NULL, "productId parameter");
 		}
 
-		for (ProductInstance productInstance : this.products) {
+		for (ProductInstance productInstance : this.getProducts()) {
 			if (productId.equals(productInstance.getIdProductInstance())) {
 				return productInstance;
 			}
@@ -327,8 +333,10 @@ public class PackagerInstance implements java.io.Serializable {
 		throw new NotFoundException(new ErrorCode("1.2.1.3.4"));
 	}
 
-	public void suspend(PackagerRequest request) throws NotRespectedRulesException, DriverException, NotFoundException,
-			MalformedXMLException, PackagerException, DataSourceException {
+	public void suspend(PackagerRequest request, ProductModelService productModelService,
+			ManualDriverFactory manualDriverFactory, PackagerActionHistoryService packagerActionHistoryService,
+			WebServiceUserService webServiceUserService) throws NotRespectedRulesException, DriverException,
+			NotFoundException, MalformedXMLException, PackagerException, DataSourceException {
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
 		}
@@ -354,9 +362,11 @@ public class PackagerInstance implements java.io.Serializable {
 		asList = completeProductModels(asList);
 		request.setProducts(new HashSet<ProductRequest>(asList));
 
-		PackagerModel.verifyXmlProperties(PackagerInstanceAction.SUSPEND, asList);
+		PackagerModel.verifyXmlProperties(PackagerInstanceAction.SUSPEND, asList, productModelService,
+				manualDriverFactory);
 
-		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.SUSPEND);
+		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.SUSPEND,
+				webServiceUserService);
 
 		if (this.getPackagerModel().isMultithreadedActions()) {
 			/*
@@ -368,7 +378,7 @@ public class PackagerInstance implements java.io.Serializable {
 			 */
 		} else {
 
-			for (ProductInstance productInstance : this.products) {
+			for (ProductInstance productInstance : getProducts()) {
 				State productState = productInstance.getCurrentState();
 
 				if (productState.equals(State.ACTIVABLE) || productState.equals(State.INPROGRESS)
@@ -418,7 +428,7 @@ public class PackagerInstance implements java.io.Serializable {
 	public State getCurrentState() throws DriverException {
 		List<State> productStates = new ArrayList<State>();
 
-		for (ProductInstance productInstance : this.products) {
+		for (ProductInstance productInstance : getProducts()) {
 
 			productStates.add(productInstance.getCurrentState());
 
@@ -459,7 +469,7 @@ public class PackagerInstance implements java.io.Serializable {
 		}
 
 		ProductRequest pr = null;
-		for (ProductInstance pi : this.products) {
+		for (ProductInstance pi : getProducts()) {
 			if (!productIdentifiers.contains(pi.getIdProductInstance())) {
 				try {
 					if (!(excludeCanceled && pi.getCurrentState().equals(State.CANCELED))) {
@@ -507,4 +517,27 @@ public class PackagerInstance implements java.io.Serializable {
 
 		return State.UNSTABLE;
 	}
+
+	public void updateReferences(PackagerActionHistory packagerHistory) throws DriverException {
+
+		if (packagerHistory == null) {
+			throw new NullException(NullCases.NULL, "packagerHistory parameter");
+		}
+		if ((packagerHistory.getPackagerActionPackagerHeaderDestinations() == null
+				|| packagerHistory.getPackagerActionPackagerHeaderDestinations().size() == 0)
+				&& (packagerHistory.getPackagerActionPackagerHeaderSources() == null
+						|| packagerHistory.getPackagerActionPackagerHeaderSources().size() == 0)) {
+			packagerHistory.addDestination(this);
+			packagerHistory.addSource(this);
+		}
+
+		for (ProductInstance pi : getProducts()) {
+			pi.updateReferences(packagerHistory);
+		}
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Packager [" + this.getRetailerPackagerId() + "]'s references have been updated.");
+		}
+	}
+
 }

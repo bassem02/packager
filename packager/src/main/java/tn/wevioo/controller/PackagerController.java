@@ -18,6 +18,8 @@ import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
 import nordnet.architecture.exceptions.implicit.NullException;
 import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import nordnet.drivers.contract.exceptions.DriverException;
+import tn.wevioo.ManualDriver;
+import tn.wevioo.ManualDriverFactory;
 import tn.wevioo.dto.PackagerInstanceDTO;
 import tn.wevioo.entities.PackagerActionHistory;
 import tn.wevioo.entities.PackagerInstance;
@@ -29,10 +31,11 @@ import tn.wevioo.model.request.PackagerRequest;
 import tn.wevioo.service.PackagerActionHistoryService;
 import tn.wevioo.service.PackagerInstanceService;
 import tn.wevioo.service.PackagerModelService;
+import tn.wevioo.service.ProductModelService;
+import tn.wevioo.service.WebServiceUserService;
 
 @RestController
 @EnableAutoConfiguration(exclude = JpaRepositoriesAutoConfiguration.class)
-// rest
 public class PackagerController extends AbstractFacade {
 
 	@Autowired
@@ -44,16 +47,31 @@ public class PackagerController extends AbstractFacade {
 	@Autowired
 	private PackagerActionHistoryService packagerActionHistoryService;
 
+	@Autowired
+	private ProductModelService productModelService;
+
+	@Autowired
+	private ManualDriverFactory manualDriverFactory;
+
+	@Autowired
+	private ManualDriver manualDriver;
+
+	@Autowired
+	private WebServiceUserService webServiceUserService;
+
 	@RequestMapping(value = "/createPackager", method = RequestMethod.POST)
-	public PackagerInstanceDTO createPackager(@RequestBody PackagerRequest request) {
+	public PackagerInstanceDTO createPackager(@RequestBody PackagerRequest request)
+			throws DriverException, NotRespectedRulesException, MalformedXMLException, PackagerException,
+			NotFoundException, DataSourceException {
 
 		PackagerModel packagerModel = packagerModelService.findByRetailerKey(request.getModel());
 		PackagerInstance createdPackagerInstance = null;
-		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.CREATE);
-		createdPackagerInstance = packagerModel.instantiate(request, history);
+		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.CREATE, webServiceUserService);
+		createdPackagerInstance = packagerModel.instantiate(request, history, productModelService, manualDriverFactory,
+				manualDriver);
 
 		packagerInstanceService.saveOrUpdate(createdPackagerInstance);
-		// packagerActionHistoryService.saveOrUpdate(history);
+		packagerActionHistoryService.saveOrUpdate(history);
 
 		return packagerInstanceService.convertToDTO(createdPackagerInstance);
 	}
@@ -62,14 +80,6 @@ public class PackagerController extends AbstractFacade {
 	public PackagerInstanceDTO getPackagerInstance(@QueryParam("retailerPackagerId") String retailerPackagerId) {
 		return packagerInstanceService
 				.convertToDTO(packagerInstanceService.findByRetailerPackagerId(retailerPackagerId));
-	}
-
-	@RequestMapping(value = "/cancelPackager", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void cancelPackager(@RequestBody PackagerRequest request) {
-
-		PackagerInstance packagerInstance = null;
-		packagerInstance = packagerInstanceService.findByRetailerPackagerId(request.getRetailerPackagerId());
-		// packagerInstance.cancel(request);
 	}
 
 	@RequestMapping(value = "/suspendPackager", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -81,7 +91,8 @@ public class PackagerController extends AbstractFacade {
 		PackagerInstance packagerInstance = null;
 		packagerInstance = packagerInstanceService.findByRetailerPackagerId(request.getRetailerPackagerId());
 		// try {
-		packagerInstance.suspend(request);
+		packagerInstance.suspend(request, productModelService, manualDriverFactory, packagerActionHistoryService,
+				webServiceUserService);
 		/*
 		 * } catch (ConverterException e) { Throwable originalEx =
 		 * super.findOriginalException(e); if (originalEx instanceof

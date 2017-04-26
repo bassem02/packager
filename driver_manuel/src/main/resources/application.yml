@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/test_driver_manual?useSSL=false
+    username: root
+    password: 
+    driverClassName: com.mysql.jdbc.Driver    
+  jpa:
+    database: MYSQL
+    show-sql: true
+    properties:
+      hibernate: 
+        dialect: org.hibernate.dialect.MySQL5Dialect
+    hibernate:
+      naming:
+        strategy: org.hibernate.cfg.ImprovedNamingStrategy
+server:
+  port: 8093

@@ -15,6 +15,10 @@ import javax.persistence.Table;
 @Table(name = "v_packager_info_product_license_key", catalog = "nn_packager_management_recette")
 public class VPackagerInfoProductLicenseKey implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private VPackagerInfoProductLicenseKeyId id;
 
 	public VPackagerInfoProductLicenseKey() {

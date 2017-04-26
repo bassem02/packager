@@ -1,14 +1,16 @@
 package tn.wevioo.entities;
 // Generated 28 mars 2017 22:31:56 by Hibernate Tools 5.2.1.Final
 
+import static javax.persistence.GenerationType.IDENTITY;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
@@ -24,6 +26,10 @@ import javax.persistence.TemporalType;
 @Table(name = "shipping_demand", catalog = "nn_packager_management_recette")
 public class ShippingDemand implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Integer packId;
 	private PackagerInstance packagerInstance;
 	private Integer id;

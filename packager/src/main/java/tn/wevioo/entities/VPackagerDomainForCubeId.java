@@ -10,6 +10,10 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class VPackagerDomainForCubeId implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String retailerPackagerId;
 	private String providerProductId;
 	private String domainName;

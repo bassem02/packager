@@ -15,6 +15,10 @@ import javax.persistence.Table;
 @Table(name = "v_packager_adminft", catalog = "nn_packager_management_recette")
 public class VPackagerAdminft implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private VPackagerAdminftId id;
 
 	public VPackagerAdminft() {

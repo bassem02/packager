@@ -15,6 +15,10 @@ import javax.persistence.Table;
 @Table(name = "vs_database_diagrams", catalog = "nn_packager_management_recette")
 public class VsDatabaseDiagrams implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private VsDatabaseDiagramsId id;
 
 	public VsDatabaseDiagrams() {

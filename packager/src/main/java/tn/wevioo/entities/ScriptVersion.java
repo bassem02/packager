@@ -2,6 +2,7 @@ package tn.wevioo.entities;
 // Generated 28 mars 2017 22:31:56 by Hibernate Tools 5.2.1.Final
 
 import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -16,6 +17,10 @@ import javax.persistence.TemporalType;
 @Table(name = "script_version", catalog = "nn_packager_management_recette")
 public class ScriptVersion implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String scriptName;
 	private int numScript;
 	private Date creationDate;

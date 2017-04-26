@@ -1,13 +1,15 @@
 package tn.wevioo.entities;
 // Generated 28 mars 2017 22:31:56 by Hibernate Tools 5.2.1.Final
 
+import static javax.persistence.GenerationType.IDENTITY;
+
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -22,6 +24,10 @@ import javax.persistence.Table;
 @Table(name = "retailer", catalog = "nn_packager_management_recette")
 public class Retailer implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7187040921953836022L;
 	private Integer idRetailer;
 	private String name;
 	private Set<PackagerInstance> packagerInstances = new HashSet<PackagerInstance>(0);

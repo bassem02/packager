@@ -4,6 +4,7 @@ package tn.wevioo.entities;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +27,7 @@ import javax.persistence.Transient;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.web.client.RestTemplate;
 
 import nordnet.architecture.exceptions.explicit.MalformedXMLException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
@@ -34,7 +36,6 @@ import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import nordnet.drivers.contract.ProductDriver;
 import nordnet.drivers.contract.exceptions.DriverException;
 import nordnet.drivers.contract.types.State;
-import nordnet.drivers.tools.Reference;
 import tn.wevioo.model.product.action.ProductInstanceAction;
 
 /**
@@ -56,7 +57,7 @@ public class ProductInstance implements java.io.Serializable {
 	private Date lastKnownStateUpdate;
 	private ProductInstance originalProductInstance = null;
 	private ProductDriver productDriver;
-	private Set<PackagerInstance> packagerSet = new HashSet<PackagerInstance>();
+	// private PackagerInstance packagerSet = new HashSet<PackagerInstance>();
 	private Set<PackagerInstanceProductInstance> packagerInstanceProductInstances = new HashSet<PackagerInstanceProductInstance>(
 			0);
 	private Set<ProductInstanceReference> productInstanceReferences = new HashSet<ProductInstanceReference>(0);
@@ -68,12 +69,21 @@ public class ProductInstance implements java.io.Serializable {
 
 	@Transient
 	public Set<PackagerInstance> getPackagerSet() {
-		return packagerSet;
+		Set<PackagerInstance> result = new HashSet<PackagerInstance>();
+		for (PackagerInstanceProductInstance packagerInstanceProductInstance : packagerInstanceProductInstances) {
+			result.add(packagerInstanceProductInstance.getPackagerInstance());
+		}
+		return result;
 	}
 
-	public void setPackagerSet(Set<PackagerInstance> packagerSet) {
-		this.packagerSet = packagerSet;
-	}
+	// @Transient
+	// public PackagerInstance getPackagerSet() {
+	// return packagerSet;
+	// }
+	//
+	// public void setPackagerSet(Set<PackagerInstance> packagerSet) {
+	// this.packagerSet = packagerSet;
+	// }
 
 	public ProductInstance(ProductModel productModel, String providerProductId, Date creationDate, Date lastUpdate) {
 		this.productModel = productModel;
@@ -99,6 +109,16 @@ public class ProductInstance implements java.io.Serializable {
 		this.productInstanceDiagnostics = productInstanceDiagnostics;
 	}
 
+	public ProductInstance(ProductDriver productDriver) {
+		if (productDriver == null) {
+			throw new NullException(NullCases.NULL, "productDriver parameter");
+		}
+		setProviderProductId(productDriver.getProviderProductId());
+		// this.providerProductId = productDriver.getProviderProductId();
+		// setProductDriver(productDriver);
+		// this.productDriver = productDriver;
+	}
+
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 
@@ -118,10 +138,6 @@ public class ProductInstance implements java.io.Serializable {
 
 	public void setOriginalProductInstance(ProductInstance originalProductInstance) {
 		this.originalProductInstance = originalProductInstance;
-	}
-
-	public void setProductDriver(ProductDriver productDriver) {
-		this.productDriver = productDriver;
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -222,8 +238,9 @@ public class ProductInstance implements java.io.Serializable {
 		this.productInstanceDiagnostics = productInstanceDiagnostics;
 	}
 
+	@Transient
 	public PackagerInstance getPackager() {
-		List<PackagerInstance> asList = new ArrayList<PackagerInstance>(packagerSet);
+		List<PackagerInstance> asList = new ArrayList<PackagerInstance>(getPackagerSet());
 
 		if (asList.size() > 0) {
 			return asList.get(0);
@@ -233,36 +250,23 @@ public class ProductInstance implements java.io.Serializable {
 	}
 
 	public void setPackager(PackagerInstance packager) {
-		this.packagerSet = new HashSet<PackagerInstance>();
+		PackagerInstanceProductInstance packagerInstanceProductInstance = new PackagerInstanceProductInstance();
+		// this.packagerSet = new HashSet<PackagerInstance>();
 		if (packager != null) {
-			this.packagerSet.add(packager);
+			packagerInstanceProductInstance.setPackagerInstance(packager);
+			packagerInstanceProductInstance.setProductInstance(this);
+			this.packagerInstanceProductInstances.add(packagerInstanceProductInstance);
+
 		}
 	}
 
-	public void cancel(String properties, PackagerActionHistory packagerHistory) {
-		/*
-		 * this.getProductDriver().cancel(properties);
-		 * 
-		 * ProductActionHistory history = null;
-		 * 
-		 * if (this.originalProductInstance == null) { history = new
-		 * ProductActionHistory(ProductInstanceAction.CANCEL, this, this,
-		 * properties); } else { history = new
-		 * ProductActionHistory(ProductInstanceAction.CANCEL,
-		 * this.originalProductInstance, this, properties); }
-		 * packagerHistory.addProductAction(history);
-		 * 
-		 * this.resetLastKnownState();
-		 * 
-		 * if
-		 * (this.productModel.getDriverFactory().getDriverInternalConfiguration(
-		 * ).areReferencesChangedOnCancelation()) { try {
-		 * this.updateReferences(packagerHistory); } catch (DriverException e) {
-		 * this.references.clear(); } }
-		 * 
-		 * if (LOGGER.isInfoEnabled()) { LOGGER.info("Product [" + getId() +
-		 * "] has been successfully canceled."); }
-		 */
+	@Transient
+	public ProductDriver getProductDriver() {
+		return productDriver;
+	}
+
+	public void setProductDriver(ProductDriver productDriver) {
+		this.productDriver = productDriver;
 	}
 
 	@Transient
@@ -284,20 +288,6 @@ public class ProductInstance implements java.io.Serializable {
 		}
 
 		return currentState;
-	}
-
-	@Transient
-	protected ProductDriver getProductDriver() throws DriverException {
-		if (productDriver == null) {
-			/*
-			 * try { productDriver =
-			 * this.productModel.getDriverFactory().findProduct(this.
-			 * providerProductId); } catch (NotFoundException ex) { throw new
-			 * DriverException(ex); }
-			 */
-		}
-
-		return productDriver;
 	}
 
 	public void suspend(final String properties, PackagerActionHistory packagerHistory)
@@ -339,7 +329,14 @@ public class ProductInstance implements java.io.Serializable {
 			throw new NullException(NullCases.NULL, "packagerHistory parameter");
 		}
 
-		List<Reference> newDriverReferences = this.getProductDriver().getReferences();
+		// List<Reference> newDriverReferences =
+		// this.getProductDriver().getReferences();
+		String url = "http://localhost:8093";
+		RestTemplate rest = new RestTemplate();
+
+		tn.wevioo.tools.Reference[] newDriverReference = (tn.wevioo.tools.Reference[]) rest
+				.getForObject(url + "/manual/getReferences", tn.wevioo.tools.Reference[].class);
+		List<tn.wevioo.tools.Reference> newDriverReferences = Arrays.asList(newDriverReference);
 
 		if (this.productInstanceReferences != null) {
 			this.productInstanceReferences.clear();
@@ -347,7 +344,7 @@ public class ProductInstance implements java.io.Serializable {
 			this.productInstanceReferences = new HashSet<ProductInstanceReference>();
 		}
 
-		for (Reference reference : newDriverReferences) {
+		for (tn.wevioo.tools.Reference reference : newDriverReferences) {
 			ProductInstanceReference newReference = new ProductInstanceReference();
 			newReference.setDiscriminatorType(reference.getKey().toString());
 			newReference.setDiscriminatorValue(reference.getValue());
@@ -371,9 +368,30 @@ public class ProductInstance implements java.io.Serializable {
 		}
 	}
 
-	private void addReference(ProductInstanceReference newReference) {
-		// TODO Auto-generated method stub
+	public void addReference(ProductInstanceReference reference) {
+		if (this.productInstanceReferences == null) {
+			this.productInstanceReferences = new HashSet<ProductInstanceReference>();
+		}
 
+		if (reference == null) {
+			throw new NullException(NullCases.NULL, "reference parameter");
+		}
+
+		if ((reference.getDiscriminatorType() == null) || (reference.getDiscriminatorType().trim().length() == 0)) {
+			throw new NullException(NullCases.NULL_EMPTY, "reference.type parameter");
+		}
+
+		if ((reference.getDiscriminatorValue() == null) || (reference.getDiscriminatorValue().trim().length() == 0)) {
+			throw new NullException(NullCases.NULL_EMPTY, "reference.value parameter");
+		}
+
+		if (reference.getProductInstance() != null) {
+			reference.getProductInstance().getProductInstanceReferences().remove(reference);
+		}
+
+		reference.setProductInstance(this);
+		reference.setCreationDate(new Date());
+		this.productInstanceReferences.add(reference);
 	}
 
 	public void resetLastKnownState() {

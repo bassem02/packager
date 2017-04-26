@@ -15,6 +15,10 @@ import javax.persistence.Table;
 @Table(name = "v_transformation", catalog = "nn_packager_management_recette")
 public class VTransformation implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private VTransformationId id;
 
 	public VTransformation() {

@@ -15,6 +15,10 @@ import javax.persistence.Table;
 @Table(name = "v_packager_domain_for_cube", catalog = "nn_packager_management_recette")
 public class VPackagerDomainForCube implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private VPackagerDomainForCubeId id;
 
 	public VPackagerDomainForCube() {

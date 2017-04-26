@@ -27,6 +27,7 @@ import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import nordnet.packager.bo.packager.action.PackagerInstanceAction;
 import nordnet.packager.tools.context.PackagerLogicTierBeanFactory;*/
 import tn.wevioo.model.packager.action.PackagerInstanceAction;
+import tn.wevioo.service.WebServiceUserService;
 import tn.wevioo.tools.context.ProductActionHistoryCreationDateComparator;
 
 /**
@@ -74,18 +75,16 @@ public class PackagerActionHistory implements java.io.Serializable {
 		this.packagerActionPackagerHeaderSources = packagerActionPackagerHeaderSources;
 	}
 
-	public PackagerActionHistory(PackagerInstanceAction action) {
-		/*
-		 * if (action == null) { throw new NullException(NullCases.NULL,
-		 * "action parameter"); }
-		 */
+	public PackagerActionHistory(PackagerInstanceAction action, WebServiceUserService webServiceUserService) {
+
+		if (action == null) {
+			throw new NullException(NullCases.NULL, "action parameter");
+		}
 
 		// this.packagerAction = action;
 		this.packagerAction = action.toString();
 		this.creationDate = new Date();
-		// this.webServiceUser =
-		// PackagerLogicTierBeanFactory.getWebServiceUserService().getAuthenticatedUser();
-		this.webServiceUser = null;
+		this.webServiceUser = webServiceUserService.findById(7);
 	}
 
 	@Id

@@ -2,6 +2,7 @@ package tn.wevioo.entities;
 // Generated 28 mars 2017 22:31:56 by Hibernate Tools 5.2.1.Final
 
 import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
@@ -11,6 +12,10 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class VPackagerId implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Date packagerCreationDate;
 	private String retailerPackagerId;
 	private String packagerRetailerKey;
