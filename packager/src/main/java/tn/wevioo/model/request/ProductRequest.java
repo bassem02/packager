@@ -4,14 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
-import nordnet.drivers.tools.ReferenceKeys;
-import tn.wevioo.model.packager.action.PackagerInstanceAction;
-
-/*import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
 import nordnet.architecture.exceptions.implicit.NullException;
 import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import nordnet.architecture.exceptions.utils.ErrorCode;
-import nordnet.drivers.tools.ReferenceKeys;*/
+import nordnet.drivers.tools.ReferenceKeys;
+import tn.wevioo.model.packager.action.PackagerInstanceAction;
 
 /**
  * The class ProductRequest defines a specific skeleton in order to ask action
@@ -51,24 +48,6 @@ public class ProductRequest {
 	 * Product reference requests.
 	 */
 	private List<ProductReferenceRequest> references = null;
-
-	/**
-	 * The methoproductRequestsd validate verifies if the current product
-	 * request is right enough to perform the received action on a product
-	 * instance, i.e. it verifies if all required and forbidden attributes
-	 * correspond to the requirements of the action.
-	 * 
-	 * <p>
-	 * 
-	 * This method does not validate the Xml properties, as they could have to
-	 * be merged with other ones before.
-	 * 
-	 * @param action
-	 *            The action which will is going to be performed on the
-	 *            corresponding product instance. Cannot be null.
-	 * @throws NotRespectedRulesException
-	 *             custom exception.
-	 */
 
 	public void setProductId(Long productId) {
 		this.productId = productId;
@@ -113,22 +92,20 @@ public class ProductRequest {
 		this.references = references;
 	}
 
-	public void validate(PackagerInstanceAction action) {
+	public void validate(PackagerInstanceAction action) throws NotRespectedRulesException {
 		if (action == null) {
-			// throw new NullException(NullCases.NULL, "action parameter");
+			throw new NullException(NullCases.NULL, "action parameter");
 		}
 
 		switch (action) {
 		case CREATE:
 		case IMPORT:
 			if (this.productId != null) {
-				// throw new NotRespectedRulesException(new
-				// ErrorCode("1.2.1.1.11"), new Object[]{ this.productId });
+				throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.11"), new Object[] { this.productId });
 			}
 
 			if ((this.model == null) || (this.model.trim().length() == 0)) {
-				// throw new NullException(NullCases.NULL_EMPTY, "product's
-				// request model key");
+				throw new NullException(NullCases.NULL_EMPTY, "product's request model key");
 			}
 			break;
 
@@ -138,8 +115,7 @@ public class ProductRequest {
 		case MERGE_DESTINATION:
 			if (this.productId == null) {
 				if ((this.model == null) || (this.model.trim().length() == 0)) {
-					// throw new NullException(NullCases.NULL_EMPTY, "product's
-					// request model key");
+					throw new NullException(NullCases.NULL_EMPTY, "product's request model key");
 				}
 			}
 			break;
@@ -154,36 +130,30 @@ public class ProductRequest {
 		case MERGE_SOURCE:
 		case TRANSLOCATE_PRODUCT:
 			if (this.productId == null) {
-				// throw new NullException(NullCases.NULL, "product's request
-				// product identifier");
+				throw new NullException(NullCases.NULL, "product's request product identifier");
 			}
 			break;
 		case IMPORT_REFERENCES:
 			if (this.providerProductId == null || this.providerProductId.trim().equals("")) {
-				// throw new NullException(NullCases.NULL_EMPTY, "product's
-				// request provider product identifier");
+				throw new NullException(NullCases.NULL_EMPTY, "product's request provider product identifier");
 			}
 			if (this.model == null || this.model.trim().equals("")) {
-				// throw new NullException(NullCases.NULL_EMPTY, "product's
-				// request model key");
+				throw new NullException(NullCases.NULL_EMPTY, "product's request model key");
 			}
 			break;
 		default:
-			// throw new NotRespectedRulesException(new ErrorCode("0.2.2.2"),
-			// new Object[]{ action });
+			throw new NotRespectedRulesException(new ErrorCode("0.2.2.2"), new Object[] { action });
 		}
 
 		if (action.equals(PackagerInstanceAction.IMPORT)) {
 			if ((this.providerProductId == null) || (this.providerProductId.trim().length() == 0)) {
-				// throw new NullException(NullCases.NULL_EMPTY, "product's
-				// request provider product identifier");
+				throw new NullException(NullCases.NULL_EMPTY, "product's request provider product identifier");
 			}
 		}
 		if (action.equals(PackagerInstanceAction.CHANGE_PROPERTIES)
 				|| action.equals(PackagerInstanceAction.TRANSFORM)) {
 			if ((this.properties == null) || (this.properties.trim().length() == 0)) {
-				// throw new NullException(NullCases.NULL_EMPTY, "product's
-				// request properties");
+				throw new NullException(NullCases.NULL_EMPTY, "product's request properties");
 			}
 		}
 
@@ -191,11 +161,10 @@ public class ProductRequest {
 			boolean hasProviderProductId = false;
 
 			if (this.references == null || this.references.size() == 0) {
-				/*
-				 * throw new NotRespectedRulesException(new
-				 * ErrorCode("0.2.1.3.2"), new Object[]{ "reference",
-				 * "product request", this.providerProductId });
-				 */
+
+				throw new NotRespectedRulesException(new ErrorCode("0.2.1.3.2"),
+						new Object[] { "reference", "product request", this.providerProductId });
+
 			}
 
 			for (ProductReferenceRequest reference : references) {
@@ -205,21 +174,19 @@ public class ProductRequest {
 					if (reference.getValue().equals(this.providerProductId)) {
 						hasProviderProductId = true;
 					} else {
-						/*
-						 * throw new NotRespectedRulesException(new
-						 * ErrorCode("1.2.1.1.18"), new Object[] {
-						 * reference.getValue(), this.providerProductId });
-						 */
+
+						throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.18"),
+								new Object[] { reference.getValue(), this.providerProductId });
+
 					}
 				}
 			}
 
 			if (!hasProviderProductId) {
-				/*
-				 * throw new NotRespectedRulesException(new
-				 * ErrorCode("1.2.1.3.5"), new Object[] { this.providerProductId
-				 * });
-				 */
+
+				throw new NotRespectedRulesException(new ErrorCode("1.2.1.3.5"),
+						new Object[] { this.providerProductId });
+
 			}
 		}
 	}

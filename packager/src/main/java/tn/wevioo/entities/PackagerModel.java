@@ -20,7 +20,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,12 +34,9 @@ import nordnet.architecture.exceptions.implicit.NullException;
 import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import nordnet.architecture.exceptions.utils.ErrorCode;
 import nordnet.drivers.contract.exceptions.DriverException;
-import nordnet.drivers.contract.types.Action;
-import nordnet.drivers.contract.types.FeasibilityTestResult;
 import tn.wevioo.ManualDriver;
 import tn.wevioo.ManualDriverFactory;
 import tn.wevioo.exceptions.PackagerException;
-import tn.wevioo.model.packager.PackagingConfiguration;
 import tn.wevioo.model.packager.action.PackagerInstanceAction;
 import tn.wevioo.model.request.PackagerRequest;
 import tn.wevioo.model.request.ProductRequest;
@@ -63,7 +59,6 @@ public class PackagerModel implements java.io.Serializable {
 	private Date creationDate;
 	private Date lastUpdate;
 	private boolean multithreadedActions;
-	private Set<PackagingConfiguration> packagingConfigurations;
 	private Set<Retailer> retailers = new HashSet<Retailer>(0);
 	private Set<PackagerInstance> packagerInstances = new HashSet<PackagerInstance>(0);
 	private Set<PackagerModelShippableItemConfiguration> packagerModelShippableItemConfigurations = new HashSet<PackagerModelShippableItemConfiguration>(
@@ -126,15 +121,6 @@ public class PackagerModel implements java.io.Serializable {
 
 	public void setRetailerKey(String retailerKey) {
 		this.retailerKey = retailerKey;
-	}
-
-	@Transient
-	public Set<PackagingConfiguration> getPackagingConfigurations() {
-		return packagingConfigurations;
-	}
-
-	public void setPackagingConfigurations(Set<PackagingConfiguration> packagingConfigurations) {
-		this.packagingConfigurations = packagingConfigurations;
 	}
 
 	@Column(name = "old_retailer_key", nullable = false)
@@ -331,57 +317,68 @@ public class PackagerModel implements java.io.Serializable {
 		if (requests == null) {
 			throw new NullException(NullCases.NULL, "requests parameter");
 		}
-
-		for (ProductRequest productRequest : requests) {
-			ProductModel productModel = productModelService.findByRetailerKey(productRequest.getModel());
-
-			switch (action) {
-			case CHANGE_PROPERTIES:
-			case TRANSFORM:
-			case SPLIT_DESTINATION:
-			case MERGE_DESTINATION:
-			case TRANSLOCATE_PRODUCT:
-
-				manualDriverFactory.verifyXmlProperties(Action.CHANGE_PROPERTIES, productRequest.getProperties());
-				break;
-			case ACTIVATE:
-				manualDriverFactory.verifyXmlProperties(Action.ACTIVATE, productRequest.getProperties());
-				break;
-			case SUSPEND:
-				manualDriverFactory.verifyXmlProperties(Action.SUSPEND, productRequest.getProperties());
-				break;
-			case REACTIVATE:
-				manualDriverFactory.verifyXmlProperties(Action.REACTIVATE, productRequest.getProperties());
-				break;
-			case RESET:
-				manualDriverFactory.verifyXmlProperties(Action.RESET, productRequest.getProperties());
-				break;
-			case DELETE:
-				manualDriverFactory.verifyXmlProperties(Action.DELETE, productRequest.getProperties());
-				break;
-			case CANCEL:
-			case SPLIT_SOURCE:
-			case MERGE_SOURCE:
-				manualDriverFactory.verifyXmlProperties(Action.CANCEL, productRequest.getProperties());
-
-				break;
-			case CREATE:
-
-				FeasibilityTestResult fr = manualDriverFactory
-						.testFeasibilityForProductCreation(productRequest.getProperties());
-				if (!fr.getPossible()) {
-					if (fr.getExceptionCause() == null) {
-						throw new NotRespectedRulesException(new ErrorCode("1.2.2.25"), new Exception(fr.getMotive()));
-					} else {
-						throw new NotRespectedRulesException(new ErrorCode("1.2.2.25"), fr.getExceptionCause());
-					}
-				}
-
-				break;
-			default:
-				throw new NotRespectedRulesException(new ErrorCode("0.2.2.2"), new Object[] { action });
-			}
-		}
+		//
+		// for (ProductRequest productRequest : requests) {
+		// ProductModel productModel =
+		// productModelService.findByRetailerKey(productRequest.getModel());
+		//
+		// switch (action) {
+		// case CHANGE_PROPERTIES:
+		// case TRANSFORM:
+		// case SPLIT_DESTINATION:
+		// case MERGE_DESTINATION:
+		// case TRANSLOCATE_PRODUCT:
+		//
+		// manualDriverFactory.verifyXmlProperties(Action.CHANGE_PROPERTIES,
+		// productRequest.getProperties());
+		// break;
+		// case ACTIVATE:
+		// manualDriverFactory.verifyXmlProperties(Action.ACTIVATE,
+		// productRequest.getProperties());
+		// break;
+		// case SUSPEND:
+		// manualDriverFactory.verifyXmlProperties(Action.SUSPEND,
+		// productRequest.getProperties());
+		// break;
+		// case REACTIVATE:
+		// manualDriverFactory.verifyXmlProperties(Action.REACTIVATE,
+		// productRequest.getProperties());
+		// break;
+		// case RESET:
+		// manualDriverFactory.verifyXmlProperties(Action.RESET,
+		// productRequest.getProperties());
+		// break;
+		// case DELETE:
+		// manualDriverFactory.verifyXmlProperties(Action.DELETE,
+		// productRequest.getProperties());
+		// break;
+		// case CANCEL:
+		// case SPLIT_SOURCE:
+		// case MERGE_SOURCE:
+		// manualDriverFactory.verifyXmlProperties(Action.CANCEL,
+		// productRequest.getProperties());
+		//
+		// break;
+		// case CREATE:
+		//
+		// FeasibilityTestResult fr = manualDriverFactory
+		// .testFeasibilityForProductCreation(productRequest.getProperties());
+		// if (!fr.getPossible()) {
+		// if (fr.getExceptionCause() == null) {
+		// throw new NotRespectedRulesException(new ErrorCode("1.2.2.25"), new
+		// Exception(fr.getMotive()));
+		// } else {
+		// throw new NotRespectedRulesException(new ErrorCode("1.2.2.25"),
+		// fr.getExceptionCause());
+		// }
+		// }
+		//
+		// break;
+		// default:
+		// throw new NotRespectedRulesException(new ErrorCode("0.2.2.2"), new
+		// Object[] { action });
+		// }
+		// }
 
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Properties are valid.");
@@ -406,7 +403,7 @@ public class PackagerModel implements java.io.Serializable {
 
 		for (String key : productOccurences.keySet()) {
 			boolean foundConfig = false;
-			for (PackagingConfiguration config : this.packagingConfigurations) {
+			for (PackagerModelProductModel config : this.packagerModelProductModels) {
 				if (config.getProductModel().getRetailerKey().equals(key)) {
 					foundConfig = true;
 					if (productOccurences.get(key) < config.getMinimumInstances()) {
@@ -428,7 +425,7 @@ public class PackagerModel implements java.io.Serializable {
 			}
 		}
 
-		for (PackagingConfiguration pc : this.packagingConfigurations) {
+		for (PackagerModelProductModel pc : this.packagerModelProductModels) {
 			if (pc.getMinimumInstances() != 0) {
 				if (!productOccurences.keySet().contains(pc.getProductModel().getRetailerKey())) {
 					throw new NotRespectedRulesException(new ErrorCode("1.2.2.23"),

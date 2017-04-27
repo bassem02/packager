@@ -16,6 +16,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -63,22 +65,23 @@ public class PackagerInstance implements java.io.Serializable {
 	private Date creationDate;
 	private Date lastUpdate;
 	private String toto;
-
-	@Transient
-	public Set<ProductInstance> getProducts() {
-		Set<ProductInstance> result = new HashSet<ProductInstance>();
-		for (PackagerInstanceProductInstance packagerInstanceProductInstance : packagerInstanceProductInstances) {
-			result.add(packagerInstanceProductInstance.getProductInstance());
-		}
-		return result;
-	}
-
 	private Set<ShippingDemand> shippingDemands = new HashSet<ShippingDemand>(0);
 	private Set<FailedShippingDemand> failedShippingDemands = new HashSet<FailedShippingDemand>(0);
-	private Set<PackagerInstanceProductInstance> packagerInstanceProductInstances = new HashSet<PackagerInstanceProductInstance>(
-			0);
+	private Set<ProductInstance> products = new HashSet<ProductInstance>(0);
 
 	public PackagerInstance() {
+	}
+
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinTable(name = "packager_instance_product_instance", joinColumns = {
+			@JoinColumn(name = "id_packager_instance", nullable = false, updatable = false) }, inverseJoinColumns = {
+					@JoinColumn(name = "id_product_instance", nullable = false, updatable = false) })
+	public Set<ProductInstance> getProducts() {
+		return products;
+	}
+
+	public void setProducts(Set<ProductInstance> products) {
+		this.products = products;
 	}
 
 	public PackagerInstance(PackagerModel packagerModel, Retailer retailer, String retailerPackagerId,
@@ -92,8 +95,7 @@ public class PackagerInstance implements java.io.Serializable {
 
 	public PackagerInstance(PackagerModel packagerModel, Retailer retailer, String retailerPackagerId,
 			Date creationDate, Date lastUpdate, String toto, Set<ShippingDemand> shippingDemands,
-			Set<FailedShippingDemand> failedShippingDemands,
-			Set<PackagerInstanceProductInstance> packagerInstanceProductInstances) {
+			Set<FailedShippingDemand> failedShippingDemands) {
 		this.packagerModel = packagerModel;
 		this.retailer = retailer;
 		this.retailerPackagerId = retailerPackagerId;
@@ -102,7 +104,6 @@ public class PackagerInstance implements java.io.Serializable {
 		this.toto = toto;
 		this.shippingDemands = shippingDemands;
 		this.failedShippingDemands = failedShippingDemands;
-		this.packagerInstanceProductInstances = packagerInstanceProductInstances;
 	}
 
 	@Id
@@ -193,31 +194,8 @@ public class PackagerInstance implements java.io.Serializable {
 		this.failedShippingDemands = failedShippingDemands;
 	}
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "packagerInstance")
-	public Set<PackagerInstanceProductInstance> getPackagerInstanceProductInstances() {
-		return this.packagerInstanceProductInstances;
-	}
-
-	public void setPackagerInstanceProductInstances(
-			Set<PackagerInstanceProductInstance> packagerInstanceProductInstances) {
-		this.packagerInstanceProductInstances = packagerInstanceProductInstances;
-	}
-
 	public void addProductInstance(ProductInstance productInstance) {
-
-		if (productInstance == null) {
-			throw new NullException(NullCases.NULL, "instance parameter");
-		}
-
-		if (this.packagerInstanceProductInstances == null) {
-			this.packagerInstanceProductInstances = new HashSet<PackagerInstanceProductInstance>();
-		}
-
-		PackagerInstanceProductInstance packagerInstanceProductInstance = new PackagerInstanceProductInstance();
-		packagerInstanceProductInstance.setPackagerInstance(this);
-		packagerInstanceProductInstance.setProductInstance(productInstance);
-		this.packagerInstanceProductInstances.add(packagerInstanceProductInstance);
-		// productInstance.setPackager(this);
+		this.products.add(productInstance);
 	}
 
 	public void cancel(PackagerRequest request, ProductModelService productModelService,
@@ -277,7 +255,7 @@ public class PackagerInstance implements java.io.Serializable {
 		}
 
 		for (ProductRequest productRequest : request.getProducts()) {
-			if (productId.equals(productRequest.getProductId())) {
+			if (productId.toString().equals(productRequest.getProductId().toString())) {
 				return productRequest;
 			}
 		}
@@ -325,7 +303,7 @@ public class PackagerInstance implements java.io.Serializable {
 		}
 
 		for (ProductInstance productInstance : this.getProducts()) {
-			if (productId.equals(productInstance.getIdProductInstance())) {
+			if (productId.toString().equals(productInstance.getIdProductInstance().toString())) {
 				return productInstance;
 			}
 		}
@@ -350,11 +328,13 @@ public class PackagerInstance implements java.io.Serializable {
 
 		State packagerState = this.getCurrentState();
 
-		if (!packagerState.equals(State.INPROGRESS) && !packagerState.equals(State.ACTIVABLE)
-				&& !packagerState.equals(State.ACTIVE) && !packagerState.equals(State.DELIVERED)) {
-			throw new NotRespectedRulesException(new ErrorCode("1.2.2.18"),
-					new Object[] { this.retailerPackagerId, "SUSPENDABLE" });
-		}
+		// if (!packagerState.equals(State.INPROGRESS) &&
+		// !packagerState.equals(State.ACTIVABLE)
+		// && !packagerState.equals(State.ACTIVE) &&
+		// !packagerState.equals(State.DELIVERED)) {
+		// throw new NotRespectedRulesException(new ErrorCode("1.2.2.18"),
+		// new Object[] { this.retailerPackagerId, "SUSPENDABLE" });
+		// }
 
 		request.validate(PackagerInstanceAction.SUSPEND);
 		List<ProductRequest> asList = new ArrayList<ProductRequest>(request.getProducts());
@@ -416,6 +396,7 @@ public class PackagerInstance implements java.io.Serializable {
 
 		history.addSource(this);
 		history.addDestination(this);
+		history.setLastUpdate(new Date());
 
 		packagerActionHistoryService.saveOrUpdate(history);
 
@@ -537,6 +518,85 @@ public class PackagerInstance implements java.io.Serializable {
 
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("Packager [" + this.getRetailerPackagerId() + "]'s references have been updated.");
+		}
+	}
+
+	public void activate(PackagerRequest request, ProductModelService productModelService,
+			ManualDriverFactory manualDriverFactory, PackagerActionHistoryService packagerActionHistoryService,
+			WebServiceUserService webServiceUserService) throws NotRespectedRulesException, DriverException,
+			NotFoundException, MalformedXMLException, PackagerException, DataSourceException {
+		if (request == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+
+		if (!request.getRetailerPackagerId().equals(this.retailerPackagerId)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.9"),
+					new Object[] { request.getRetailerPackagerId(), this.retailerPackagerId });
+		}
+
+		if (!this.getCurrentState().equals(State.ACTIVABLE)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.2.18"),
+					new Object[] { this.retailerPackagerId, State.ACTIVABLE.toString() });
+		}
+		request.validate(PackagerInstanceAction.ACTIVATE);
+		List<ProductRequest> asList = new ArrayList<ProductRequest>(request.getProducts());
+		verifyProductModels(asList);
+		asList = completeProductModels(asList);
+		request.setProducts(new HashSet<ProductRequest>(asList));
+
+		PackagerModel.verifyXmlProperties(PackagerInstanceAction.ACTIVATE, asList, productModelService,
+				manualDriverFactory);
+
+		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.ACTIVATE,
+				webServiceUserService);
+
+		if (this.getPackagerModel().isMultithreadedActions()) {
+			// PackagerTaskExecutor packagerTaskExecutor =
+			// (PackagerTaskExecutor) PackagerLogicTierBeanFactory
+			// .getInstance().getBean("activatePackagerTaskExecutor");
+			// packagerTaskExecutor.initialize(this, request, history, false);
+			// packagerTaskExecutor.execute();
+		} else {
+			for (ProductInstance productInstance : this.products) {
+				if (productInstance.getCurrentState().equals(State.ACTIVABLE)) {
+					ProductRequest productRequest = this.getProductRequest(request,
+							productInstance.getIdProductInstance());
+
+					if (productRequest == null) {
+						try {
+							productInstance.activate(null, history);
+						} catch (UnsupportedActionException e) {
+							// If the activation action is not supported the
+							// process continues
+							if (LOGGER.isWarnEnabled()) {
+								LOGGER.warn("Activate opperation not supported for productInstance ["
+										+ productInstance.getIdProductInstance() + "]");
+							}
+						}
+					} else {
+						try {
+							productInstance.activate(productRequest.getProperties(), history);
+						} catch (UnsupportedActionException e) {
+							// If the activation action is not supported the
+							// process continues
+							if (LOGGER.isWarnEnabled()) {
+								LOGGER.warn("Activate opperation not supported for productInstance ["
+										+ productInstance.getIdProductInstance() + "]");
+							}
+						}
+					}
+				}
+			}
+		}
+
+		history.addSource(this);
+		history.addDestination(this);
+		history.setLastUpdate(new Date());
+
+		packagerActionHistoryService.saveOrUpdate(history);
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Packager [" + this.getRetailerPackagerId() + "] has been successfully activated.");
 		}
 	}
 

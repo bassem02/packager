@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -57,33 +58,13 @@ public class ProductInstance implements java.io.Serializable {
 	private Date lastKnownStateUpdate;
 	private ProductInstance originalProductInstance = null;
 	private ProductDriver productDriver;
-	// private PackagerInstance packagerSet = new HashSet<PackagerInstance>();
-	private Set<PackagerInstanceProductInstance> packagerInstanceProductInstances = new HashSet<PackagerInstanceProductInstance>(
-			0);
 	private Set<ProductInstanceReference> productInstanceReferences = new HashSet<ProductInstanceReference>(0);
 	private Set<ShippingDemand> shippingDemands = new HashSet<ShippingDemand>(0);
 	private Set<ProductInstanceDiagnostic> productInstanceDiagnostics = new HashSet<ProductInstanceDiagnostic>(0);
+	private Set<PackagerInstance> packagers = new HashSet<PackagerInstance>(0);
 
 	public ProductInstance() {
 	}
-
-	@Transient
-	public Set<PackagerInstance> getPackagerSet() {
-		Set<PackagerInstance> result = new HashSet<PackagerInstance>();
-		for (PackagerInstanceProductInstance packagerInstanceProductInstance : packagerInstanceProductInstances) {
-			result.add(packagerInstanceProductInstance.getPackagerInstance());
-		}
-		return result;
-	}
-
-	// @Transient
-	// public PackagerInstance getPackagerSet() {
-	// return packagerSet;
-	// }
-	//
-	// public void setPackagerSet(Set<PackagerInstance> packagerSet) {
-	// this.packagerSet = packagerSet;
-	// }
 
 	public ProductInstance(ProductModel productModel, String providerProductId, Date creationDate, Date lastUpdate) {
 		this.productModel = productModel;
@@ -93,17 +74,14 @@ public class ProductInstance implements java.io.Serializable {
 	}
 
 	public ProductInstance(ProductModel productModel, String providerProductId, Date creationDate, Date lastUpdate,
-			String lastKnownState, Date lastKnownStateUpdate,
-			Set<PackagerInstanceProductInstance> packagerInstanceProductInstances,
-			Set<ProductInstanceReference> productInstanceReferences, Set<ShippingDemand> shippingDemands,
-			Set<ProductInstanceDiagnostic> productInstanceDiagnostics) {
+			String lastKnownState, Date lastKnownStateUpdate, Set<ProductInstanceReference> productInstanceReferences,
+			Set<ShippingDemand> shippingDemands, Set<ProductInstanceDiagnostic> productInstanceDiagnostics) {
 		this.productModel = productModel;
 		this.providerProductId = providerProductId;
 		this.creationDate = creationDate;
 		this.lastUpdate = lastUpdate;
 		this.lastKnownState = lastKnownState;
 		this.lastKnownStateUpdate = lastKnownStateUpdate;
-		this.packagerInstanceProductInstances = packagerInstanceProductInstances;
 		this.productInstanceReferences = productInstanceReferences;
 		this.shippingDemands = shippingDemands;
 		this.productInstanceDiagnostics = productInstanceDiagnostics;
@@ -115,8 +93,20 @@ public class ProductInstance implements java.io.Serializable {
 		}
 		setProviderProductId(productDriver.getProviderProductId());
 		// this.providerProductId = productDriver.getProviderProductId();
-		// setProductDriver(productDriver);
+		setProductDriver(productDriver);
 		// this.productDriver = productDriver;
+	}
+
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinTable(name = "packager_instance_product_instance", joinColumns = {
+			@JoinColumn(name = "id_product_instance", nullable = false, updatable = false) }, inverseJoinColumns = {
+					@JoinColumn(name = "id_packager_instance", nullable = false, updatable = false) })
+	public Set<PackagerInstance> getPackagers() {
+		return packagers;
+	}
+
+	public void setPackagers(Set<PackagerInstance> packagers) {
+		this.packagers = packagers;
 	}
 
 	@Id
@@ -199,16 +189,6 @@ public class ProductInstance implements java.io.Serializable {
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "productInstance")
-	public Set<PackagerInstanceProductInstance> getPackagerInstanceProductInstances() {
-		return this.packagerInstanceProductInstances;
-	}
-
-	public void setPackagerInstanceProductInstances(
-			Set<PackagerInstanceProductInstance> packagerInstanceProductInstances) {
-		this.packagerInstanceProductInstances = packagerInstanceProductInstances;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "productInstance")
 	public Set<ProductInstanceReference> getProductInstanceReferences() {
 		return this.productInstanceReferences;
 	}
@@ -240,23 +220,12 @@ public class ProductInstance implements java.io.Serializable {
 
 	@Transient
 	public PackagerInstance getPackager() {
-		List<PackagerInstance> asList = new ArrayList<PackagerInstance>(getPackagerSet());
+		List<PackagerInstance> asList = new ArrayList<PackagerInstance>(getPackagers());
 
 		if (asList.size() > 0) {
 			return asList.get(0);
 		} else {
 			return null;
-		}
-	}
-
-	public void setPackager(PackagerInstance packager) {
-		PackagerInstanceProductInstance packagerInstanceProductInstance = new PackagerInstanceProductInstance();
-		// this.packagerSet = new HashSet<PackagerInstance>();
-		if (packager != null) {
-			packagerInstanceProductInstance.setPackagerInstance(packager);
-			packagerInstanceProductInstance.setProductInstance(this);
-			this.packagerInstanceProductInstances.add(packagerInstanceProductInstance);
-
 		}
 	}
 
@@ -272,9 +241,12 @@ public class ProductInstance implements java.io.Serializable {
 	@Transient
 	public State getCurrentState() throws DriverException {
 
-		State currentState = this.getProductDriver().getCurrentState();
-
-		String currentState_string = currentState.toString();
+		// State currentState = this.getProductDriver().getCurrentState();
+		String url = "http://localhost:8093";
+		RestTemplate rest = new RestTemplate();
+		System.out.println("ref=  " + this.getProviderProductId());
+		String currentState_string = (String) rest
+				.getForObject(url + "/manual/getCurrentState?ref=" + this.getProviderProductId(), String.class);
 		String productInstanceStatus = this.getLastKnownState();
 
 		if (!currentState_string.equals(productInstanceStatus)) {
@@ -283,11 +255,11 @@ public class ProductInstance implements java.io.Serializable {
 		}
 
 		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("Product [" + this.getIdProductInstance() + "]'s current state : [" + currentState.toString()
-					+ "]");
+			LOGGER.info(
+					"Product [" + this.getIdProductInstance() + "]'s current state : [" + currentState_string + "]");
 		}
 
-		return currentState;
+		return State.valueOf(currentState_string.toString());
 	}
 
 	public void suspend(final String properties, PackagerActionHistory packagerHistory)
@@ -301,7 +273,16 @@ public class ProductInstance implements java.io.Serializable {
 			throw new NullException(NullCases.NULL, "packagerHistory parameter");
 		}
 
-		this.getProductDriver().suspend(properties);
+		// this.getProductDriver().suspend(properties);
+
+		String url = "http://localhost:8093";
+		RestTemplate rest = new RestTemplate();
+
+		System.out.println(
+				url + "/manual/suspendProduct?properties=" + properties + "&ppid=" + this.getProviderProductId());
+		String result = (String) rest.getForObject(
+				url + "/manual/suspendProduct?properties=" + properties + "&ppid=" + this.getProviderProductId(),
+				String.class);
 
 		ProductActionHistory history = new ProductActionHistory(ProductInstanceAction.SUSPEND, this, this, properties);
 		packagerHistory.addProductAction(history);
@@ -397,5 +378,52 @@ public class ProductInstance implements java.io.Serializable {
 	public void resetLastKnownState() {
 		this.lastKnownState = null;
 		this.lastKnownStateUpdate = null;
+	}
+
+	public void activate(final String properties, PackagerActionHistory packagerHistory)
+			throws DriverException, MalformedXMLException, NotRespectedRulesException {
+
+		if ((properties != null) && (properties.trim().length() == 0)) {
+			throw new NullException(NullCases.EMPTY, "properties parameter");
+		}
+
+		if (packagerHistory == null) {
+			throw new NullException(NullCases.NULL, "packagerHistory parameter");
+		}
+
+		// this.getProductDriver().activate(properties);
+
+		String url = "http://localhost:8093";
+		RestTemplate rest = new RestTemplate();
+
+		String result = (String) rest.getForObject(
+				url + "/manual/activateProduct?properties=" + properties + "&ppid=" + this.getProviderProductId(),
+				String.class);
+
+		ProductActionHistory history = null;
+
+		if (this.originalProductInstance == null) {
+			history = new ProductActionHistory(ProductInstanceAction.ACTIVATE, this, this, properties);
+		} else {
+			history = new ProductActionHistory(ProductInstanceAction.ACTIVATE, this.originalProductInstance, this,
+					properties);
+		}
+		packagerHistory.addProductAction(history);
+
+		this.resetLastKnownState();
+
+		// if
+		// (this.productModel.getDriverFactory().getDriverInternalConfiguration().areReferencesChangedOnActivation())
+		// {
+		try {
+			this.updateReferences(packagerHistory);
+		} catch (DriverException e) {
+			this.productInstanceReferences.clear();
+		}
+		// }
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Product [" + getIdProductInstance() + "] has been successfully activated.");
+		}
 	}
 }
