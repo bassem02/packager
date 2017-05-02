@@ -3,6 +3,7 @@ package tn.wevioo.entities;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +29,7 @@ import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfig
 
 import nordnet.architecture.exceptions.explicit.DataSourceException;
 import nordnet.architecture.exceptions.explicit.MalformedXMLException;
+import nordnet.architecture.exceptions.explicit.MalformedXMLException.MalformedCases;
 import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
 import nordnet.architecture.exceptions.implicit.NullException;
@@ -37,9 +39,11 @@ import nordnet.drivers.contract.exceptions.DriverException;
 import tn.wevioo.ManualDriver;
 import tn.wevioo.ManualDriverFactory;
 import tn.wevioo.exceptions.PackagerException;
+import tn.wevioo.feasibility.FeasibilityResult;
 import tn.wevioo.model.packager.action.PackagerInstanceAction;
 import tn.wevioo.model.request.PackagerRequest;
 import tn.wevioo.model.request.ProductRequest;
+import tn.wevioo.service.PackagerInstanceService;
 import tn.wevioo.service.ProductModelService;
 
 /**
@@ -391,6 +395,7 @@ public class PackagerModel implements java.io.Serializable {
 		Map<String, Integer> productOccurences = new HashMap<String, Integer>();
 
 		if (requests != null) {
+			System.out.println("model = " + requests);
 			for (ProductRequest productRequest : requests) {
 				if (productOccurences.containsKey(productRequest.getModel())) {
 					productOccurences.put(productRequest.getModel(),
@@ -425,7 +430,7 @@ public class PackagerModel implements java.io.Serializable {
 			}
 		}
 
-		for (PackagerModelProductModel pc : this.packagerModelProductModels) {
+		for (PackagerModelProductModel pc : getPackagerModelProductModels()) {
 			if (pc.getMinimumInstances() != 0) {
 				if (!productOccurences.keySet().contains(pc.getProductModel().getRetailerKey())) {
 					throw new NotRespectedRulesException(new ErrorCode("1.2.2.23"),
@@ -437,6 +442,225 @@ public class PackagerModel implements java.io.Serializable {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Product occurences are valid.");
 		}
+	}
+
+	public FeasibilityResult isInstantiationPossible(PackagerRequest request,
+			PackagerInstanceService packagerInstanceService, ProductModelService productModelService,
+			ManualDriverFactory manualDriverFactory) throws PackagerException, DriverException, DataSourceException {
+		if (request == null) {
+			return new FeasibilityResult(false, new NullException(NullCases.NULL, "request").getMessage());
+		}
+
+		if (request.getRetailerPackagerId() == null) {
+			return new FeasibilityResult(false, new NullException(NullCases.NULL, "retailerPackagerId").getMessage());
+		}
+
+		if (!request.getModel().equals(this.getRetailerKey())) {
+			return new FeasibilityResult(false,
+					new NotRespectedRulesException(new ErrorCode("1.2.1.1.10")).getMessage());
+		}
+
+		try {
+
+			request = prepareRequestForInstantiation(request, packagerInstanceService, productModelService,
+					manualDriverFactory);
+
+		} catch (NotRespectedRulesException ex) {
+
+			if (LOGGER.isWarnEnabled()) {
+				LOGGER.warn("Instantiation impossible.", ex);
+			}
+
+			return new FeasibilityResult(false, ex.getMessage());
+
+		} catch (MalformedXMLException ex) {
+
+			if (LOGGER.isWarnEnabled()) {
+				LOGGER.warn("Instantiation impossible.", ex);
+			}
+
+			return new FeasibilityResult(false, ex.getMessage());
+
+		} catch (NotFoundException ex) {
+
+			if (LOGGER.isWarnEnabled()) {
+				LOGGER.warn("Instantiation impossible.", ex);
+			}
+
+			return new FeasibilityResult(false, ex.getMessage());
+
+		} catch (NullException ex) {
+
+			if (LOGGER.isWarnEnabled()) {
+				LOGGER.warn("Instantiation impossible.", ex);
+			}
+
+			return new FeasibilityResult(false, ex.getMessage());
+		}
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("The instantiation is possible.");
+		}
+
+		return new FeasibilityResult(true, null);
+	}
+
+	private PackagerRequest prepareRequestForInstantiation(PackagerRequest request,
+			PackagerInstanceService packagerInstanceService, ProductModelService productModelService,
+			ManualDriverFactory manualDriverFactory) throws NotRespectedRulesException, PackagerException,
+			MalformedXMLException, NotFoundException, DriverException, DataSourceException {
+
+		if (request == null) {
+			throw new NullException(NullCases.NULL_EMPTY, "request");
+		}
+
+		if ((request.getRetailerPackagerId() == null) && (request.getRetailerPackagerId().trim().length() == 0)) {
+			throw new NullException(NullCases.NULL_EMPTY, "request.retailerPackagerId parameter");
+		}
+
+		if (!request.getModel().equals(this.getRetailerKey())) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.7"));
+		}
+
+		if (!packagerInstanceService.isRetailerPackagerIdFree(request.getRetailerPackagerId())) {
+			throw new NotRespectedRulesException(new ErrorCode("0.2.1.1.9"),
+					new Object[] { request.getRetailerPackagerId() });
+		}
+
+		if ((this.hasDeliveryReferences()) && (request.getDeliveryRequest() == null)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.13"));
+		}
+
+		if ((!this.hasDeliveryReferences()) && (request.getDeliveryRequest() != null)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.2.9"),
+					new Object[] { request.getRetailerPackagerId() });
+		}
+
+		// this.mergeUserPropertiesWithDefault(request.getCreationProductRequests(),
+		// false);
+
+		// this.mergeUserPropertiesWithDefaultConfiguration(request.getCreationProductRequests());
+
+		if (LOGGER.isDebugEnabled()) {
+
+			String mergedProperties = "Merged properties :";
+
+			for (ProductRequest currentCreationRequest : request.getCreationProductRequests()) {
+
+				mergedProperties += "\n\n -> " + currentCreationRequest.getModel() + "\n\n";
+				mergedProperties += currentCreationRequest.getProperties();
+			}
+
+			LOGGER.debug(mergedProperties);
+		}
+
+		try {
+			List<ProductRequest> asList = new ArrayList<ProductRequest>(request.getProducts());
+			verifyXmlProperties(PackagerInstanceAction.CREATE, asList, productModelService, manualDriverFactory);
+		} catch (MalformedXMLException ex) {
+			throw new MalformedXMLException(MalformedCases.INVALID_SCHEMA, ex.getMalformedXML(), ex);
+		}
+
+		List<ProductRequest> productsAsList = new ArrayList<ProductRequest>(request.getProducts());
+		// request.getProducts().addAll(this.completeWithMissingProducts(productsAsList));
+		try {
+			List<ProductRequest> asList = new ArrayList<ProductRequest>(request.getProducts());
+			verifyXmlProperties(PackagerInstanceAction.CREATE, asList, productModelService, manualDriverFactory);
+		} catch (MalformedXMLException ex) {
+			throw new MalformedXMLException(MalformedCases.INVALID_SCHEMA, ex.getMalformedXML(), ex);
+		}
+
+		List<ProductRequest> asList = new ArrayList<ProductRequest>(request.getProducts());
+		this.verifyProductOccurences(asList);
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Request is ready for instantiation.");
+		}
+
+		return request;
+	}
+
+	// protected List<ProductRequest>
+	// mergeUserPropertiesWithDefault(List<ProductRequest> requests,
+	// boolean isDefaultPrioritary, ProductModelService productModelService)
+	// throws PackagerException,
+	// MalformedXMLException, NotFoundException, DriverException,
+	// DataSourceException, NotRespectedRulesException {
+	// if (requests == null) {
+	// throw new NullException(NullCases.NULL, "requests parameter");
+	// }
+	//
+	// for (ProductRequest productRequest : requests) {
+	// ProductModel productModel =
+	// productModelService.findByRetailerKey(productRequest.getModel());
+	//
+	// try {
+	// if (isDefaultPrioritary) {
+	// productRequest.setProperties(PackagerLogicTierBeanFactory.getPackagerXmlMerger()
+	// .merge(productModel.getDefaultRequest().getProperties(),
+	// productRequest.getProperties()));
+	// } else {
+	// productRequest.setProperties(PackagerLogicTierBeanFactory.getPackagerXmlMerger()
+	// .merge(productRequest.getProperties(),
+	// productModel.getDefaultRequest().getProperties()));
+	// }
+	//
+	// } catch (ResourceAccessException e) {
+	// throw new PackagerException(e);
+	// }
+	//
+	// }
+	//
+	// return requests;
+	// }
+
+	// public List<ProductRequest>
+	// completeWithMissingProducts(List<ProductRequest> requests) throws
+	// PackagerException {
+	//
+	// if (requests == null) {
+	// throw new NullException(NullCases.NULL, "requests parameter");
+	// }
+	//
+	// Map<ProductModel, Integer> missingProducts =
+	// computeMissingProducts(requests);
+	//
+	// for (ProductModel productModel : missingProducts.keySet()) {
+	// for (int i = 0; i < missingProducts.get(productModel); i++) {
+	// try {
+	// requests.add(productModel.getDefaultRequest());
+	//
+	// if (LOGGER.isDebugEnabled()) {
+	// LOGGER.debug("Add new product [" + productModel.getKey() + "].");
+	// }
+	//
+	// } catch (ResourceAccessException e) {
+	// throw new PackagerException(e);
+	// }
+	// }
+	// }
+	//
+	// return requests;
+	// }
+
+	public Boolean hasDeliveryReferences() {
+		if ((this.packagerModelShippableItemConfigurations != null)
+				&& (this.packagerModelShippableItemConfigurations.size() > 0)) {
+			return true;
+		}
+
+		if (this.packagerModelProductModels == null) {
+			return false;
+		}
+
+		for (PackagerModelProductModel pc : this.packagerModelProductModels) {
+			if ((pc.getProductModelShippableItemConfigurations() != null)
+					&& (pc.getProductModelShippableItemConfigurations().size() > 0)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }

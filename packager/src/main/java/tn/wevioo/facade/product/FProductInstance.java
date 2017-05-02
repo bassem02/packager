@@ -1,9 +1,18 @@
-package tn.wevioo.facade.instance;
+package tn.wevioo.facade.product;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import nordnet.drivers.contract.types.State;
+
+/**
+ * The class FProductInstance allows providing information to the Packager's users about a product instance. All the
+ * provided information is guaranteed to have been retrieved instantly.
+ * 
+ * @author THUGUERRE
+ * @since 2.0.0
+ */
 public class FProductInstance implements Serializable {
 
 	/**
@@ -25,7 +34,7 @@ public class FProductInstance implements Serializable {
 	/**
 	 * This product instance's current state.
 	 */
-	//private State currentState;
+	private State currentState;
 
 	/**
 	 * The product instance's product model's key.
@@ -64,13 +73,13 @@ public class FProductInstance implements Serializable {
 		return this.providerProductId;
 	}
 
-	/*public void setCurrentState(State currentState) {
+	public void setCurrentState(State currentState) {
 		this.currentState = currentState;
 	}
 
 	public State getCurrentState() {
 		return this.currentState;
-	}*/
+	}
 
 	public void setProductModel(String productModel) {
 		this.productModel = productModel;

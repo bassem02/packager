@@ -218,6 +218,8 @@ public class ProductModel implements java.io.Serializable {
 		createdProductInstance.setProductModel(this);
 		createdProductInstance.setCreationDate(new Date());
 		createdProductInstance.setLastUpdate(new Date());
+		createdProductInstance.setLastKnownState("INPROGRESS");
+		createdProductInstance.setLastKnownStateUpdate(new Date());
 
 		ProductActionHistory productHistory = new ProductActionHistory(ProductInstanceAction.CREATE, null,
 				createdProductInstance, properties);

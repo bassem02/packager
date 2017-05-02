@@ -30,6 +30,8 @@ import nordnet.architecture.exceptions.utils.ErrorCode;
 import nordnet.drivers.contract.exceptions.DriverException;
 import nordnet.drivers.contract.impl.ProductDriverFactoryImpl;
 import nordnet.drivers.contract.types.FeasibilityTestResult;
+import nordnet.tools.idgenerator.algorithms.stringcomputing.UUIDGenerator;
+import nordnet.tools.idgenerator.exception.AlgorithmException;
 import tn.wevioo.configuration.ManualConfiguration;
 import tn.wevioo.configuration.ManualInternalConfiguration;
 import tn.wevioo.entities.Product;
@@ -121,6 +123,8 @@ public class ManualDriverFactory
 	@Autowired
 	ManualDriver createdDriver;
 
+	UUIDGenerator idGenerator = new UUIDGenerator();
+
 	@Override
 	protected ManualDriver performCreateProduct(Object properties) throws DriverException, NotRespectedRulesException {
 
@@ -130,14 +134,14 @@ public class ManualDriverFactory
 		}
 		ProductProperties productProperties = (ProductProperties) properties;
 		String ref = null;
-		// try {
-		// ref =
-		// super.getDriverToolFactory().getProviderProductIdGenerator().generateIdentifier(null);
-		// } catch (AlgorithmException e) {
-		// LOGGER.error(e);
-		// throw new DriverException(e);
-		// }
-		ref = "ref";
+
+		// ref = "ref";
+		try {
+			ref = idGenerator.generateIdentifier(null);
+		} catch (AlgorithmException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		Product product = new Product();
 		// try {
@@ -264,7 +268,7 @@ public class ManualDriverFactory
 		return createdProduct;
 	}
 
-	private Object parse(String properties) throws SAXException, IOException, ParserConfigurationException {
+	static Object parse(String properties) throws SAXException, IOException, ParserConfigurationException {
 		DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		InputSource is = new InputSource();
 		is.setCharacterStream(new StringReader(properties));

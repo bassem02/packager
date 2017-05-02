@@ -1,4 +1,4 @@
-package tn.wevioo.facade.instance;
+package tn.wevioo.facade.product;
 
 import java.util.Date;
 

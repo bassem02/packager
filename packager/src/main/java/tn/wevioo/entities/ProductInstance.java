@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -241,7 +242,6 @@ public class ProductInstance implements java.io.Serializable {
 	@Transient
 	public State getCurrentState() throws DriverException {
 
-		// State currentState = this.getProductDriver().getCurrentState();
 		String url = "http://localhost:8093";
 		RestTemplate rest = new RestTemplate();
 		System.out.println("ref=  " + this.getProviderProductId());
@@ -273,8 +273,6 @@ public class ProductInstance implements java.io.Serializable {
 			throw new NullException(NullCases.NULL, "packagerHistory parameter");
 		}
 
-		// this.getProductDriver().suspend(properties);
-
 		String url = "http://localhost:8093";
 		RestTemplate rest = new RestTemplate();
 
@@ -287,7 +285,9 @@ public class ProductInstance implements java.io.Serializable {
 		ProductActionHistory history = new ProductActionHistory(ProductInstanceAction.SUSPEND, this, this, properties);
 		packagerHistory.addProductAction(history);
 
-		this.resetLastKnownState();
+		// this.resetLastKnownState();
+		this.setLastKnownState("SUSPENDED");
+		this.setLastKnownStateUpdate(new Date());
 
 		// if
 		// (this.productModel.getDriverFactory().getDriverInternalConfiguration().areReferencesChangedOnSuspension())
@@ -304,19 +304,29 @@ public class ProductInstance implements java.io.Serializable {
 		}
 	}
 
+	@Transient
+	public String getProductProperties() throws DriverException {
+		// return this.getProductDriver().getProductProperties();
+		String url = "http://localhost:8093";
+		RestTemplate rest = new RestTemplate();
+
+		String result = (String) rest
+				.getForObject(url + "/manual/getProductProperties?ppid=" + this.getProviderProductId(), String.class);
+
+		return result;
+	}
+
 	public void updateReferences(PackagerActionHistory packagerHistory) throws DriverException {
 
 		if (packagerHistory == null) {
 			throw new NullException(NullCases.NULL, "packagerHistory parameter");
 		}
 
-		// List<Reference> newDriverReferences =
-		// this.getProductDriver().getReferences();
 		String url = "http://localhost:8093";
 		RestTemplate rest = new RestTemplate();
 
-		tn.wevioo.tools.Reference[] newDriverReference = (tn.wevioo.tools.Reference[]) rest
-				.getForObject(url + "/manual/getReferences", tn.wevioo.tools.Reference[].class);
+		tn.wevioo.tools.Reference[] newDriverReference = (tn.wevioo.tools.Reference[]) rest.getForObject(
+				url + "/manual/getReferences?ppid=" + this.providerProductId, tn.wevioo.tools.Reference[].class);
 		List<tn.wevioo.tools.Reference> newDriverReferences = Arrays.asList(newDriverReference);
 
 		if (this.productInstanceReferences != null) {
@@ -391,8 +401,6 @@ public class ProductInstance implements java.io.Serializable {
 			throw new NullException(NullCases.NULL, "packagerHistory parameter");
 		}
 
-		// this.getProductDriver().activate(properties);
-
 		String url = "http://localhost:8093";
 		RestTemplate rest = new RestTemplate();
 
@@ -410,7 +418,9 @@ public class ProductInstance implements java.io.Serializable {
 		}
 		packagerHistory.addProductAction(history);
 
-		this.resetLastKnownState();
+		// this.resetLastKnownState();
+		this.setLastKnownState("ACTIVE");
+		this.setLastKnownStateUpdate(new Date());
 
 		// if
 		// (this.productModel.getDriverFactory().getDriverInternalConfiguration().areReferencesChangedOnActivation())
@@ -425,5 +435,207 @@ public class ProductInstance implements java.io.Serializable {
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("Product [" + getIdProductInstance() + "] has been successfully activated.");
 		}
+	}
+
+	public void reactivate(final String properties, PackagerActionHistory packagerHistory)
+			throws NotRespectedRulesException, MalformedXMLException, DriverException {
+		if ((properties != null) && (properties.trim().length() == 0)) {
+			throw new NullException(NullCases.EMPTY, "properties parameter");
+		}
+
+		if (packagerHistory == null) {
+			throw new NullException(NullCases.NULL, "packagerHistory parameter");
+		}
+
+		String url = "http://localhost:8093";
+		RestTemplate rest = new RestTemplate();
+
+		String result = (String) rest.getForObject(
+				url + "/manual/reactivateProduct?properties=" + properties + "&ppid=" + this.getProviderProductId(),
+				String.class);
+
+		ProductActionHistory history = null;
+
+		if (this.originalProductInstance == null) {
+			history = new ProductActionHistory(ProductInstanceAction.REACTIVATE, this, this, properties);
+		} else {
+			history = new ProductActionHistory(ProductInstanceAction.REACTIVATE, this.originalProductInstance, this,
+					properties);
+		}
+		packagerHistory.addProductAction(history);
+
+		// this.resetLastKnownState();
+		this.setLastKnownState("ACTIVE");
+		this.setLastKnownStateUpdate(new Date());
+
+		// if
+		// (this.productModel.getDriverFactory().getDriverInternalConfiguration()
+		// .areReferencesChangedOnReactivation()) {
+		try {
+			this.updateReferences(packagerHistory);
+		} catch (DriverException e) {
+			this.productInstanceReferences.clear();
+		}
+		// }
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Product [" + getIdProductInstance() + "] has been successfully reactivated.");
+		}
+	}
+
+	public void cancel(final String properties, PackagerActionHistory packagerHistory)
+			throws DriverException, MalformedXMLException, NotRespectedRulesException {
+
+		if ((properties != null) && (properties.trim().length() == 0)) {
+			throw new NullException(NullCases.EMPTY, "properties parameter");
+		}
+
+		if (packagerHistory == null) {
+			throw new NullException(NullCases.NULL, "packagerHistory parameter");
+		}
+
+		String url = "http://localhost:8093";
+		RestTemplate rest = new RestTemplate();
+
+		String result = (String) rest.getForObject(
+				url + "/manual/cancelProduct?properties=" + properties + "&ppid=" + this.getProviderProductId(),
+				String.class);
+
+		ProductActionHistory history = null;
+
+		if (this.originalProductInstance == null) {
+			history = new ProductActionHistory(ProductInstanceAction.CANCEL, this, this, properties);
+		} else {
+			history = new ProductActionHistory(ProductInstanceAction.CANCEL, this.originalProductInstance, this,
+					properties);
+		}
+		packagerHistory.addProductAction(history);
+
+		// this.resetLastKnownState();
+		this.setLastKnownState("CANCELED");
+		this.setLastKnownStateUpdate(new Date());
+
+		// if
+		// (this.productModel.getDriverFactory().getDriverInternalConfiguration().areReferencesChangedOnCancelation())
+		// {
+		try {
+			this.updateReferences(packagerHistory);
+		} catch (DriverException e) {
+			this.productInstanceReferences.clear();
+		}
+		// }
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Product [" + getIdProductInstance() + "] has been successfully canceled.");
+		}
+	}
+
+	public void reset(final String properties, PackagerActionHistory packagerHistory)
+			throws DriverException, MalformedXMLException, NotRespectedRulesException {
+
+		if ((properties != null) && (properties.trim().length() == 0)) {
+			throw new NullException(NullCases.EMPTY, "properties parameter");
+		}
+
+		if (packagerHistory == null) {
+			throw new NullException(NullCases.NULL, "packagerHistory parameter");
+		}
+
+		String url = "http://localhost:8093";
+		RestTemplate rest = new RestTemplate();
+
+		String result = (String) rest.getForObject(
+				url + "/manual/resetProduct?properties=" + properties + "&ppid=" + this.getProviderProductId(),
+				String.class);
+
+		ProductActionHistory history = null;
+
+		if (this.originalProductInstance == null) {
+			history = new ProductActionHistory(ProductInstanceAction.RESET, this, this, properties);
+		} else {
+			history = new ProductActionHistory(ProductInstanceAction.RESET, this.originalProductInstance, this,
+					properties);
+		}
+		packagerHistory.addProductAction(history);
+
+		// this.resetLastKnownState();
+		this.setLastKnownState("RESETED");
+		this.setLastKnownStateUpdate(new Date());
+
+		// if
+		// (this.productModel.getDriverFactory().getDriverInternalConfiguration().areReferencesChangedOnReset())
+		// {
+		try {
+			this.updateReferences(packagerHistory);
+		} catch (DriverException e) {
+			this.productInstanceReferences.clear();
+		}
+		// }
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Product [" + getIdProductInstance() + "] has been successfully reseted.");
+		}
+	}
+
+	@Transient
+	public String getUsageProperties() throws DriverException {
+
+		String url = "http://localhost:8093";
+		RestTemplate rest = new RestTemplate();
+
+		String result = (String) rest
+				.getForObject(url + "/manual/performGetUsageProperties?ppid=" + this.providerProductId, String.class);
+
+		return result;
+	}
+
+	public void updateSelfDiagnostics(PackagerActionHistory packagerHistory) throws DriverException {
+		if (packagerHistory == null) {
+			throw new NullException(NullCases.NULL, "packagerHistory parameter");
+		}
+
+		Map<String, String> newDriverDiagnostics = this.getProductDriver().getSelfDiagnostics();
+
+		if (productInstanceDiagnostics == null) {
+			this.productInstanceDiagnostics = new HashSet<ProductInstanceDiagnostic>();
+		} else {
+			this.productInstanceDiagnostics.clear();
+		}
+
+		for (String key : newDriverDiagnostics.keySet()) {
+			ProductInstanceDiagnostic pid = new ProductInstanceDiagnostic();
+			pid.setDiagnosticKey(key);
+			pid.setDiagnosticValue(newDriverDiagnostics.get(key));
+			pid.setCreationDate(new Date());
+
+			this.addDiagnostic(pid);
+		}
+
+		ProductActionHistory history = null;
+		if (this.originalProductInstance == null) {
+			history = new ProductActionHistory(ProductInstanceAction.UPDATE_SELF_DIAGNOSTIC, this, this, null);
+		} else {
+			history = new ProductActionHistory(ProductInstanceAction.UPDATE_SELF_DIAGNOSTIC,
+					this.originalProductInstance, this, null);
+		}
+
+		packagerHistory.addProductAction(history);
+	}
+
+	public void addDiagnostic(ProductInstanceDiagnostic diagnostic) {
+		if (diagnostic == null) {
+			throw new NullException(NullCases.NULL, "diagnostic parameter");
+		}
+
+		if (this.productInstanceDiagnostics == null) {
+			this.productInstanceDiagnostics = new HashSet<ProductInstanceDiagnostic>();
+		}
+
+		if (diagnostic.getProductInstance() != null) {
+			diagnostic.getProductInstance().getProductInstanceDiagnostics().remove(diagnostic);
+		}
+		diagnostic.setProductInstance(this);
+		diagnostic.setCreationDate(new Date());
+		this.productInstanceDiagnostics.add(diagnostic);
 	}
 }

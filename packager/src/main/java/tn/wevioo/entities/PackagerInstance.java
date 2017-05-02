@@ -40,6 +40,7 @@ import nordnet.drivers.contract.exceptions.DriverException;
 import nordnet.drivers.contract.types.State;
 import tn.wevioo.ManualDriverFactory;
 import tn.wevioo.exceptions.PackagerException;
+import tn.wevioo.feasibility.FeasibilityResult;
 import tn.wevioo.model.packager.action.PackagerInstanceAction;
 import tn.wevioo.model.request.PackagerRequest;
 import tn.wevioo.model.request.ProductRequest;
@@ -196,57 +197,6 @@ public class PackagerInstance implements java.io.Serializable {
 
 	public void addProductInstance(ProductInstance productInstance) {
 		this.products.add(productInstance);
-	}
-
-	public void cancel(PackagerRequest request, ProductModelService productModelService,
-			ManualDriverFactory manualDriverFactory, PackagerActionHistoryService packagerActionHistoryService,
-			WebServiceUserService webServiceUserService) throws NotRespectedRulesException, DriverException,
-			NotFoundException, MalformedXMLException, PackagerException, DataSourceException {
-
-		request.validate(PackagerInstanceAction.CANCEL);
-		List<ProductRequest> asList = new ArrayList<ProductRequest>(request.getProducts());
-		verifyProductModels(asList);
-		asList = completeProductModels(asList);
-		request.setProducts(new HashSet<ProductRequest>(asList));
-
-		PackagerModel.verifyXmlProperties(PackagerInstanceAction.CANCEL, asList, productModelService,
-				manualDriverFactory);
-
-		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.CANCEL, webServiceUserService);
-
-		if (this.packagerModel.isMultithreadedActions()) {
-
-			/*
-			 * PackagerTaskExecutor packagerTaskExecutor =
-			 * (PackagerTaskExecutor) PackagerLogicTierBeanFactory
-			 * .getInstance().getBean("cancelPackagerTaskExecutor");
-			 * packagerTaskExecutor.initialize(this, request, history, false);
-			 * packagerTaskExecutor.execute();
-			 */
-
-		} else {
-			for (ProductInstance productInstance : getProducts()) {
-				if (!productInstance.getCurrentState().equals(State.CANCELED)) {
-					ProductRequest productRequest = this.getProductRequest(request,
-							productInstance.getIdProductInstance());
-
-					if (productRequest == null) {
-						// productInstance.cancel(null, history);
-
-					} else {
-						// productInstance.cancel(productRequest.getProperties(),
-						// history);
-
-					}
-				}
-			}
-		}
-
-		history.addSource(this);
-		history.addDestination(this);
-
-		packagerActionHistoryService.saveOrUpdate(history);
-
 	}
 
 	protected ProductRequest getProductRequest(PackagerRequest request, Integer productId) {
@@ -598,6 +548,288 @@ public class PackagerInstance implements java.io.Serializable {
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("Packager [" + this.getRetailerPackagerId() + "] has been successfully activated.");
 		}
+	}
+
+	public void reactivate(PackagerRequest request, ProductModelService productModelService,
+			ManualDriverFactory manualDriverFactory, PackagerActionHistoryService packagerActionHistoryService,
+			WebServiceUserService webServiceUserService) throws NotRespectedRulesException, DriverException,
+			NotFoundException, MalformedXMLException, PackagerException, DataSourceException {
+
+		if (request == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+
+		if (!request.getRetailerPackagerId().equals(this.retailerPackagerId)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.9"),
+					new Object[] { request.getRetailerPackagerId(), this.retailerPackagerId });
+		}
+
+		if (!this.getCurrentState().equals(State.SUSPENDED)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.2.18"),
+					new Object[] { this.retailerPackagerId, "REACTIVABLE" });
+		}
+
+		request.validate(PackagerInstanceAction.REACTIVATE);
+		List<ProductRequest> asList = new ArrayList<ProductRequest>(request.getProducts());
+		verifyProductModels(asList);
+		asList = completeProductModels(asList);
+		request.setProducts(new HashSet<ProductRequest>(asList));
+
+		PackagerModel.verifyXmlProperties(PackagerInstanceAction.REACTIVATE, asList, productModelService,
+				manualDriverFactory);
+
+		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.REACTIVATE,
+				webServiceUserService);
+
+		if (this.getPackagerModel().isMultithreadedActions()) {
+			// PackagerTaskExecutor packagerTaskExecutor =
+			// (PackagerTaskExecutor) PackagerLogicTierBeanFactory
+			// .getInstance().getBean("reactivatePackagerTaskExecutor");
+			// packagerTaskExecutor.initialize(this, request, history, false);
+			// packagerTaskExecutor.execute();
+		} else {
+			for (ProductInstance productInstance : this.products) {
+				if (productInstance.getCurrentState().equals(State.SUSPENDED)) {
+					ProductRequest productRequest = this.getProductRequest(request,
+							productInstance.getIdProductInstance());
+
+					if (productRequest == null) {
+						try {
+							productInstance.reactivate(null, history);
+						} catch (UnsupportedActionException e) {
+							// If the reactivation action is not supported the
+							// process continues
+							if (LOGGER.isWarnEnabled()) {
+								LOGGER.warn("Reactivate opperation not supported for productInstance ["
+										+ productInstance.getIdProductInstance() + "]");
+							}
+						}
+					} else {
+						try {
+							productInstance.reactivate(productRequest.getProperties(), history);
+						} catch (UnsupportedActionException e) {
+							// If the reactivation action is not supported the
+							// process continues
+							if (LOGGER.isWarnEnabled()) {
+								LOGGER.warn("Reactivate opperation not supported for productInstance ["
+										+ productInstance.getIdProductInstance() + "]");
+							}
+						}
+					}
+				}
+			}
+		}
+
+		history.addSource(this);
+		history.addDestination(this);
+		history.setLastUpdate(new Date());
+
+		packagerActionHistoryService.saveOrUpdate(history);
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Packager [" + this.getRetailerPackagerId() + "] has been successfully reactivated.");
+		}
+	}
+
+	public void cancel(PackagerRequest request, ProductModelService productModelService,
+			ManualDriverFactory manualDriverFactory, PackagerActionHistoryService packagerActionHistoryService,
+			WebServiceUserService webServiceUserService) throws NotRespectedRulesException, DriverException,
+			NotFoundException, MalformedXMLException, PackagerException, DataSourceException {
+
+		if (request == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+
+		if (!request.getRetailerPackagerId().equals(this.retailerPackagerId)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.9"),
+					new Object[] { request.getRetailerPackagerId(), this.retailerPackagerId });
+		}
+
+		if (this.getCurrentState().equals(State.CANCELED)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.2.19"),
+					new Object[] { this.retailerPackagerId, "CANCELED" });
+		}
+
+		request.validate(PackagerInstanceAction.CANCEL);
+		List<ProductRequest> asList = new ArrayList<ProductRequest>(request.getProducts());
+		verifyProductModels(asList);
+		asList = completeProductModels(asList);
+		request.setProducts(new HashSet<ProductRequest>(asList));
+
+		PackagerModel.verifyXmlProperties(PackagerInstanceAction.CANCEL, asList, productModelService,
+				manualDriverFactory);
+
+		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.CANCEL, webServiceUserService);
+
+		if (this.getPackagerModel().isMultithreadedActions()) {
+			// PackagerTaskExecutor packagerTaskExecutor =
+			// (PackagerTaskExecutor) PackagerLogicTierBeanFactory
+			// .getInstance().getBean("cancelPackagerTaskExecutor");
+			// packagerTaskExecutor.initialize(this, request, history, false);
+			// packagerTaskExecutor.execute();
+		} else {
+			for (ProductInstance productInstance : this.products) {
+				if (!productInstance.getCurrentState().equals(State.CANCELED)) {
+					ProductRequest productRequest = this.getProductRequest(request,
+							productInstance.getIdProductInstance());
+
+					if (productRequest == null) {
+						try {
+							productInstance.cancel(null, history);
+						} catch (UnsupportedActionException e) {
+							// If the cancel action is not supported the process
+							// continues
+							if (LOGGER.isWarnEnabled()) {
+								LOGGER.warn("Cancel opperation not supported for productInstance ["
+										+ productInstance.getIdProductInstance() + "]");
+							}
+						}
+					} else {
+						try {
+							productInstance.cancel(productRequest.getProperties(), history);
+						} catch (UnsupportedActionException e) {
+							// If the cancel action is not supported the process
+							// continues
+							if (LOGGER.isWarnEnabled()) {
+								LOGGER.warn("Cancel opperation not supported for productInstance ["
+										+ productInstance.getIdProductInstance() + "]");
+							}
+						}
+					}
+				}
+			}
+		}
+
+		history.addSource(this);
+		history.addDestination(this);
+		history.setLastUpdate(new Date());
+
+		packagerActionHistoryService.saveOrUpdate(history);
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Packager [" + this.getRetailerPackagerId() + "] has been successfully canceled.");
+		}
+	}
+
+	public void reset(PackagerRequest request, ProductModelService productModelService,
+			ManualDriverFactory manualDriverFactory, PackagerActionHistoryService packagerActionHistoryService,
+			WebServiceUserService webServiceUserService) throws NotRespectedRulesException, DriverException,
+			NotFoundException, MalformedXMLException, PackagerException, DataSourceException {
+
+		if (request == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+
+		if (!request.getRetailerPackagerId().equals(this.retailerPackagerId)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.9"),
+					new Object[] { request.getRetailerPackagerId(), this.retailerPackagerId });
+		}
+
+		if (!this.getCurrentState().equals(State.ACTIVE)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.2.18"),
+					new Object[] { this.retailerPackagerId, "RESETABLE" });
+		}
+
+		request.validate(PackagerInstanceAction.RESET);
+		List<ProductRequest> asList = new ArrayList<ProductRequest>(request.getProducts());
+		verifyProductModels(asList);
+		asList = completeProductModels(asList);
+		request.setProducts(new HashSet<ProductRequest>(asList));
+
+		PackagerModel.verifyXmlProperties(PackagerInstanceAction.RESET, asList, productModelService,
+				manualDriverFactory);
+
+		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.RESET, webServiceUserService);
+
+		if (this.getPackagerModel().isMultithreadedActions()) {
+			// PackagerTaskExecutor packagerTaskExecutor =
+			// (PackagerTaskExecutor) PackagerLogicTierBeanFactory
+			// .getInstance().getBean("resetPackagerTaskExecutor");
+			// packagerTaskExecutor.initialize(this, request, history, false);
+			// packagerTaskExecutor.execute();
+		} else {
+			for (ProductInstance productInstance : this.products) {
+				if (productInstance.getCurrentState().equals(State.ACTIVE)) {
+					ProductRequest productRequest = this.getProductRequest(request,
+							productInstance.getIdProductInstance());
+
+					if (productRequest == null) {
+						try {
+							productInstance.reset(null, history);
+						} catch (UnsupportedActionException e) {
+							// If the reset action is not supported the process
+							// continues
+							if (LOGGER.isWarnEnabled()) {
+								LOGGER.warn("Reset opperation not supported for productInstance ["
+										+ productInstance.getIdProductInstance() + "]");
+							}
+						}
+					} else {
+						try {
+							productInstance.reset(productRequest.getProperties(), history);
+						} catch (UnsupportedActionException e) {
+							// If the reset action is not supported the process
+							// continues
+							if (LOGGER.isWarnEnabled()) {
+								LOGGER.warn("Reset opperation not supported for productInstance ["
+										+ productInstance.getIdProductInstance() + "]");
+							}
+						}
+					}
+				}
+			}
+		}
+
+		history.addSource(this);
+		history.addDestination(this);
+		history.setLastUpdate(new Date());
+
+		packagerActionHistoryService.saveOrUpdate(history);
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Packager [" + this.getRetailerPackagerId() + "] has been successfully reseted.");
+		}
+	}
+
+	public FeasibilityResult isProductCancelationPossible(ProductRequest request)
+			throws PackagerException, NotFoundException {
+
+		this.getProductInstance(request.getProductId());
+		List<ProductRequest> fullProductRequest = new ArrayList<ProductRequest>();
+		List<ProductRequest> selectedProductRequest = new ArrayList<ProductRequest>();
+		fullProductRequest = this.completeMissingExistingProducts(fullProductRequest, true);
+
+		for (ProductRequest pr : fullProductRequest) {
+			if (pr.getProductId() != request.getProductId()) {
+				selectedProductRequest.add(pr);
+			}
+		}
+
+		try {
+			this.getPackagerModel().verifyProductOccurences(selectedProductRequest);
+			return new FeasibilityResult(true, null, null);
+		} catch (NotRespectedRulesException e) {
+			return new FeasibilityResult(false, e.getMessage(), e);
+		}
+	}
+
+	public void updateSelfDiagnostics(PackagerActionHistory packagerHistory) throws DriverException {
+		if (packagerHistory == null) {
+			throw new NullException(NullCases.NULL, "packagerHistory parameter");
+		}
+
+		if (((packagerHistory.getPackagerActionPackagerHeaderDestinations() == null)
+				|| (packagerHistory.getPackagerActionPackagerHeaderDestinations().size() == 0))
+				&& ((packagerHistory.getPackagerActionPackagerHeaderSources() == null)
+						|| (packagerHistory.getPackagerActionPackagerHeaderSources().size() == 0))) {
+			packagerHistory.addSource(this);
+			packagerHistory.addDestination(this);
+		}
+
+		for (ProductInstance pi : this.products) {
+			pi.updateSelfDiagnostics(packagerHistory);
+		}
+
 	}
 
 }

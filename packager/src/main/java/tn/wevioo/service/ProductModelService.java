@@ -2,6 +2,7 @@ package tn.wevioo.service;
 
 import java.util.List;
 
+import tn.wevioo.dto.ProductModelDTO;
 import tn.wevioo.entities.ProductModel;
 
 public interface ProductModelService {
@@ -15,5 +16,7 @@ public interface ProductModelService {
 	public ProductModel findByRetailerKey(String retailerKey);
 
 	public List<ProductModel> findAll();
+
+	public ProductModelDTO convertToDTO(ProductModel productModel);
 
 }

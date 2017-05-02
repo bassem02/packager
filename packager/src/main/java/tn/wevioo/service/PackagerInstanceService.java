@@ -19,4 +19,6 @@ public interface PackagerInstanceService {
 
 	public PackagerInstanceDTO convertToDTO(PackagerInstance packagerInstance);
 
+	public Boolean isRetailerPackagerIdFree(String retailerPackagerId);
+
 }

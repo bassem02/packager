@@ -71,4 +71,9 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 		return result;
 	}
 
+	@Override
+	public Boolean isRetailerPackagerIdFree(String retailerPackagerId) {
+		return packagerInstanceDao.findByRetailerPackagerId(retailerPackagerId) == null;
+	}
+
 }

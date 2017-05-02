@@ -1,10 +1,13 @@
 package tn.wevioo.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import nordnet.architecture.exceptions.explicit.NotFoundException;
+import nordnet.architecture.exceptions.utils.ErrorCode;
 import tn.wevioo.dao.PackagerModelDao;
 import tn.wevioo.dto.PackagerModelDTO;
 import tn.wevioo.entities.PackagerModel;
@@ -36,7 +39,12 @@ public class PackagerModelServiceImpl implements PackagerModelService {
 	}
 
 	@Override
-	public PackagerModel findByRetailerKey(String retailerKey) {
+	public PackagerModel findByRetailerKey(String retailerKey) throws NotFoundException {
+		PackagerModel packagerModel = packagerModelDao.findByRetailerKey(retailerKey);
+		if (packagerModel == null) {
+			throw new NotFoundException(new ErrorCode("0.2.1.3.2"),
+					new Object[] { "packager model", "model key", retailerKey });
+		}
 		return packagerModelDao.findByRetailerKey(retailerKey);
 	}
 
@@ -53,6 +61,17 @@ public class PackagerModelServiceImpl implements PackagerModelService {
 		result.setOldRetailerKey(packagerModel.getOldRetailerKey());
 		result.setRetailerKey(packagerModel.getRetailerKey());
 
+		return result;
+	}
+
+	@Override
+	public List<PackagerModel> findAllActive() {
+		List<PackagerModel> packagerModels = packagerModelDao.findAll();
+		List<PackagerModel> result = new ArrayList<PackagerModel>();
+		for (PackagerModel packagerModel : packagerModels) {
+			if ((packagerModel.getRetailerKey() != null) && !(packagerModel.getRetailerKey().equals("")))
+				result.add(packagerModel);
+		}
 		return result;
 	}
 
