@@ -364,6 +364,8 @@ public class PackagerController extends AbstractFacade {
 		packager.updateSelfDiagnostics(packagerHistory);
 		packagerActionHistoryService.saveOrUpdate(packagerHistory);
 		packagerInstanceService.saveOrUpdate(packager);
+
+		// convert PackagerInstance to FPackagerInstanceHeader
 		FPackagerInstanceHeader fPackagerInstanceHeader = new FPackagerInstanceHeader();
 		fPackagerInstanceHeader.setCreationDate(packager.getCreationDate());
 		fPackagerInstanceHeader.setPackagerModel(packager.getPackagerModel().getRetailerKey());
@@ -397,6 +399,7 @@ public class PackagerController extends AbstractFacade {
 			fProductInstanceHeaders.add(fProductInstanceHeader);
 		}
 		fPackagerInstanceHeader.setProducts(fProductInstanceHeaders);
+		// FIN convert PackagerInstance to FPackagerInstanceHeader
 
 		return fPackagerInstanceHeader;
 	}
