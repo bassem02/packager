@@ -2,13 +2,13 @@ package tn.wevioo.service.impl;
 
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import tn.wevioo.dao.ProductModelDao;
-import tn.wevioo.dto.ProductModelDTO;
+import tn.wevioo.entities.PackagerModelProductModel;
 import tn.wevioo.entities.ProductModel;
+import tn.wevioo.facade.product.FProductModel;
 import tn.wevioo.service.ProductModelService;
 
 @Service("productModelService")
@@ -43,10 +43,15 @@ public class ProductModelServiceImpl implements ProductModelService {
 	}
 
 	@Override
-	public ProductModelDTO convertToDTO(ProductModel productModel) {
-		ProductModelDTO productModelDTO = new ProductModelDTO();
-		BeanUtils.copyProperties(productModel, productModelDTO);
-		return productModelDTO;
+	public FProductModel convertToDTO(PackagerModelProductModel config) {
 
+		FProductModel fProductModelDTO = new FProductModel();
+		fProductModelDTO.setName(config.getProductModel().getRetailerKey());
+		fProductModelDTO.setKey(config.getProductModel().getOldRetailerKey());
+		fProductModelDTO.setMaximumInstances(config.getMaximumInstances());
+		fProductModelDTO.setMinimumInstances(config.getMinimumInstances());
+
+		return fProductModelDTO;
 	}
+
 }

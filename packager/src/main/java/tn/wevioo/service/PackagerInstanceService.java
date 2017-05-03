@@ -2,8 +2,10 @@ package tn.wevioo.service;
 
 import java.util.List;
 
-import tn.wevioo.dto.PackagerInstanceDTO;
+import nordnet.drivers.contract.exceptions.DriverException;
 import tn.wevioo.entities.PackagerInstance;
+import tn.wevioo.facade.packager.FPackagerInstance;
+import tn.wevioo.facade.packager.FPackagerInstanceHeader;
 
 public interface PackagerInstanceService {
 
@@ -17,8 +19,10 @@ public interface PackagerInstanceService {
 
 	public List<PackagerInstance> findAll();
 
-	public PackagerInstanceDTO convertToDTO(PackagerInstance packagerInstance);
+	public FPackagerInstance convertToDTO(PackagerInstance packagerInstance) throws DriverException;
 
 	public Boolean isRetailerPackagerIdFree(String retailerPackagerId);
+
+	public FPackagerInstanceHeader convertToHeaderDTO(PackagerInstance packagerInstance);
 
 }

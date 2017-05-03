@@ -2,8 +2,9 @@ package tn.wevioo.service;
 
 import java.util.List;
 
-import tn.wevioo.dto.ProductModelDTO;
+import tn.wevioo.entities.PackagerModelProductModel;
 import tn.wevioo.entities.ProductModel;
+import tn.wevioo.facade.product.FProductModel;
 
 public interface ProductModelService {
 
@@ -17,6 +18,6 @@ public interface ProductModelService {
 
 	public List<ProductModel> findAll();
 
-	public ProductModelDTO convertToDTO(ProductModel productModel);
+	public FProductModel convertToDTO(PackagerModelProductModel config);
 
 }

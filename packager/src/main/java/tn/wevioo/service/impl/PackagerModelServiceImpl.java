@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.architecture.exceptions.utils.ErrorCode;
 import tn.wevioo.dao.PackagerModelDao;
-import tn.wevioo.dto.PackagerModelDTO;
 import tn.wevioo.entities.PackagerModel;
+import tn.wevioo.entities.PackagerModelProductModel;
+import tn.wevioo.facade.packager.FPackagerModel;
+import tn.wevioo.facade.product.FProductModel;
 import tn.wevioo.service.PackagerModelService;
 
 @Service("packagerModelService")
@@ -48,20 +50,29 @@ public class PackagerModelServiceImpl implements PackagerModelService {
 		return packagerModelDao.findByRetailerKey(retailerKey);
 	}
 
-	public PackagerModelDTO convertToDTO(PackagerModel packagerModel) {
+	public FPackagerModel convertToDTO(PackagerModel packagerModel) {
 		if (packagerModel == null) {
 			return null;
 		}
 
-		PackagerModelDTO result = new PackagerModelDTO();
-		result.setCreationDate(packagerModel.getCreationDate());
-		result.setLastUpdate(packagerModel.getLastUpdate());
-		result.setIdPackagerModel(packagerModel.getIdPackagerModel());
-		result.setMultithreadedActions(packagerModel.isMultithreadedActions());
-		result.setOldRetailerKey(packagerModel.getOldRetailerKey());
-		result.setRetailerKey(packagerModel.getRetailerKey());
+		FPackagerModel fPackagerModel = new FPackagerModel();
+		fPackagerModel.setKey(packagerModel.getRetailerKey());
+		fPackagerModel.setName(packagerModel.getOldRetailerKey());
 
-		return result;
+		List<FProductModel> fProductModels = new ArrayList<FProductModel>();
+
+		for (PackagerModelProductModel packagerModelProductModel : packagerModel.getPackagerModelProductModels()) {
+			FProductModel fProductModel = new FProductModel();
+			fProductModel.setName(packagerModelProductModel.getProductModel().getRetailerKey());
+			fProductModel.setKey(packagerModelProductModel.getProductModel().getOldRetailerKey());
+			fProductModel.setMaximumInstances(packagerModelProductModel.getMaximumInstances());
+			fProductModel.setMinimumInstances(packagerModelProductModel.getMinimumInstances());
+			fProductModels.add(fProductModel);
+		}
+
+		fPackagerModel.setProducts(fProductModels);
+
+		return fPackagerModel;
 	}
 
 	@Override

@@ -1,8 +1,9 @@
 package tn.wevioo.facade.product;
 
 /**
- * The class FProductProperties allows retrieving the current properties of an existent product instance. All the
- * provided information is guaranteed to have been retrieved quasi-instantly. However, a possible delta is possible,
+ * The class FProductProperties allows retrieving the current properties of an
+ * existent product instance. All the provided information is guaranteed to have
+ * been retrieved quasi-instantly. However, a possible delta is possible,
  * regarding the cache system.
  * 
  * @author vberezan
@@ -10,6 +11,10 @@ package tn.wevioo.facade.product;
  */
 public class FProductProperties extends FProductInstance {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * Product properties.
 	 */

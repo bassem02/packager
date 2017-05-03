@@ -6,6 +6,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,9 @@ import javax.persistence.Transient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import nordnet.architecture.exceptions.explicit.MalformedXMLException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
@@ -594,12 +598,26 @@ public class ProductInstance implements java.io.Serializable {
 			throw new NullException(NullCases.NULL, "packagerHistory parameter");
 		}
 
-		Map<String, String> newDriverDiagnostics = this.getProductDriver().getSelfDiagnostics();
+		// Map<String, String> newDriverDiagnostics =
+		// this.getProductDriver().getSelfDiagnostics();
+
+		String url = "http://localhost:8093";
+		RestTemplate rest = new RestTemplate();
+
+		String result = (String) rest.getForObject(url + "/manual/getSelfDiagnostics", String.class);
+		Map<String, String> newDriverDiagnostics = new HashMap<String, String>();
+		ObjectMapper mapper = new ObjectMapper();
 
 		if (productInstanceDiagnostics == null) {
 			this.productInstanceDiagnostics = new HashSet<ProductInstanceDiagnostic>();
 		} else {
 			this.productInstanceDiagnostics.clear();
+		}
+
+		try {
+			newDriverDiagnostics = mapper.readValue(result, new TypeReference<HashMap<String, String>>() {
+			});
+		} catch (Exception e) {
 		}
 
 		for (String key : newDriverDiagnostics.keySet()) {

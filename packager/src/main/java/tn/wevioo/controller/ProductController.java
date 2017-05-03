@@ -22,20 +22,21 @@ import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import nordnet.architecture.exceptions.utils.ErrorCode;
 import nordnet.drivers.contract.exceptions.DriverException;
 import nordnet.tools.converter.exceptions.ConverterException;
-import tn.wevioo.dto.FProductModelDTO;
-import tn.wevioo.dto.ProductInstanceDTO;
-import tn.wevioo.dto.ProductPropertiesDTO;
 import tn.wevioo.entities.PackagerActionHistory;
 import tn.wevioo.entities.PackagerModel;
 import tn.wevioo.entities.PackagerModelProductModel;
 import tn.wevioo.entities.ProductInstance;
 import tn.wevioo.exceptions.PackagerException;
+import tn.wevioo.facade.product.FProductInstance;
+import tn.wevioo.facade.product.FProductModel;
+import tn.wevioo.facade.product.FProductProperties;
 import tn.wevioo.feasibility.FeasibilityResult;
 import tn.wevioo.model.packager.action.PackagerInstanceAction;
 import tn.wevioo.model.request.ProductRequest;
 import tn.wevioo.service.PackagerActionHistoryService;
 import tn.wevioo.service.PackagerModelService;
 import tn.wevioo.service.ProductInstanceService;
+import tn.wevioo.service.ProductModelService;
 import tn.wevioo.service.WebServiceUserService;
 
 @RestController
@@ -53,6 +54,9 @@ public class ProductController {
 
 	@Autowired
 	private PackagerModelService packagerModelService;
+
+	@Autowired
+	private ProductModelService productModelService;
 
 	@RequestMapping(value = "/cancelProduct", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 	public void cancelProduct(@RequestBody ProductRequest request) throws NotFoundException, NotRespectedRulesException,
@@ -97,8 +101,8 @@ public class ProductController {
 	}
 
 	@RequestMapping(value = "/getProductInstance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ProductInstanceDTO getProductInstance(@QueryParam("productId") Integer productId)
-			throws PackagerException, DataSourceException {
+	public FProductInstance getProductInstance(@QueryParam("productId") Integer productId)
+			throws PackagerException, DataSourceException, DriverException {
 
 		return productInstanceService.convertToDTO(productInstanceService.findById(productId));
 	}
@@ -117,7 +121,7 @@ public class ProductController {
 	}
 
 	@RequestMapping(value = "/getProductProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ProductPropertiesDTO getProductProperties(@QueryParam("productId") Long productId)
+	public FProductProperties getProductProperties(@QueryParam("productId") Long productId)
 			throws NotFoundException, PackagerException, DriverException, DataSourceException {
 
 		if (productId == null) {
@@ -126,13 +130,11 @@ public class ProductController {
 
 		ProductInstance productInstace = productInstanceService.findById(productId.intValue());
 
-		ProductPropertiesDTO productPropertiesDTO = new ProductPropertiesDTO();
-		productPropertiesDTO.setProperties(productInstace.getProductProperties());
-		return productPropertiesDTO;
+		return productInstanceService.convertToPropertiesDTO(productInstace);
 	}
 
 	@RequestMapping(value = "/getProductModelConfiguration", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public FProductModelDTO getProductModelConfiguration(@QueryParam("packagerModelKey") String packagerModelKey,
+	public FProductModel getProductModelConfiguration(@QueryParam("packagerModelKey") String packagerModelKey,
 			@QueryParam("productModelKey") String productModelKey)
 			throws PackagerException, DataSourceException, NotFoundException {
 
@@ -141,14 +143,11 @@ public class ProductController {
 		}
 
 		PackagerModel packagerModel = packagerModelService.findByRetailerKey(packagerModelKey);
-		FProductModelDTO fProductModelDTO = new FProductModelDTO();
+
 		for (PackagerModelProductModel config : packagerModel.getPackagerModelProductModels()) {
 			if (config.getProductModel().getRetailerKey().equals(productModelKey)) {
-				fProductModelDTO.setName(config.getProductModel().getRetailerKey());
-				fProductModelDTO.setKey(config.getProductModel().getOldRetailerKey());
-				fProductModelDTO.setMaximumInstances(config.getMaximumInstances());
-				fProductModelDTO.setMinimumInstances(config.getMinimumInstances());
-				return fProductModelDTO;
+
+				return productModelService.convertToDTO(config);
 			}
 		}
 		throw new NotFoundException(new ErrorCode("0.2.1.3.2"),
@@ -156,8 +155,7 @@ public class ProductController {
 	}
 
 	@RequestMapping(value = "/getProductModelConfigurationByPrefix", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public FProductModelDTO getProductModelConfigurationByPrefix(
-			@QueryParam("packagerModelKey") String packagerModelKey,
+	public FProductModel getProductModelConfigurationByPrefix(@QueryParam("packagerModelKey") String packagerModelKey,
 			@QueryParam("productModelPrefix") String productModelPrefix)
 			throws PackagerException, DataSourceException, NotFoundException {
 
@@ -166,14 +164,9 @@ public class ProductController {
 		}
 
 		PackagerModel packagerModel = packagerModelService.findByRetailerKey(packagerModelKey);
-		FProductModelDTO fProductModelDTO = new FProductModelDTO();
 		for (PackagerModelProductModel config : packagerModel.getPackagerModelProductModels()) {
 			if (config.getProductModel().getRetailerKey().startsWith(productModelPrefix)) {
-				fProductModelDTO.setName(config.getProductModel().getRetailerKey());
-				fProductModelDTO.setKey(config.getProductModel().getOldRetailerKey());
-				fProductModelDTO.setMaximumInstances(config.getMaximumInstances());
-				fProductModelDTO.setMinimumInstances(config.getMinimumInstances());
-				return fProductModelDTO;
+				return productModelService.convertToDTO(config);
 			}
 		}
 		throw new NotFoundException(new ErrorCode("0.2.1.3.2"),

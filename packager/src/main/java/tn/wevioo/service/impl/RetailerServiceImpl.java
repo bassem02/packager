@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import tn.wevioo.dao.RetailerDAO;
-import tn.wevioo.dto.RetailerDTO;
 import tn.wevioo.entities.Retailer;
 import tn.wevioo.service.RetailerService;
 
@@ -35,19 +34,6 @@ public class RetailerServiceImpl implements RetailerService {
 	@Override
 	public List<Retailer> findAll() {
 		return retailerDAO.findAll();
-	}
-
-	@Override
-	public RetailerDTO convertToDTO(Retailer retailer) {
-		if (retailer == null) {
-			return null;
-		}
-
-		RetailerDTO result = new RetailerDTO();
-		result.setIdRetailer(retailer.getIdRetailer());
-		result.setName(result.getName());
-
-		return result;
 	}
 
 }

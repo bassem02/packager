@@ -2,7 +2,6 @@ package tn.wevioo.service;
 
 import java.util.List;
 
-import tn.wevioo.dto.RetailerDTO;
 import tn.wevioo.entities.Retailer;
 
 public interface RetailerService {
@@ -15,5 +14,4 @@ public interface RetailerService {
 
 	public List<Retailer> findAll();
 
-	public RetailerDTO convertToDTO(Retailer retailer);
 }
