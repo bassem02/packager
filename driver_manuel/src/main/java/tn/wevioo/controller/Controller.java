@@ -117,4 +117,9 @@ public class Controller {
 		return manualDriver.getProductProperties(ppid);
 	}
 
+	@RequestMapping(value = "/manual/getSelfDiagnostics", method = RequestMethod.GET)
+	public String getSelfDiagnostics() throws DriverException, JAXBException {
+
+		return manualDriver.getSelfDiagnostics().toString();
+	}
 }

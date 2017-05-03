@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Transient;
 import javax.xml.bind.JAXBContext;
@@ -20,6 +21,7 @@ import org.xml.sax.SAXException;
 import nordnet.architecture.exceptions.NNException;
 import nordnet.architecture.exceptions.NNImplicitException;
 import nordnet.architecture.exceptions.explicit.MalformedXMLException;
+import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
 import nordnet.architecture.exceptions.implicit.NullException;
 import nordnet.architecture.exceptions.implicit.NullException.NullCases;
@@ -794,4 +796,14 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 		LOGGER.info("The suspend is done");
 	}
 
+	public Map<String, String> getSelfDiagnostics() throws DriverException {
+		try {
+			if (this.getDriverConfiguration() != null) {
+				throw new DriverException(new ErrorCode("0.1.1.7.6"),
+						new Object[] { this.getDriverConfiguration().getDriverKey() });
+			}
+		} catch (NotFoundException e) {
+		}
+		throw new DriverException(new ErrorCode("0.1.1.7.6"));
+	}
 }
