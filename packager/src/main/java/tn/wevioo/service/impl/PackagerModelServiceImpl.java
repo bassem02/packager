@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.architecture.exceptions.utils.ErrorCode;
 import tn.wevioo.dao.PackagerModelDao;
+import tn.wevioo.dto.packager.PackagerModelDTO;
+import tn.wevioo.dto.product.ProductModelDTO;
 import tn.wevioo.entities.PackagerModel;
 import tn.wevioo.entities.PackagerModelProductModel;
-import tn.wevioo.facade.packager.FPackagerModel;
-import tn.wevioo.facade.product.FProductModel;
 import tn.wevioo.service.PackagerModelService;
 
 @Service("packagerModelService")
@@ -50,29 +50,29 @@ public class PackagerModelServiceImpl implements PackagerModelService {
 		return packagerModelDao.findByRetailerKey(retailerKey);
 	}
 
-	public FPackagerModel convertToDTO(PackagerModel packagerModel) {
+	public PackagerModelDTO convertToDTO(PackagerModel packagerModel) {
 		if (packagerModel == null) {
 			return null;
 		}
 
-		FPackagerModel fPackagerModel = new FPackagerModel();
-		fPackagerModel.setKey(packagerModel.getRetailerKey());
-		fPackagerModel.setName(packagerModel.getOldRetailerKey());
+		PackagerModelDTO packagerModelDTO = new PackagerModelDTO();
+		packagerModelDTO.setKey(packagerModel.getRetailerKey());
+		packagerModelDTO.setName(packagerModel.getOldRetailerKey());
 
-		List<FProductModel> fProductModels = new ArrayList<FProductModel>();
+		List<ProductModelDTO> productModelDTOs = new ArrayList<ProductModelDTO>();
 
 		for (PackagerModelProductModel packagerModelProductModel : packagerModel.getPackagerModelProductModels()) {
-			FProductModel fProductModel = new FProductModel();
-			fProductModel.setName(packagerModelProductModel.getProductModel().getRetailerKey());
-			fProductModel.setKey(packagerModelProductModel.getProductModel().getOldRetailerKey());
-			fProductModel.setMaximumInstances(packagerModelProductModel.getMaximumInstances());
-			fProductModel.setMinimumInstances(packagerModelProductModel.getMinimumInstances());
-			fProductModels.add(fProductModel);
+			ProductModelDTO productModelDTO = new ProductModelDTO();
+			productModelDTO.setName(packagerModelProductModel.getProductModel().getRetailerKey());
+			productModelDTO.setKey(packagerModelProductModel.getProductModel().getOldRetailerKey());
+			productModelDTO.setMaximumInstances(packagerModelProductModel.getMaximumInstances());
+			productModelDTO.setMinimumInstances(packagerModelProductModel.getMinimumInstances());
+			productModelDTOs.add(productModelDTO);
 		}
 
-		fPackagerModel.setProducts(fProductModels);
+		packagerModelDTO.setProducts(productModelDTOs);
 
-		return fPackagerModel;
+		return packagerModelDTO;
 	}
 
 	@Override

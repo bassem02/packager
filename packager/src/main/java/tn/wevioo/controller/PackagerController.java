@@ -23,23 +23,22 @@ import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import nordnet.drivers.contract.exceptions.DriverException;
 import tn.wevioo.ManualDriver;
 import tn.wevioo.ManualDriverFactory;
+import tn.wevioo.dto.impl.AbstractFacade;
+import tn.wevioo.dto.packager.PackagerInstanceDTO;
+import tn.wevioo.dto.packager.PackagerInstanceHeaderDTO;
+import tn.wevioo.dto.packager.PackagerModelDTO;
+import tn.wevioo.dto.product.ProductPropertiesDTO;
 import tn.wevioo.entities.PackagerActionHistory;
 import tn.wevioo.entities.PackagerInstance;
 import tn.wevioo.entities.PackagerModel;
 import tn.wevioo.entities.ProductInstance;
 import tn.wevioo.exceptions.PackagerException;
-import tn.wevioo.facade.impl.AbstractFacade;
-import tn.wevioo.facade.packager.FPackagerInstance;
-import tn.wevioo.facade.packager.FPackagerInstanceHeader;
-import tn.wevioo.facade.packager.FPackagerModel;
-import tn.wevioo.facade.product.FProductProperties;
 import tn.wevioo.feasibility.FeasibilityResult;
 import tn.wevioo.model.packager.action.PackagerInstanceAction;
 import tn.wevioo.model.request.PackagerRequest;
 import tn.wevioo.service.PackagerActionHistoryService;
 import tn.wevioo.service.PackagerInstanceService;
 import tn.wevioo.service.PackagerModelService;
-import tn.wevioo.service.ProductInstanceService;
 import tn.wevioo.service.ProductModelService;
 import tn.wevioo.service.WebServiceUserService;
 
@@ -60,9 +59,6 @@ public class PackagerController extends AbstractFacade {
 	private ProductModelService productModelService;
 
 	@Autowired
-	private ProductInstanceService productInstanceService;
-
-	@Autowired
 	private ManualDriverFactory manualDriverFactory;
 
 	@Autowired
@@ -72,7 +68,7 @@ public class PackagerController extends AbstractFacade {
 	private WebServiceUserService webServiceUserService;
 
 	@RequestMapping(value = "/createPackager", method = RequestMethod.POST)
-	public FPackagerInstance createPackager(@RequestBody PackagerRequest request)
+	public PackagerInstanceDTO createPackager(@RequestBody PackagerRequest request)
 			throws DriverException, NotRespectedRulesException, MalformedXMLException, PackagerException,
 			NotFoundException, DataSourceException {
 
@@ -89,7 +85,7 @@ public class PackagerController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/getPackagerInstance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public FPackagerInstance getPackagerInstance(@QueryParam("retailerPackagerId") String retailerPackagerId)
+	public PackagerInstanceDTO getPackagerInstance(@QueryParam("retailerPackagerId") String retailerPackagerId)
 			throws DriverException {
 		return packagerInstanceService
 				.convertToDTO(packagerInstanceService.findByRetailerPackagerId(retailerPackagerId));
@@ -218,7 +214,7 @@ public class PackagerController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/getPackagerInstanceHeader", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public FPackagerInstanceHeader getPackagerInstanceHeader(
+	public PackagerInstanceHeaderDTO getPackagerInstanceHeader(
 			@QueryParam("retailerPackagerId") String retailerPackagerId)
 			throws PackagerException, NotFoundException, DataSourceException {
 
@@ -229,28 +225,28 @@ public class PackagerController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/getPackagerProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<FProductProperties> getPackagerProperties(@QueryParam("retailerPackagerId") String retailerPackagerId)
+	public List<ProductPropertiesDTO> getPackagerProperties(@QueryParam("retailerPackagerId") String retailerPackagerId)
 			throws NotFoundException, PackagerException, DriverException, DataSourceException {
-		List<FProductProperties> result = new ArrayList<FProductProperties>();
+		List<ProductPropertiesDTO> result = new ArrayList<ProductPropertiesDTO>();
 
 		PackagerInstance packagerInstance = packagerInstanceService.findByRetailerPackagerId(retailerPackagerId);
 
 		for (ProductInstance pi : packagerInstance.getProducts()) {
-			FProductProperties fProductProperties = new FProductProperties();
-			fProductProperties.setProperties(pi.getProductProperties());
-			result.add(fProductProperties);
+			ProductPropertiesDTO productPropertiesDTO = new ProductPropertiesDTO();
+			productPropertiesDTO.setProperties(pi.getProductProperties());
+			result.add(productPropertiesDTO);
 		}
 
 		return result;
 	}
 
 	@RequestMapping(value = "/getPackagerModels", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<FPackagerModel> getPackagerModels() throws PackagerException, DataSourceException {
+	public List<PackagerModelDTO> getPackagerModels() throws PackagerException, DataSourceException {
 		List<PackagerModel> packagerModels = new ArrayList<PackagerModel>();
 
 		packagerModels = packagerModelService.findAllActive();
 
-		List<FPackagerModel> result = new ArrayList<FPackagerModel>();
+		List<PackagerModelDTO> result = new ArrayList<PackagerModelDTO>();
 
 		for (PackagerModel packagerModel : packagerModels) {
 			result.add(packagerModelService.convertToDTO(packagerModel));
@@ -261,7 +257,7 @@ public class PackagerController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/getPackagerModel", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public FPackagerModel getPackagerModel(@QueryParam("packagerModelKey") String packagerModelKey)
+	public PackagerModelDTO getPackagerModel(@QueryParam("packagerModelKey") String packagerModelKey)
 			throws NotFoundException, PackagerException, DataSourceException {
 		PackagerModel packagerModel = packagerModelService.findByRetailerKey(packagerModelKey);
 
@@ -270,7 +266,7 @@ public class PackagerController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/updateSelfDiagnostics", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public FPackagerInstanceHeader updateSelfDiagnostics(@QueryParam("retailerPackagerId") String retailerPackagerId)
+	public PackagerInstanceHeaderDTO updateSelfDiagnostics(@QueryParam("retailerPackagerId") String retailerPackagerId)
 			throws NotFoundException, PackagerException, DataSourceException, DriverException {
 		if (retailerPackagerId == null || retailerPackagerId.trim().length() == 0) {
 			throw new NullException(NullCases.NULL_EMPTY, "retailerPackagerId parameter");

@@ -22,14 +22,14 @@ import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import nordnet.architecture.exceptions.utils.ErrorCode;
 import nordnet.drivers.contract.exceptions.DriverException;
 import nordnet.tools.converter.exceptions.ConverterException;
+import tn.wevioo.dto.product.ProductInstanceDTO;
+import tn.wevioo.dto.product.ProductModelDTO;
+import tn.wevioo.dto.product.ProductPropertiesDTO;
 import tn.wevioo.entities.PackagerActionHistory;
 import tn.wevioo.entities.PackagerModel;
 import tn.wevioo.entities.PackagerModelProductModel;
 import tn.wevioo.entities.ProductInstance;
 import tn.wevioo.exceptions.PackagerException;
-import tn.wevioo.facade.product.FProductInstance;
-import tn.wevioo.facade.product.FProductModel;
-import tn.wevioo.facade.product.FProductProperties;
 import tn.wevioo.feasibility.FeasibilityResult;
 import tn.wevioo.model.packager.action.PackagerInstanceAction;
 import tn.wevioo.model.request.ProductRequest;
@@ -101,7 +101,7 @@ public class ProductController {
 	}
 
 	@RequestMapping(value = "/getProductInstance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public FProductInstance getProductInstance(@QueryParam("productId") Integer productId)
+	public ProductInstanceDTO getProductInstance(@QueryParam("productId") Integer productId)
 			throws PackagerException, DataSourceException, DriverException {
 
 		return productInstanceService.convertToDTO(productInstanceService.findById(productId));
@@ -121,7 +121,7 @@ public class ProductController {
 	}
 
 	@RequestMapping(value = "/getProductProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public FProductProperties getProductProperties(@QueryParam("productId") Long productId)
+	public ProductPropertiesDTO getProductProperties(@QueryParam("productId") Long productId)
 			throws NotFoundException, PackagerException, DriverException, DataSourceException {
 
 		if (productId == null) {
@@ -134,7 +134,7 @@ public class ProductController {
 	}
 
 	@RequestMapping(value = "/getProductModelConfiguration", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public FProductModel getProductModelConfiguration(@QueryParam("packagerModelKey") String packagerModelKey,
+	public ProductModelDTO getProductModelConfiguration(@QueryParam("packagerModelKey") String packagerModelKey,
 			@QueryParam("productModelKey") String productModelKey)
 			throws PackagerException, DataSourceException, NotFoundException {
 
@@ -155,7 +155,7 @@ public class ProductController {
 	}
 
 	@RequestMapping(value = "/getProductModelConfigurationByPrefix", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public FProductModel getProductModelConfigurationByPrefix(@QueryParam("packagerModelKey") String packagerModelKey,
+	public ProductModelDTO getProductModelConfigurationByPrefix(@QueryParam("packagerModelKey") String packagerModelKey,
 			@QueryParam("productModelPrefix") String productModelPrefix)
 			throws PackagerException, DataSourceException, NotFoundException {
 

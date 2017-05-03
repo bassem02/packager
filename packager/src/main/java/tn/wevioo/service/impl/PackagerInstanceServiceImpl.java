@@ -9,16 +9,16 @@ import org.springframework.stereotype.Service;
 
 import nordnet.drivers.contract.exceptions.DriverException;
 import tn.wevioo.dao.PackagerInstanceDao;
+import tn.wevioo.dto.packager.PackagerInstanceDTO;
+import tn.wevioo.dto.packager.PackagerInstanceHeaderDTO;
+import tn.wevioo.dto.product.ProductInstanceDTO;
+import tn.wevioo.dto.product.ProductInstanceDiagnosticDTO;
+import tn.wevioo.dto.product.ProductInstanceHeaderDTO;
+import tn.wevioo.dto.product.ProductInstanceReferenceDTO;
 import tn.wevioo.entities.PackagerInstance;
 import tn.wevioo.entities.ProductInstance;
 import tn.wevioo.entities.ProductInstanceDiagnostic;
 import tn.wevioo.entities.ProductInstanceReference;
-import tn.wevioo.facade.packager.FPackagerInstance;
-import tn.wevioo.facade.packager.FPackagerInstanceHeader;
-import tn.wevioo.facade.product.FProductInstance;
-import tn.wevioo.facade.product.FProductInstanceDiagnostic;
-import tn.wevioo.facade.product.FProductInstanceHeader;
-import tn.wevioo.facade.product.FProductInstanceReference;
 import tn.wevioo.service.PackagerInstanceService;
 import tn.wevioo.service.PackagerModelService;
 import tn.wevioo.service.ProductInstanceDiagnosticService;
@@ -68,22 +68,22 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 		return packagerInstanceDao.findByRetailerPackagerId(retailerPackagerId);
 	}
 
-	public FPackagerInstance convertToDTO(PackagerInstance packagerInstance) throws DriverException {
+	public PackagerInstanceDTO convertToDTO(PackagerInstance packagerInstance) throws DriverException {
 		if (packagerInstance == null) {
 			return null;
 		}
 
-		FPackagerInstance result = new FPackagerInstance();
+		PackagerInstanceDTO result = new PackagerInstanceDTO();
 
 		result.setCurrentState(packagerInstance.getCurrentState());
 		result.setPackagerModel(packagerInstance.getPackagerModel().getRetailerKey());
 		result.setRetailerPackagerId(packagerInstance.getRetailerPackagerId());
-		List<FProductInstance> fProductInstances = new ArrayList<FProductInstance>();
+		List<ProductInstanceDTO> productInstanceDTOs = new ArrayList<ProductInstanceDTO>();
 		for (ProductInstance productInstance : packagerInstance.getProducts()) {
 
-			fProductInstances.add(productInstanceService.convertToDTO(productInstance));
+			productInstanceDTOs.add(productInstanceService.convertToDTO(productInstance));
 		}
-		result.setProducts(fProductInstances);
+		result.setProducts(productInstanceDTOs);
 
 		return result;
 	}
@@ -94,39 +94,39 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 	}
 
 	@Override
-	public FPackagerInstanceHeader convertToHeaderDTO(PackagerInstance packagerInstance) {
-		FPackagerInstanceHeader fPackagerInstanceHeader = new FPackagerInstanceHeader();
-		fPackagerInstanceHeader.setCreationDate(packagerInstance.getCreationDate());
-		fPackagerInstanceHeader.setRetailerPackagerId(packagerInstance.getRetailerPackagerId());
-		fPackagerInstanceHeader.setPackagerModel(packagerInstance.getPackagerModel().getRetailerKey());
+	public PackagerInstanceHeaderDTO convertToHeaderDTO(PackagerInstance packagerInstance) {
+		PackagerInstanceHeaderDTO packagerInstanceHeaderDTO = new PackagerInstanceHeaderDTO();
+		packagerInstanceHeaderDTO.setCreationDate(packagerInstance.getCreationDate());
+		packagerInstanceHeaderDTO.setRetailerPackagerId(packagerInstance.getRetailerPackagerId());
+		packagerInstanceHeaderDTO.setPackagerModel(packagerInstance.getPackagerModel().getRetailerKey());
 
-		List<FProductInstanceHeader> products = new ArrayList<FProductInstanceHeader>();
+		List<ProductInstanceHeaderDTO> products = new ArrayList<ProductInstanceHeaderDTO>();
 		Set<ProductInstance> productsInstance = packagerInstance.getProducts();
 
 		for (ProductInstance productInstance : productsInstance) {
-			FProductInstanceHeader fProductInstanceHeader = new FProductInstanceHeader();
-			fProductInstanceHeader.setProductId(productInstance.getIdProductInstance().longValue());
-			fProductInstanceHeader.setProductModel(productInstance.getProductModel().getRetailerKey());
-			fProductInstanceHeader.setProviderProductId(productInstance.getProviderProductId());
+			ProductInstanceHeaderDTO productInstanceHeaderDTO = new ProductInstanceHeaderDTO();
+			productInstanceHeaderDTO.setProductId(productInstance.getIdProductInstance().longValue());
+			productInstanceHeaderDTO.setProductModel(productInstance.getProductModel().getRetailerKey());
+			productInstanceHeaderDTO.setProviderProductId(productInstance.getProviderProductId());
 
-			List<FProductInstanceReference> fProductInstanceReferences = new ArrayList<FProductInstanceReference>();
+			List<ProductInstanceReferenceDTO> productInstanceReferenceDTOs = new ArrayList<ProductInstanceReferenceDTO>();
 			for (ProductInstanceReference productInstanceReference : productInstance.getProductInstanceReferences()) {
-				fProductInstanceReferences.add(productInstanceReferenceService.convertToDTO(productInstanceReference));
+				productInstanceReferenceDTOs.add(productInstanceReferenceService.convertToDTO(productInstanceReference));
 			}
-			fProductInstanceHeader.setReferences(fProductInstanceReferences);
+			productInstanceHeaderDTO.setReferences(productInstanceReferenceDTOs);
 
-			List<FProductInstanceDiagnostic> fProductInstanceDiagnostics = new ArrayList<FProductInstanceDiagnostic>();
+			List<ProductInstanceDiagnosticDTO> productInstanceDiagnosticDTOs = new ArrayList<ProductInstanceDiagnosticDTO>();
 			for (ProductInstanceDiagnostic productInstanceDiagnostic : productInstance
 					.getProductInstanceDiagnostics()) {
-				fProductInstanceDiagnostics
+				productInstanceDiagnosticDTOs
 						.add(productInstanceDiagnosticService.convertToDTO(productInstanceDiagnostic));
 			}
-			fProductInstanceHeader.setDiagnostics(fProductInstanceDiagnostics);
-			products.add(fProductInstanceHeader);
+			productInstanceHeaderDTO.setDiagnostics(productInstanceDiagnosticDTOs);
+			products.add(productInstanceHeaderDTO);
 		}
-		fPackagerInstanceHeader.setProducts(products);
+		packagerInstanceHeaderDTO.setProducts(products);
 
-		return fPackagerInstanceHeader;
+		return packagerInstanceHeaderDTO;
 	}
 
 }

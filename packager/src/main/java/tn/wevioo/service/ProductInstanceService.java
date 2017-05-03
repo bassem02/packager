@@ -3,9 +3,9 @@ package tn.wevioo.service;
 import java.util.List;
 
 import nordnet.drivers.contract.exceptions.DriverException;
+import tn.wevioo.dto.product.ProductInstanceDTO;
+import tn.wevioo.dto.product.ProductPropertiesDTO;
 import tn.wevioo.entities.ProductInstance;
-import tn.wevioo.facade.product.FProductInstance;
-import tn.wevioo.facade.product.FProductProperties;
 
 public interface ProductInstanceService {
 
@@ -17,8 +17,8 @@ public interface ProductInstanceService {
 
 	public List<ProductInstance> findAll();
 
-	public FProductInstance convertToDTO(ProductInstance findById) throws DriverException;
+	public ProductInstanceDTO convertToDTO(ProductInstance findById) throws DriverException;
 
-	public FProductProperties convertToPropertiesDTO(ProductInstance productInstance) throws DriverException;
+	public ProductPropertiesDTO convertToPropertiesDTO(ProductInstance productInstance) throws DriverException;
 
 }

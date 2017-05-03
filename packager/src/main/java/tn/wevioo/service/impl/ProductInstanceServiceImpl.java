@@ -9,13 +9,13 @@ import org.springframework.stereotype.Service;
 
 import nordnet.drivers.contract.exceptions.DriverException;
 import tn.wevioo.dao.ProductInstanceDAO;
+import tn.wevioo.dto.product.ProductInstanceDTO;
+import tn.wevioo.dto.product.ProductInstanceDiagnosticDTO;
+import tn.wevioo.dto.product.ProductInstanceReferenceDTO;
+import tn.wevioo.dto.product.ProductPropertiesDTO;
 import tn.wevioo.entities.ProductInstance;
 import tn.wevioo.entities.ProductInstanceDiagnostic;
 import tn.wevioo.entities.ProductInstanceReference;
-import tn.wevioo.facade.product.FProductInstance;
-import tn.wevioo.facade.product.FProductInstanceDiagnostic;
-import tn.wevioo.facade.product.FProductInstanceReference;
-import tn.wevioo.facade.product.FProductProperties;
 import tn.wevioo.service.ProductInstanceDiagnosticService;
 import tn.wevioo.service.ProductInstanceReferenceService;
 import tn.wevioo.service.ProductInstanceService;
@@ -58,39 +58,39 @@ public class ProductInstanceServiceImpl implements ProductInstanceService {
 	}
 
 	@Override
-	public FProductInstance convertToDTO(ProductInstance productInstance) throws DriverException {
+	public ProductInstanceDTO convertToDTO(ProductInstance productInstance) throws DriverException {
 
-		FProductInstance fProductInstance = new FProductInstance();
-		fProductInstance.setProductId(productInstance.getIdProductInstance().longValue());
-		fProductInstance.setProductModel(productInstance.getProductModel().getRetailerKey());
-		fProductInstance.setProviderProductId(productInstance.getProviderProductId());
-		fProductInstance.setCurrentState(productInstance.getCurrentState());
+		ProductInstanceDTO productInstanceDTO = new ProductInstanceDTO();
+		productInstanceDTO.setProductId(productInstance.getIdProductInstance().longValue());
+		productInstanceDTO.setProductModel(productInstance.getProductModel().getRetailerKey());
+		productInstanceDTO.setProviderProductId(productInstance.getProviderProductId());
+		productInstanceDTO.setCurrentState(productInstance.getCurrentState());
 
-		List<FProductInstanceReference> fProductInstanceReferences = new ArrayList<FProductInstanceReference>();
+		List<ProductInstanceReferenceDTO> productInstanceReferenceDTOs = new ArrayList<ProductInstanceReferenceDTO>();
 		for (ProductInstanceReference productInstanceReference : productInstance.getProductInstanceReferences()) {
-			fProductInstanceReferences.add(productInstanceReferenceService.convertToDTO(productInstanceReference));
+			productInstanceReferenceDTOs.add(productInstanceReferenceService.convertToDTO(productInstanceReference));
 		}
-		fProductInstance.setReferences(fProductInstanceReferences);
+		productInstanceDTO.setReferences(productInstanceReferenceDTOs);
 
-		List<FProductInstanceDiagnostic> fProductInstanceDiagnostics = new ArrayList<FProductInstanceDiagnostic>();
+		List<ProductInstanceDiagnosticDTO> productInstanceDiagnosticDTOs = new ArrayList<ProductInstanceDiagnosticDTO>();
 		for (ProductInstanceDiagnostic productInstanceDiagnostic : productInstance.getProductInstanceDiagnostics()) {
-			fProductInstanceDiagnostics.add(productInstanceDiagnosticService.convertToDTO(productInstanceDiagnostic));
+			productInstanceDiagnosticDTOs.add(productInstanceDiagnosticService.convertToDTO(productInstanceDiagnostic));
 		}
-		fProductInstance.setDiagnostics(fProductInstanceDiagnostics);
+		productInstanceDTO.setDiagnostics(productInstanceDiagnosticDTOs);
 
-		return fProductInstance;
+		return productInstanceDTO;
 	}
 
 	@Override
-	public FProductProperties convertToPropertiesDTO(ProductInstance productInstance) throws DriverException {
+	public ProductPropertiesDTO convertToPropertiesDTO(ProductInstance productInstance) throws DriverException {
 
-		FProductInstance fProductInstance = convertToDTO(productInstance);
+		ProductInstanceDTO productInstanceDTO = convertToDTO(productInstance);
 
-		FProductProperties fProductProperties = new FProductProperties();
-		BeanUtils.copyProperties(fProductInstance, fProductProperties);
-		fProductProperties.setProperties(productInstance.getProductProperties());
+		ProductPropertiesDTO productPropertiesDTO = new ProductPropertiesDTO();
+		BeanUtils.copyProperties(productInstanceDTO, productPropertiesDTO);
+		productPropertiesDTO.setProperties(productInstance.getProductProperties());
 
-		return fProductProperties;
+		return productPropertiesDTO;
 	}
 
 }
