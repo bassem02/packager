@@ -18,6 +18,7 @@ import org.xml.sax.SAXException;
 import nordnet.architecture.exceptions.explicit.MalformedXMLException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
 import nordnet.drivers.contract.exceptions.DriverException;
+import nordnet.drivers.contract.types.FeasibilityTestResult;
 import tn.wevioo.ManualDriver;
 import tn.wevioo.ManualDriverFactory;
 import tn.wevioo.entities.Product;
@@ -122,4 +123,22 @@ public class Controller {
 
 		return manualDriver.getSelfDiagnostics().toString();
 	}
+
+	@RequestMapping(value = "/manual/isPropertiesChangePossible", method = RequestMethod.GET)
+	public FeasibilityTestResult isPropertiesChangePossible(@QueryParam("properties") String properties)
+			throws DriverException, JAXBException, MalformedXMLException {
+
+		return manualDriver.isPropertiesChangePossible(properties);
+	}
+
+	@RequestMapping(value = "/manual/changePropertiesManual", method = RequestMethod.GET)
+	public String changePropertiesManual(@QueryParam("properties") String properties, @QueryParam("ppid") String ppid)
+			throws DriverException, JAXBException, MalformedXMLException, NotRespectedRulesException, SAXException,
+			IOException, ParserConfigurationException {
+
+		manualDriver.changePropertiesManual(properties, ppid);
+
+		return "properties changed";
+	}
+
 }

@@ -29,6 +29,7 @@ import nordnet.architecture.exceptions.implicit.UnsupportedActionException;
 import nordnet.architecture.exceptions.utils.ErrorCode;
 import nordnet.drivers.contract.exceptions.DriverException;
 import nordnet.drivers.contract.impl.ProductDriverImpl;
+import nordnet.drivers.contract.types.FeasibilityTestResult;
 import nordnet.drivers.contract.types.State;
 import nordnet.drivers.tools.Reference;
 import nordnet.drivers.tools.ReferenceKeys;
@@ -805,5 +806,125 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 		} catch (NotFoundException e) {
 		}
 		throw new DriverException(new ErrorCode("0.1.1.7.6"));
+	}
+
+	public FeasibilityTestResult isPropertiesChangePossible(String properties)
+			throws DriverException, MalformedXMLException {
+
+		Object parsedProperties = null;
+
+		try {
+			parsedProperties = ManualDriverFactory.parse(properties);
+			return performIsPropertiesChangePossible(parsedProperties);
+		} catch (Exception e) {
+			FeasibilityTestResult result = new FeasibilityTestResult();
+			result.setPossible(false);
+			result.setMotive(e.getMessage());
+			result.setExceptionCause(e);
+
+			return result;
+		}
+
+	}
+
+	public void changePropertiesManual(final String properties, String ppid) throws DriverException,
+			MalformedXMLException, NotRespectedRulesException, SAXException, IOException, ParserConfigurationException {
+
+		Object parsedProperties = null;
+
+		try {
+			parsedProperties = startChangePropertiesManual(properties, ppid);
+			performChangePropertiesManual(parsedProperties, ppid);
+		} catch (DriverException ex) {
+			failChangePropertiesManual(properties, ex, ppid);
+			throw ex;
+		} catch (NotRespectedRulesException ex) {
+			failChangePropertiesManual(properties, ex, ppid);
+			throw ex;
+		} catch (MalformedXMLException ex) {
+			failChangePropertiesManual(properties, ex, ppid);
+			throw ex;
+		} catch (NullException ex) {
+			failChangePropertiesManual(properties, ex, ppid);
+			throw ex;
+		}
+
+		successChangePropertiesManual(properties, ppid);
+	}
+
+	protected void failChangePropertiesManual(final String properties, Exception cause, String ppid)
+			throws DriverException {
+		if (cause == null) {
+			throw new NullException(NullCases.NULL, "cause");
+		}
+		// will lose the error log if we put the condition here
+		// if((properties == null) || (properties.trim().length() == 0)){
+		// throw new NullException(NullCases.NULL_EMPTY, "properties");
+		// }
+
+		String errorCode = "N/A";
+		if (cause instanceof NNException) {
+			errorCode = ((NNException) cause).getErrorCode().toString();
+		} else {
+			if (cause instanceof NNImplicitException) {
+				errorCode = ((NNImplicitException) cause).getErrorCode().toString();
+			}
+		}
+
+		this.getHistoricalReportLogger()
+				.error("The properties of product " + this.getClass().getSimpleName() + " [" + ppid
+						+ "] cannot be changed because of exception " + cause.getClass().getSimpleName() + "/"
+						+ errorCode + ":" + cause.getMessage());
+	}
+
+	protected void successChangePropertiesManual(String properties, String ppid) throws DriverException {
+		this.getHistoricalReportLogger().info("The properties of the product " + this.getClass().getSimpleName() + " ["
+				+ ppid + "] have been successfully changed (new state=[" + this.getCurrentState() + "]).");
+	}
+
+	protected void performChangePropertiesManual(Object properties, String ppid)
+			throws DriverException, NotRespectedRulesException {
+		LOGGER.info("Change properties of the product: " + ppid);
+		if (!(properties instanceof ProductProperties)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.5"), new Object[] { "productProperties",
+					ProductProperties.class, properties.getClass().getSimpleName() });
+		}
+		Product product = null;
+		try {
+			product = this.productService.findByProviderProductId(ppid);
+		} catch (NNException e1) {
+			LOGGER.error(e1);
+			throw new DriverException(e1);
+		}
+		ProductProperties productProperties = (ProductProperties) properties;
+
+		if (productProperties.getHexacle() != null) {
+			if (product.getCurrentHexacle() == null) {
+				product.setCurrentHexacle(productProperties.getHexacle());
+			} else {
+				product.setPreviousHexacle(product.getCurrentHexacle());
+				product.setCurrentHexacle(productProperties.getHexacle());
+			}
+
+			try {
+				if (!product.getCurrentHexacle().equals(product.getPreviousHexacle())) {
+					this.productService.changeProduct(product);
+				}
+			} catch (NNException e) {
+				LOGGER.error(e);
+				throw new DriverException(e);
+			}
+		}
+		LOGGER.info("Properties changed successfully !");
+	}
+
+	protected Object startChangePropertiesManual(final String properties, String ppid) throws DriverException,
+			MalformedXMLException, NotRespectedRulesException, SAXException, IOException, ParserConfigurationException {
+		Object result = ManualDriverFactory.parse(properties);
+		if (this.getCurrentState().equals(State.CANCELED)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.2.12"), new Object[] { ppid, State.CANCELED });
+		}
+
+		return result;
 	}
 }
