@@ -86,6 +86,7 @@ public class PackagerActionHistory implements java.io.Serializable {
 		this.packagerAction = action.toString();
 		this.creationDate = new Date();
 		this.webServiceUser = webServiceUserService.findById(7);
+		setLastUpdate(new Date());
 	}
 
 	@Id

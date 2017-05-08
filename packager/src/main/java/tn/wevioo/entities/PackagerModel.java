@@ -3,6 +3,7 @@ package tn.wevioo.entities;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,11 +22,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
+import org.xml.sax.SAXException;
 
 import nordnet.architecture.exceptions.explicit.DataSourceException;
 import nordnet.architecture.exceptions.explicit.MalformedXMLException;
@@ -37,13 +40,13 @@ import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import nordnet.architecture.exceptions.utils.ErrorCode;
 import nordnet.drivers.contract.exceptions.DriverException;
 import nordnet.drivers.contract.types.Action;
-import nordnet.drivers.contract.types.FeasibilityTestResult;
 import tn.wevioo.ManualDriver;
 import tn.wevioo.ManualDriverFactory;
 import tn.wevioo.exceptions.PackagerException;
 import tn.wevioo.feasibility.FeasibilityResult;
 import tn.wevioo.model.packager.action.PackagerInstanceAction;
 import tn.wevioo.model.request.PackagerRequest;
+import tn.wevioo.model.request.PackagerTransformationRequest;
 import tn.wevioo.model.request.ProductRequest;
 import tn.wevioo.service.PackagerInstanceService;
 import tn.wevioo.service.ProductInstanceService;
@@ -317,7 +320,7 @@ public class PackagerModel implements java.io.Serializable {
 	public static void verifyXmlProperties(PackagerInstanceAction action, List<ProductRequest> requests,
 			ProductModelService productModelService, ManualDriverFactory manualDriverFactory)
 			throws DriverException, NotFoundException, MalformedXMLException, PackagerException, DataSourceException,
-			NotRespectedRulesException {
+			NotRespectedRulesException, SAXException, IOException, ParserConfigurationException {
 
 		if (action == null) {
 			throw new NullException(NullCases.NULL, "action parameter");
@@ -337,40 +340,42 @@ public class PackagerModel implements java.io.Serializable {
 			case MERGE_DESTINATION:
 			case TRANSLOCATE_PRODUCT:
 
-				manualDriverFactory.verifyXmlProperties(Action.CHANGE_PROPERTIES, productRequest.getProperties());
+				manualDriverFactory.verifyXmlPropertiesManual(Action.CHANGE_PROPERTIES, productRequest.getProperties());
 				break;
 			case ACTIVATE:
-				manualDriverFactory.verifyXmlProperties(Action.ACTIVATE, productRequest.getProperties());
+				manualDriverFactory.verifyXmlPropertiesManual(Action.ACTIVATE, productRequest.getProperties());
 				break;
 			case SUSPEND:
-				manualDriverFactory.verifyXmlProperties(Action.SUSPEND, productRequest.getProperties());
+				manualDriverFactory.verifyXmlPropertiesManual(Action.SUSPEND, productRequest.getProperties());
 				break;
 			case REACTIVATE:
-				manualDriverFactory.verifyXmlProperties(Action.REACTIVATE, productRequest.getProperties());
+				manualDriverFactory.verifyXmlPropertiesManual(Action.REACTIVATE, productRequest.getProperties());
 				break;
 			case RESET:
-				manualDriverFactory.verifyXmlProperties(Action.RESET, productRequest.getProperties());
+				manualDriverFactory.verifyXmlPropertiesManual(Action.RESET, productRequest.getProperties());
 				break;
 			case DELETE:
-				manualDriverFactory.verifyXmlProperties(Action.DELETE, productRequest.getProperties());
+				manualDriverFactory.verifyXmlPropertiesManual(Action.DELETE, productRequest.getProperties());
 				break;
 			case CANCEL:
 			case SPLIT_SOURCE:
 			case MERGE_SOURCE:
-				manualDriverFactory.verifyXmlProperties(Action.CANCEL, productRequest.getProperties());
+				manualDriverFactory.verifyXmlPropertiesManual(Action.CANCEL, productRequest.getProperties());
 
 				break;
 			case CREATE:
 
-				FeasibilityTestResult fr = manualDriverFactory
-						.testFeasibilityForProductCreation(productRequest.getProperties());
-				if (!fr.getPossible()) {
-					if (fr.getExceptionCause() == null) {
-						throw new NotRespectedRulesException(new ErrorCode("1.2.2.25"), new Exception(fr.getMotive()));
-					} else {
-						throw new NotRespectedRulesException(new ErrorCode("1.2.2.25"), fr.getExceptionCause());
-					}
-				}
+				// FeasibilityTestResult fr = manualDriverFactory
+				// .testFeasibilityForProductCreation(productRequest.getProperties());
+				// if (!fr.getPossible()) {
+				// if (fr.getExceptionCause() == null) {
+				// throw new NotRespectedRulesException(new
+				// ErrorCode("1.2.2.25"), new Exception(fr.getMotive()));
+				// } else {
+				// throw new NotRespectedRulesException(new
+				// ErrorCode("1.2.2.25"), fr.getExceptionCause());
+				// }
+				// }
 
 				break;
 			default:
@@ -440,7 +445,8 @@ public class PackagerModel implements java.io.Serializable {
 
 	public FeasibilityResult isInstantiationPossible(PackagerRequest request,
 			PackagerInstanceService packagerInstanceService, ProductModelService productModelService,
-			ManualDriverFactory manualDriverFactory) throws PackagerException, DriverException, DataSourceException {
+			ManualDriverFactory manualDriverFactory) throws PackagerException, DriverException, DataSourceException,
+			SAXException, IOException, ParserConfigurationException {
 		if (request == null) {
 			return new FeasibilityResult(false, new NullException(NullCases.NULL, "request").getMessage());
 		}
@@ -501,8 +507,9 @@ public class PackagerModel implements java.io.Serializable {
 
 	private PackagerRequest prepareRequestForInstantiation(PackagerRequest request,
 			PackagerInstanceService packagerInstanceService, ProductModelService productModelService,
-			ManualDriverFactory manualDriverFactory) throws NotRespectedRulesException, PackagerException,
-			MalformedXMLException, NotFoundException, DriverException, DataSourceException {
+			ManualDriverFactory manualDriverFactory)
+			throws NotRespectedRulesException, PackagerException, MalformedXMLException, NotFoundException,
+			DriverException, DataSourceException, SAXException, IOException, ParserConfigurationException {
 
 		if (request == null) {
 			throw new NullException(NullCases.NULL_EMPTY, "request");
@@ -682,5 +689,57 @@ public class PackagerModel implements java.io.Serializable {
 		}
 
 		return requests;
+	}
+
+	protected PackagerInstance instantiateDestinationFromSplitMerge(PackagerTransformationRequest request,
+			PackagerActionHistory history, ProductModelService productModelService,
+			ProductInstanceService productInstanceService, WebServiceUserService webServiceUserService,
+			ManualDriverFactory manualDriverFactory, ManualDriver manualDriver) throws PackagerException,
+			DriverException, NotFoundException, DataSourceException, NotRespectedRulesException, MalformedXMLException {
+
+		PackagerInstance result = new PackagerInstance();
+		// creating the product instances
+		result.setRetailerPackagerId(request.getDestinationRetailerPackagerId());
+		result.setCreationDate(new Date());
+		result.setPackagerModel(this);
+		result.setLastUpdate(new Date());
+
+		Retailer retailer = new Retailer();
+		retailer.setIdRetailer(1);
+		retailer.setName("NORDNET.COM");
+		result.setRetailer(retailer);
+
+		for (ProductRequest pr : request.getCreationProductRequests()) {
+			ProductModel productModel = productModelService.findByRetailerKey(pr.getModel());
+			ProductInstance productInstance = productModel.instantiate(pr.getProperties(), history, manualDriverFactory,
+					manualDriver, webServiceUserService, productInstanceService);
+			result.addProductInstance(productInstance);
+		}
+
+		// moving existing product instances
+		System.out.println("aaa " + request.getProducts());
+		for (ProductRequest pr : request.getChangeProductRequests()) {
+			ProductInstance productInstance = productInstanceService.findById(pr.getProductId().intValue());
+
+			productInstance.getPackager().getProducts().remove(productInstance);
+
+			ProductInstance piDestination = productInstance.clone();
+
+			result.addProductInstance(piDestination);
+
+			if (pr.getProperties() != null) {
+				piDestination.changeProperties(pr.getProperties(), history, webServiceUserService,
+						productInstanceService, manualDriverFactory);
+			}
+		}
+
+		try {
+			result.updateReferences(history, webServiceUserService, productInstanceService);
+		} catch (Exception e) {
+			return result;
+		}
+
+		return result;
+
 	}
 }

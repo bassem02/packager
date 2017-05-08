@@ -709,7 +709,6 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 		String result = null;
 		try {
 			result = generateXmlUsageProperties(usageProperties);
-			System.out.println(result);
 			LOGGER.info("Generation of XML is done");
 		} catch (JAXBException e) {
 			LOGGER.error("The generation of XML isn't done", e);

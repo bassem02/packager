@@ -3,6 +3,7 @@ package tn.wevioo.entities;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -24,12 +25,15 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xml.sax.SAXException;
 
 import nordnet.architecture.exceptions.explicit.DataSourceException;
 import nordnet.architecture.exceptions.explicit.MalformedXMLException;
+import nordnet.architecture.exceptions.explicit.MalformedXMLException.MalformedCases;
 import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
 import nordnet.architecture.exceptions.implicit.NullException;
@@ -38,6 +42,7 @@ import nordnet.architecture.exceptions.implicit.UnsupportedActionException;
 import nordnet.architecture.exceptions.utils.ErrorCode;
 import nordnet.drivers.contract.exceptions.DriverException;
 import nordnet.drivers.contract.types.State;
+import tn.wevioo.ManualDriver;
 import tn.wevioo.ManualDriverFactory;
 import tn.wevioo.exceptions.PackagerException;
 import tn.wevioo.feasibility.FeasibilityResult;
@@ -48,6 +53,7 @@ import tn.wevioo.model.request.PackagerTransformationRequest;
 import tn.wevioo.model.request.ProductRequest;
 import tn.wevioo.service.PackagerActionHistoryService;
 import tn.wevioo.service.PackagerInstanceService;
+import tn.wevioo.service.PackagerModelService;
 import tn.wevioo.service.ProductInstanceService;
 import tn.wevioo.service.ProductModelService;
 import tn.wevioo.service.WebServiceUserService;
@@ -200,7 +206,7 @@ public class PackagerInstance implements java.io.Serializable {
 	}
 
 	public void addProductInstance(ProductInstance productInstance) {
-		this.products.add(productInstance);
+		this.getProducts().add(productInstance);
 	}
 
 	protected ProductRequest getProductRequest(PackagerRequest request, Integer productId) {
@@ -269,7 +275,7 @@ public class PackagerInstance implements java.io.Serializable {
 			ManualDriverFactory manualDriverFactory, PackagerActionHistoryService packagerActionHistoryService,
 			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService)
 			throws NotRespectedRulesException, DriverException, NotFoundException, MalformedXMLException,
-			PackagerException, DataSourceException {
+			PackagerException, DataSourceException, SAXException, IOException, ParserConfigurationException {
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
 		}
@@ -482,7 +488,7 @@ public class PackagerInstance implements java.io.Serializable {
 			ManualDriverFactory manualDriverFactory, PackagerActionHistoryService packagerActionHistoryService,
 			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService)
 			throws NotRespectedRulesException, DriverException, NotFoundException, MalformedXMLException,
-			PackagerException, DataSourceException {
+			PackagerException, DataSourceException, SAXException, IOException, ParserConfigurationException {
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
 		}
@@ -563,7 +569,7 @@ public class PackagerInstance implements java.io.Serializable {
 			ManualDriverFactory manualDriverFactory, PackagerActionHistoryService packagerActionHistoryService,
 			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService)
 			throws NotRespectedRulesException, DriverException, NotFoundException, MalformedXMLException,
-			PackagerException, DataSourceException {
+			PackagerException, DataSourceException, SAXException, IOException, ParserConfigurationException {
 
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
@@ -646,7 +652,7 @@ public class PackagerInstance implements java.io.Serializable {
 			ManualDriverFactory manualDriverFactory, PackagerActionHistoryService packagerActionHistoryService,
 			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService)
 			throws NotRespectedRulesException, DriverException, NotFoundException, MalformedXMLException,
-			PackagerException, DataSourceException {
+			PackagerException, DataSourceException, SAXException, IOException, ParserConfigurationException {
 
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
@@ -728,7 +734,7 @@ public class PackagerInstance implements java.io.Serializable {
 			ManualDriverFactory manualDriverFactory, PackagerActionHistoryService packagerActionHistoryService,
 			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService)
 			throws NotRespectedRulesException, DriverException, NotFoundException, MalformedXMLException,
-			PackagerException, DataSourceException {
+			PackagerException, DataSourceException, SAXException, IOException, ParserConfigurationException {
 
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
@@ -852,8 +858,9 @@ public class PackagerInstance implements java.io.Serializable {
 	public void translocateProductInstances(PackagerTransformationRequest request, PackagerActionHistory history,
 			PackagerInstanceService packagerInstanceService, ProductInstanceService productInstanceService,
 			ProductModelService productModelService, ManualDriverFactory manualDriverFactory,
-			WebServiceUserService webServiceUserService) throws PackagerException, MalformedXMLException,
-			NotFoundException, NotRespectedRulesException, DriverException, DataSourceException {
+			WebServiceUserService webServiceUserService)
+			throws PackagerException, MalformedXMLException, NotFoundException, NotRespectedRulesException,
+			DriverException, DataSourceException, SAXException, IOException, ParserConfigurationException {
 
 		request = prepareRequestForProductTranslocation(request, packagerInstanceService, productInstanceService,
 				productModelService, manualDriverFactory);
@@ -887,8 +894,9 @@ public class PackagerInstance implements java.io.Serializable {
 
 	private PackagerTransformationRequest prepareRequestForProductTranslocation(PackagerTransformationRequest request,
 			PackagerInstanceService packagerInstanceService, ProductInstanceService productInstanceService,
-			ProductModelService productModelService, ManualDriverFactory manualDriverFactory) throws NotFoundException,
-			PackagerException, DriverException, MalformedXMLException, NotRespectedRulesException, DataSourceException {
+			ProductModelService productModelService, ManualDriverFactory manualDriverFactory)
+			throws NotFoundException, PackagerException, DriverException, MalformedXMLException,
+			NotRespectedRulesException, DataSourceException, SAXException, IOException, ParserConfigurationException {
 
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
@@ -962,7 +970,7 @@ public class PackagerInstance implements java.io.Serializable {
 					}
 				}
 			}
-			this.packagerModel.verifyProductOccurences(futureProducts);
+			// this.packagerModel.verifyProductOccurences(futureProducts);
 
 			PackagerInstance destinationPackagerInstance = packagerInstanceService
 					.findByRetailerPackagerId(request.getDestinationRetailerPackagerId());
@@ -997,12 +1005,15 @@ public class PackagerInstance implements java.io.Serializable {
 
 	public FeasibilityResult isProductTranslocationPossible(PackagerTransformationRequest request,
 			PackagerInstanceService packagerInstanceService, ProductInstanceService productInstanceService,
-			ProductModelService productModelService, ManualDriverFactory manualDriverFactory)
-			throws PackagerException, DriverException, DataSourceException {
+			ProductModelService productModelService, ManualDriverFactory manualDriverFactory) throws DriverException,
+			DataSourceException, PackagerException, SAXException, IOException, ParserConfigurationException {
 		try {
 			request = this.prepareRequestForProductTranslocation(request, packagerInstanceService,
 					productInstanceService, productModelService, manualDriverFactory);
 			return new FeasibilityResult(true, null, null);
+
+		} catch (PackagerException e) {
+			return new FeasibilityResult(false, e.getMessage(), e);
 		} catch (NotRespectedRulesException e) {
 			return new FeasibilityResult(false, e.getMessage(), e);
 		} catch (NotFoundException e) {
@@ -1011,6 +1022,316 @@ public class PackagerInstance implements java.io.Serializable {
 			return new FeasibilityResult(false, e.getMessage(), e);
 		}
 
+	}
+
+	public List<PackagerInstance> split(PackagerRequest source, PackagerTransformationRequest destination1,
+			PackagerTransformationRequest destination2, PackagerActionHistory history,
+			PackagerModelService packagerModelService, WebServiceUserService webServiceUserService,
+			ProductInstanceService productInstanceService, PackagerInstanceService packagerInstanceService,
+			ProductModelService productModelService, ManualDriverFactory manualDriverFactory, ManualDriver manualDriver)
+			throws PackagerException, DataSourceException, NotRespectedRulesException, NotFoundException,
+			MalformedXMLException, DriverException, SAXException, IOException, ParserConfigurationException {
+
+		if (source == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+		if (source.getRetailerPackagerId() == null) {
+			throw new NullException(NullCases.NULL, "retailer packager id parameter");
+		}
+		if (!source.getRetailerPackagerId().equals(this.getRetailerPackagerId())) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.9"),
+					new Object[] { source.getRetailerPackagerId(), this.getRetailerPackagerId() });
+		}
+		if (destination1 == null) {
+			throw new NullException(NullCases.NULL, "first destination packager transformation request parameter");
+		}
+
+		List<PackagerInstance> result = new ArrayList<PackagerInstance>();
+		PackagerInstance destinationPackagerInstance1 = null;
+		PackagerInstance destinationPackagerInstance2 = null;
+
+		prepareRequestsToSplit(source, destination1, destination2, packagerInstanceService, packagerModelService,
+				productModelService, manualDriverFactory, productInstanceService);
+
+		PackagerModel destinationPackagerModel1 = packagerModelService
+				.findByRetailerKey(destination1.getDestinationModel());
+		destinationPackagerInstance1 = destinationPackagerModel1.instantiateDestinationFromSplitMerge(destination1,
+				history, productModelService, productInstanceService, webServiceUserService, manualDriverFactory,
+				manualDriver);
+		if (destination2 != null) {
+			PackagerModel destinationPackagerModel2 = packagerModelService
+					.findByRetailerKey(destination2.getDestinationModel());
+			destinationPackagerInstance2 = destinationPackagerModel2.instantiateDestinationFromSplitMerge(destination2,
+					history, productModelService, productInstanceService, webServiceUserService, manualDriverFactory,
+					manualDriver);
+		}
+
+		for (ProductRequest pr : source.getProducts()) {
+			ProductInstance pi = this.getProductInstance(pr.getProductId());
+			try {
+				pi.cancel(pr.getProperties(), history, webServiceUserService, productInstanceService);
+			} catch (UnsupportedActionException e) {
+				// If the cancel action is not supported the process continues
+				if (LOGGER.isWarnEnabled()) {
+					LOGGER.warn(
+							"Cancel opperation not supported for productInstance [" + pi.getIdProductInstance() + "]");
+				}
+			}
+		}
+
+		result.add(destinationPackagerInstance1);
+
+		if (destinationPackagerInstance2 != null) {
+			result.add(destinationPackagerInstance2);
+		}
+
+		history.addSource(packagerInstanceService.findByRetailerPackagerId(source.getRetailerPackagerId()));
+		history.addDestination(destinationPackagerInstance1);
+
+		if (destination2 != null) {
+			history.addDestination(destinationPackagerInstance2);
+		}
+
+		return result;
+	}
+
+	private void prepareRequestsToSplit(PackagerRequest source, PackagerTransformationRequest destination1,
+			PackagerTransformationRequest destination2, PackagerInstanceService packagerInstanceService,
+			PackagerModelService packagerModelService, ProductModelService productModelService,
+			ManualDriverFactory manualDriverFactory, ProductInstanceService productInstanceService)
+			throws PackagerException, DataSourceException, NotRespectedRulesException, MalformedXMLException,
+			NotFoundException, DriverException, SAXException, IOException, ParserConfigurationException {
+		destination1 = prepareRequestToSplitDestination(destination1, packagerInstanceService, packagerModelService,
+				productModelService, manualDriverFactory, productInstanceService);
+		destination2 = prepareRequestToSplitDestination(destination2, packagerInstanceService, packagerModelService,
+				productModelService, manualDriverFactory, productInstanceService);
+		if (destination2 != null) {
+			// verify if an existed product has been found twice on both
+			// destination packager requests.
+			for (ProductRequest pr : destination1.getChangeProductRequests()) {
+				if (PackagerInstance.productInstanceIsFoundTwice(pr.getProductId(), destination2)) {
+					throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.15"),
+							new Object[] { pr.getProductId() });
+				}
+			}
+		}
+		source = prepareRequestToSplitSource(source, destination1, destination2);
+	}
+
+	private PackagerRequest prepareRequestToSplitSource(PackagerRequest source,
+			PackagerTransformationRequest destination1, PackagerTransformationRequest destination2)
+			throws PackagerException, DataSourceException, NotFoundException, MalformedXMLException,
+			NotRespectedRulesException, DriverException {
+
+		if (source == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+		if (source.getRetailerPackagerId() == null) {
+			throw new NullException(NullCases.NULL, "retailer packager id parameter");
+		}
+		if (!source.getRetailerPackagerId().equals(this.getRetailerPackagerId())) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.9"),
+					new Object[] { source.getRetailerPackagerId(), this.getRetailerPackagerId() });
+		}
+		if (destination1 == null) {
+			throw new NullException(NullCases.NULL, "first destination packager instance parameter");
+		}
+
+		source.validate(PackagerInstanceAction.SPLIT_SOURCE);
+		// verify if an existed product has been found twice on source and on
+		// destination packager request.
+		for (ProductRequest pr : source.getChangeProductRequests()) {
+			if (PackagerInstance.productInstanceIsFoundTwice(pr.getProductId(), destination1)) {
+				throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.14"), new Object[] { pr.getProductId() });
+			}
+			if (PackagerInstance.productInstanceIsFoundTwice(pr.getProductId(), destination2)) {
+				throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.14"), new Object[] { pr.getProductId() });
+			}
+		}
+
+		List<ProductRequest> fullProductRequests = new ArrayList<ProductRequest>();
+		fullProductRequests.addAll(source.getProducts());
+		fullProductRequests = this.completeMissingExistingProducts(fullProductRequests, true);
+		fullProductRequests = this.removeCanceledProductRequests(fullProductRequests);
+		// these products will be cancelled at the end of split action
+		fullProductRequests.removeAll(source.getProducts());
+		// changeProductRequests from destination requests were just used to
+		// compute missing products
+		fullProductRequests.removeAll(destination1.getChangeProductRequests());
+		if (destination2 != null) {
+			// changeProductRequests from destination requests were just used to
+			// compute missing products
+			fullProductRequests.removeAll(destination2.getChangeProductRequests());
+		}
+		if (fullProductRequests.size() > 0) {
+			this.packagerModel.verifyProductOccurences(fullProductRequests);
+		}
+		return source;
+	}
+
+	private List<ProductRequest> removeCanceledProductRequests(List<ProductRequest> requests) throws DriverException {
+
+		if (requests == null) {
+			throw new NullException(NullCases.NULL, "requests parameter");
+		}
+
+		List<ProductRequest> result = new ArrayList<ProductRequest>();
+
+		for (ProductRequest pr : requests) {
+			if (pr.getProductId() == null) {
+				result.add(pr);
+			} else {
+				for (ProductInstance pi : this.getProducts()) {
+					if (pi.getIdProductInstance().toString().equals(pr.getProductId().toString())) {
+						if (!pi.getCurrentState().equals(State.CANCELED)) {
+							result.add(pr);
+						}
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+	private static boolean productInstanceIsFoundTwice(Long productId, PackagerRequest packagerRequest) {
+		if (packagerRequest != null) {
+			for (ProductRequest pr : packagerRequest.getChangeProductRequests()) {
+				if (productId.equals(pr.getProductId())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private PackagerTransformationRequest prepareRequestToSplitDestination(PackagerTransformationRequest request,
+			PackagerInstanceService packagerInstanceService, PackagerModelService packagerModelService,
+			ProductModelService productModelService, ManualDriverFactory manualDriverFactory,
+			ProductInstanceService productInstanceService)
+			throws NotFoundException, NotRespectedRulesException, DataSourceException, DriverException,
+			PackagerException, MalformedXMLException, SAXException, IOException, ParserConfigurationException {
+		if (request == null) {
+			return null;
+		}
+
+		if (request.getDestinationRetailerPackagerId() == null) {
+			throw new NullException(NullCases.NULL, "destination retailer packager identifier parameter");
+		}
+		if (!packagerInstanceService.isRetailerPackagerIdFree(request.getDestinationRetailerPackagerId())) {
+			throw new NotRespectedRulesException(new ErrorCode("0.2.1.1.9"),
+					new Object[] { request.getDestinationRetailerPackagerId() });
+		}
+
+		if (request.getDestinationModel() == null) {
+			throw new NullException(NullCases.NULL, "destination packager model parameter");
+		}
+
+		request.setRetailerPackagerId(this.getRetailerPackagerId());
+		request.setModel(this.getPackagerModel().getRetailerKey());
+		request.validate(PackagerInstanceAction.SPLIT_DESTINATION);
+
+		PackagerModel destinationPackagerModel = packagerModelService.findByRetailerKey(request.getDestinationModel());
+		// prepare change properties requests
+		List<ProductRequest> changeProductRequests = this.completeProductModels(request.getChangeProductRequests());
+		this.verifyProductModels(changeProductRequests);
+		changeProductRequests = this.removeCanceledProductRequests(changeProductRequests);
+		// changeProductRequests =
+		// this.mergeUserPropertiesWithExisting(changeProductRequests);
+		changeProductRequests = destinationPackagerModel.completeDestinationProductModels(changeProductRequests);
+		// changeProductRequests =
+		// destinationPackagerModel.mergeUserPropertiesWithDefault(changeProductRequests,
+		// true);
+
+		PackagerModel.verifyXmlProperties(PackagerInstanceAction.SPLIT_DESTINATION, changeProductRequests,
+				productModelService, manualDriverFactory);
+
+		// prepare create product requests
+		// List<ProductRequest> createProductRequests = destinationPackagerModel
+		// .mergeUserPropertiesWithDefault(request.getCreationProductRequests(),
+		// false);
+		List<ProductRequest> createProductRequests = request.getCreationProductRequests();
+		// createProductRequests = destinationPackagerModel
+		// .mergeUserPropertiesWithDefaultConfiguration(request.getCreationProductRequests());
+
+		try {
+			PackagerModel.verifyXmlProperties(PackagerInstanceAction.CREATE,
+					new ArrayList<ProductRequest>(request.getProducts()), productModelService, manualDriverFactory);
+		} catch (MalformedXMLException e) {
+			throw new MalformedXMLException(MalformedCases.INVALID_STRUCTURE, e.getMalformedXML(), e);
+		}
+		try {
+			PackagerModel.verifyXmlProperties(PackagerInstanceAction.CREATE, createProductRequests, productModelService,
+					manualDriverFactory);
+		} catch (MalformedXMLException e) {
+			throw new MalformedXMLException(MalformedCases.INVALID_STRUCTURE, e.getMalformedXML(), e);
+		}
+
+		List<ProductRequest> fullProductRequests = new ArrayList<ProductRequest>();
+		fullProductRequests.addAll(createProductRequests);
+		fullProductRequests.addAll(changeProductRequests);
+		request.setProducts(new HashSet<ProductRequest>(fullProductRequests));
+		// destinationPackagerModel.verifyProductOccurences(new
+		// ArrayList<ProductRequest>(request.getProducts()));
+		return request;
+	}
+
+	public FeasibilityResult isSplitPossible(PackagerRequest source, PackagerTransformationRequest destination1,
+			PackagerTransformationRequest destination2, PackagerInstanceService packagerInstanceService,
+			PackagerModelService packagerModelService, ProductModelService productModelService,
+			ManualDriverFactory manualDriverFactory, ProductInstanceService productInstanceService)
+			throws PackagerException, DataSourceException, DriverException, NotRespectedRulesException,
+			NotFoundException, MalformedXMLException, SAXException, IOException, ParserConfigurationException {
+		if (source == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+		if (source.getRetailerPackagerId() == null) {
+			throw new NullException(NullCases.NULL, "retailer packager id parameter");
+		}
+		if (!source.getRetailerPackagerId().equals(this.getRetailerPackagerId())) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.9"),
+					new Object[] { source.getRetailerPackagerId(), this.getRetailerPackagerId() });
+		}
+		if (destination1 == null) {
+			throw new NullException(NullCases.NULL, "first destination packager transformation request parameter");
+		}
+		try {
+			destination1 = this.prepareRequestToSplitDestination(destination1, packagerInstanceService,
+					packagerModelService, productModelService, manualDriverFactory, productInstanceService);
+			destination2 = this.prepareRequestToSplitDestination(destination2, packagerInstanceService,
+					packagerModelService, productModelService, manualDriverFactory, productInstanceService);
+			this.prepareRequestToSplitSource(source, destination1, destination2);
+		} catch (NotFoundException e) {
+			return new FeasibilityResult(false, e.getMessage());
+		} catch (NotRespectedRulesException e) {
+			return new FeasibilityResult(false, e.getMessage());
+		} catch (MalformedXMLException e) {
+			return new FeasibilityResult(false, e.getMessage());
+		}
+
+		for (ProductRequest pr : destination1.getChangeProductRequests()) {
+			ProductInstance pi = productInstanceService.findById(pr.getProductId().intValue());
+			if (pr.getProperties() != null) {
+				FeasibilityResult result = pi.isPropertiesChangePossible(pr.getProperties());
+				if (!result.getPossible()) {
+					return result;
+				}
+			}
+		}
+
+		if (destination2 != null) {
+			for (ProductRequest pr : destination2.getChangeProductRequests()) {
+				ProductInstance pi = productInstanceService.findById(pr.getProductId().intValue());
+				if (pr.getProperties() != null) {
+					FeasibilityResult result = pi.isPropertiesChangePossible(pr.getProperties());
+					if (!result.getPossible()) {
+						return result;
+					}
+				}
+			}
+		}
+
+		return new FeasibilityResult(true, null);
 	}
 
 }

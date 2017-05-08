@@ -16,9 +16,9 @@ import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
 import nordnet.architecture.exceptions.implicit.NullException;
 import nordnet.architecture.exceptions.utils.ErrorCode;
-import nordnet.tools.properties.PropertiesFile;
-import nordnet.tools.xml.merger.XmlMerger;
+import tn.wevioo.tools.properties.PropertiesFile;
 import tn.wevioo.tools.properties.impl.SystemPropertyFile;
+import tn.wevioo.tools.xml.merger.XmlMerger;
 
 public class XmlMergeImpl implements XmlMerger {
 	private static final Log LOGGER = LogFactory.getLog(XmlMergeImpl.class);

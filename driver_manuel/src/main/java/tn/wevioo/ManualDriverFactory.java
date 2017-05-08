@@ -29,6 +29,7 @@ import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import nordnet.architecture.exceptions.utils.ErrorCode;
 import nordnet.drivers.contract.exceptions.DriverException;
 import nordnet.drivers.contract.impl.ProductDriverFactoryImpl;
+import nordnet.drivers.contract.types.Action;
 import nordnet.drivers.contract.types.FeasibilityTestResult;
 import nordnet.tools.idgenerator.algorithms.stringcomputing.UUIDGenerator;
 import nordnet.tools.idgenerator.exception.AlgorithmException;
@@ -284,7 +285,6 @@ public class ManualDriverFactory
 		Element hexacle = (Element) hexacleNode.item(0);
 
 		productProperties.setHexacle(getCharacterDataFromElement(hexacle));
-		System.out.println(getCharacterDataFromElement(hexacle));
 
 		NodeList idClientNode = element.getElementsByTagName("manual:idClient");
 		Element idClient = (Element) idClientNode.item(0);
@@ -311,6 +311,62 @@ public class ManualDriverFactory
 			return cd.getData();
 		}
 		return "";
+	}
+
+	public void verifyXmlPropertiesManual(final Action action, final String properties)
+			throws MalformedXMLException, DriverException, SAXException, IOException, ParserConfigurationException {
+		this.validateAndParseXmlPropertiesManual(action, properties);
+	}
+
+	protected Object validateAndParseXmlPropertiesManual(final Action action, final String properties)
+			throws MalformedXMLException, DriverException, SAXException, IOException, ParserConfigurationException {
+		if (action == null) {
+			throw new NullException(NullCases.NULL, "action");
+		}
+		switch (action) {
+		case CREATE_PRODUCT:
+			validateXmlPropertiesParameter(properties,
+					getDriverInternalConfiguration().areCreateProductPropertiesRequired());
+			break;
+		case ACTIVATE:
+			validateXmlPropertiesParameter(properties,
+					getDriverInternalConfiguration().areActivatePropertiesRequired());
+			break;
+		case REACTIVATE:
+			validateXmlPropertiesParameter(properties,
+					getDriverInternalConfiguration().areReactivatePropertiesRequired());
+			break;
+		case SUSPEND:
+			validateXmlPropertiesParameter(properties, getDriverInternalConfiguration().areSuspendPropertiesRequired());
+			break;
+		case CANCEL:
+			validateXmlPropertiesParameter(properties, getDriverInternalConfiguration().areCancelPropertiesRequired());
+			break;
+		case CHANGE_PROPERTIES:
+		case TRANSFORMATION:
+			validateXmlPropertiesParameter(properties, true);
+			break;
+		case DELETE:
+			validateXmlPropertiesParameter(properties, getDriverInternalConfiguration().areDeletePropertiesRequired());
+			break;
+		case RESET:
+			validateXmlPropertiesParameter(properties, getDriverInternalConfiguration().areResetPropertiesRequired());
+			break;
+		case GET_USAGE_PROPERTIES:
+			validateXmlPropertiesParameter(properties, false);
+			break;
+		default:
+			throw new UnsupportedOperationException("The action " + action + " is not supported.");
+		}
+
+		if (properties != null) {
+			return parse(properties);
+		}
+		return null;
+	}
+
+	public ManualInternalConfiguration getDriverInternalConfiguration() throws DriverException {
+		return new ManualInternalConfiguration();
 	}
 
 	/*

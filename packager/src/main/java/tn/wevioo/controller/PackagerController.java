@@ -1,9 +1,11 @@
 package tn.wevioo.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.QueryParam;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.xml.sax.SAXException;
 
 import nordnet.architecture.exceptions.explicit.DataSourceException;
 import nordnet.architecture.exceptions.explicit.MalformedXMLException;
@@ -37,6 +40,7 @@ import tn.wevioo.feasibility.FeasibilityResult;
 import tn.wevioo.model.packager.action.PackagerInstanceAction;
 import tn.wevioo.model.request.PackagerRequest;
 import tn.wevioo.model.request.PackagerTransformationRequest;
+import tn.wevioo.model.request.SplitPackagerRequest;
 import tn.wevioo.service.PackagerActionHistoryService;
 import tn.wevioo.service.PackagerInstanceService;
 import tn.wevioo.service.PackagerModelService;
@@ -97,8 +101,9 @@ public class PackagerController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/suspendPackager", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void suspendPackager(@RequestBody PackagerRequest request) throws NotFoundException,
-			NotRespectedRulesException, DriverException, PackagerException, MalformedXMLException, DataSourceException {
+	public void suspendPackager(@RequestBody PackagerRequest request)
+			throws NotFoundException, NotRespectedRulesException, DriverException, PackagerException,
+			MalformedXMLException, DataSourceException, SAXException, IOException, ParserConfigurationException {
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
 		}
@@ -112,7 +117,7 @@ public class PackagerController extends AbstractFacade {
 	@RequestMapping(value = "/activatePackager", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 	public void activatePackager(@RequestBody PackagerRequest request)
 			throws DriverException, NotRespectedRulesException, MalformedXMLException, PackagerException,
-			NotFoundException, DataSourceException {
+			NotFoundException, DataSourceException, SAXException, IOException, ParserConfigurationException {
 
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
@@ -127,8 +132,9 @@ public class PackagerController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/reactivatePackager", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void reactivatePackager(@RequestBody PackagerRequest request) throws NotRespectedRulesException,
-			NotFoundException, DriverException, PackagerException, MalformedXMLException, DataSourceException {
+	public void reactivatePackager(@RequestBody PackagerRequest request)
+			throws NotRespectedRulesException, NotFoundException, DriverException, PackagerException,
+			MalformedXMLException, DataSourceException, SAXException, IOException, ParserConfigurationException {
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
 		}
@@ -141,8 +147,9 @@ public class PackagerController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/cancelPackager", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void cancelPackager(@RequestBody PackagerRequest request) throws NotRespectedRulesException,
-			NotFoundException, DriverException, PackagerException, MalformedXMLException, DataSourceException {
+	public void cancelPackager(@RequestBody PackagerRequest request)
+			throws NotRespectedRulesException, NotFoundException, DriverException, PackagerException,
+			MalformedXMLException, DataSourceException, SAXException, IOException, ParserConfigurationException {
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
 		}
@@ -155,8 +162,9 @@ public class PackagerController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/resetPackager", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void resetPackager(@RequestBody PackagerRequest request) throws NotRespectedRulesException,
-			NotFoundException, DriverException, PackagerException, MalformedXMLException, DataSourceException {
+	public void resetPackager(@RequestBody PackagerRequest request)
+			throws NotRespectedRulesException, NotFoundException, DriverException, PackagerException,
+			MalformedXMLException, DataSourceException, SAXException, IOException, ParserConfigurationException {
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
 		}
@@ -177,7 +185,8 @@ public class PackagerController extends AbstractFacade {
 
 	@RequestMapping(value = "/isPackagerCreationPossible", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public FeasibilityResult isPackagerCreationPossible(@RequestBody PackagerRequest request)
-			throws PackagerException, DriverException, DataSourceException, NotRespectedRulesException {
+			throws PackagerException, DriverException, DataSourceException, NotRespectedRulesException, SAXException,
+			IOException, ParserConfigurationException {
 
 		if (request == null) {
 			FeasibilityResult fFeasibilityResult = new FeasibilityResult();
@@ -289,8 +298,9 @@ public class PackagerController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/translocateProductInstances", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void translocateProductInstances(PackagerTransformationRequest request) throws PackagerException,
-			DriverException, MalformedXMLException, DataSourceException, NotFoundException, NotRespectedRulesException {
+	public void translocateProductInstances(@RequestBody PackagerTransformationRequest request)
+			throws PackagerException, DriverException, MalformedXMLException, DataSourceException, NotFoundException,
+			NotRespectedRulesException, SAXException, IOException, ParserConfigurationException {
 
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
@@ -305,6 +315,88 @@ public class PackagerController extends AbstractFacade {
 
 		packagerInstanceService.saveOrUpdate(originalPackagerInstance);
 		packagerActionHistoryService.saveOrUpdate(history);
+	}
+
+	@RequestMapping(value = "/isProductTranslocationPossible", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public FeasibilityResult isProductTranslocationPossible(@RequestBody PackagerTransformationRequest request)
+			throws DriverException, DataSourceException, PackagerException, SAXException, IOException,
+			ParserConfigurationException {
+
+		if (request == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+
+		FeasibilityResult result = null;
+
+		PackagerInstance packagerInstance = packagerInstanceService
+				.findByRetailerPackagerId(request.getRetailerPackagerId());
+		result = packagerInstance.isProductTranslocationPossible(request, packagerInstanceService,
+				productInstanceService, productModelService, manualDriverFactory);
+		return result;
+	}
+
+	@RequestMapping(value = "/splitPackager", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public void splitPackager(@RequestBody SplitPackagerRequest request)
+			throws PackagerException, DriverException, DataSourceException, MalformedXMLException, NotFoundException,
+			NotRespectedRulesException, SAXException, IOException, ParserConfigurationException {
+		if (request.getSource() == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+		if (request.getSource().getRetailerPackagerId() == null) {
+			throw new NullException(NullCases.NULL, "retailer packager id parameter");
+		}
+
+		PackagerInstance packagerInstance = packagerInstanceService
+				.findByRetailerPackagerId(request.getSource().getRetailerPackagerId());
+		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.SPLIT, webServiceUserService);
+		List<PackagerInstance> result = packagerInstance.split(request.getSource(), request.getDestination1(),
+				request.getDestination2(), history, packagerModelService, webServiceUserService, productInstanceService,
+				packagerInstanceService, productModelService, manualDriverFactory, manualDriver);
+		if (result != null && result.size() > 0) {
+			for (PackagerInstance pi : result) {
+				packagerInstanceService.saveOrUpdate(pi);
+			}
+		}
+		packagerActionHistoryService.saveOrUpdate(history);
+
+	}
+
+	@RequestMapping(value = "/isSplitPackagerPossible", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public FeasibilityResult isSplitPackagerPossible(@RequestBody SplitPackagerRequest request)
+			throws PackagerException, DataSourceException, DriverException, NotFoundException, MalformedXMLException,
+			SAXException, IOException, ParserConfigurationException {
+		FeasibilityResult fResult = new FeasibilityResult();
+		if (request.getSource() == null) {
+			NullException exp = new NullException(NullCases.NULL, "request parameter");
+			fResult.setMotive(exp.getMessage());
+			fResult.setPossible(false);
+			return fResult;
+		}
+		if (request.getSource().getRetailerPackagerId() == null) {
+			NullException exp = new NullException(NullCases.NULL, "retailer packager id parameter");
+			fResult.setMotive(exp.getMessage());
+			fResult.setPossible(false);
+			return fResult;
+		}
+
+		PackagerInstance packagerInstance = null;
+		packagerInstance = packagerInstanceService
+				.findByRetailerPackagerId(request.getSource().getRetailerPackagerId());
+
+		try {
+			FeasibilityResult result = packagerInstance.isSplitPossible(request.getSource(), request.getDestination1(),
+					request.getDestination2(), packagerInstanceService, packagerModelService, productModelService,
+					manualDriverFactory, productInstanceService);
+			return result;
+		} catch (NotRespectedRulesException e) {
+			fResult.setMotive(e.getMessage());
+			fResult.setPossible(false);
+			return fResult;
+		} catch (NullException e) {
+			fResult.setMotive(e.getMessage());
+			fResult.setPossible(false);
+			return fResult;
+		}
 	}
 
 }

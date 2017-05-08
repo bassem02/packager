@@ -30,6 +30,7 @@ import javax.persistence.Transient;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -39,9 +40,14 @@ import nordnet.architecture.exceptions.explicit.MalformedXMLException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
 import nordnet.architecture.exceptions.implicit.NullException;
 import nordnet.architecture.exceptions.implicit.NullException.NullCases;
+import nordnet.architecture.exceptions.utils.ErrorCode;
 import nordnet.drivers.contract.ProductDriver;
 import nordnet.drivers.contract.exceptions.DriverException;
+import nordnet.drivers.contract.types.FeasibilityTestResult;
 import nordnet.drivers.contract.types.State;
+import tn.wevioo.ManualDriverFactory;
+import tn.wevioo.exceptions.PackagerException;
+import tn.wevioo.feasibility.FeasibilityResult;
 import tn.wevioo.model.product.action.ProductInstanceAction;
 import tn.wevioo.service.ProductInstanceService;
 import tn.wevioo.service.WebServiceUserService;
@@ -683,6 +689,7 @@ public class ProductInstance implements java.io.Serializable {
 		pi.setProductModel(this.getProductModel());
 		pi.setProviderProductId(this.getProviderProductId());
 		pi.setShippingDemands(new HashSet<ShippingDemand>());
+		pi.setLastUpdate(new Date());
 		pi.originalProductInstance = this;
 
 		for (ProductInstanceReference ref : this.getProductInstanceReferences()) {
@@ -712,6 +719,86 @@ public class ProductInstance implements java.io.Serializable {
 			throw new NullException(NullCases.NULL, "delivery demand parameter");
 		}
 		this.shippingDemands.add(shippingDemand);
+	}
+
+	public void changeProperties(final String properties, PackagerActionHistory packagerActionHistory,
+			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService,
+			ManualDriverFactory manualDriverFactory)
+			throws DriverException, MalformedXMLException, NotRespectedRulesException {
+
+		if ((properties == null) || (properties.trim().length() == 0)) {
+			throw new NullException(NullCases.NULL_EMPTY, "properties parameter");
+		}
+
+		if (packagerActionHistory == null) {
+			throw new NullException(NullCases.NULL, "packagerHistory parameter");
+		}
+
+		if (this.getCurrentState().equals(State.CANCELED)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.2.12"),
+					new Object[] { String.valueOf(this.getIdProductInstance()), State.CANCELED.toString() });
+		}
+
+		// this.getProductDriver().changeProperties(properties);
+
+		String url = "http://localhost:8093";
+		RestTemplate rest = new RestTemplate();
+
+		String result = (String) rest.getForObject(url + "/manual/changePropertiesManual?properties=" + properties
+				+ "&ppid=" + this.getProviderProductId(), String.class);
+
+		ProductActionHistory history = null;
+
+		if (this.originalProductInstance == null) {
+			history = new ProductActionHistory(ProductInstanceAction.CHANGE_PROPERTIES, this, this, properties,
+					webServiceUserService, productInstanceService);
+		} else {
+			history = new ProductActionHistory(ProductInstanceAction.CHANGE_PROPERTIES, this.originalProductInstance,
+					this, properties, webServiceUserService, productInstanceService);
+		}
+		packagerActionHistory.addProductAction(history);
+
+		this.resetLastKnownState();
+
+		System.out.println("manualDriverFactory.getDriverInternalConfiguration()= "
+				+ manualDriverFactory.getDriverInternalConfiguration());
+
+		// if
+		// (manualDriverFactory.getDriverInternalConfiguration().areReferencesChangedOnChangeProperties())
+		// {
+		try {
+			this.updateReferences(packagerActionHistory, webServiceUserService, productInstanceService);
+		} catch (DriverException e) {
+			this.getProductInstanceReferences().clear();
+		}
+		// }
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Product [" + getIdProductInstance() + "]'s properties have been successfully changed.");
+		}
+	}
+
+	public FeasibilityResult isPropertiesChangePossible(String properties)
+			throws DriverException, MalformedXMLException, PackagerException, NotRespectedRulesException {
+
+		if ((properties == null) || (properties.trim().length() == 0)) {
+			throw new NullException(NullCases.NULL_EMPTY, "properties parameter");
+		}
+
+		if (this.getCurrentState().equals(State.CANCELED)) {
+			NotRespectedRulesException ex = new NotRespectedRulesException(new ErrorCode("1.2.2.12"),
+					new Object[] { String.valueOf(this.getIdProductInstance()), State.CANCELED.toString() });
+			return new FeasibilityResult(false, ex.getMessage(), null);
+		} else {
+			String url = "http://localhost:8093";
+			RestTemplate rest = new RestTemplate();
+
+			FeasibilityTestResult result = (FeasibilityTestResult) rest.getForObject(
+					url + "/manual/isPropertiesChangePossible?properties=" + properties, FeasibilityTestResult.class);
+			FeasibilityResult feasibilityResult = new FeasibilityResult();
+			BeanUtils.copyProperties(result, feasibilityResult);
+			return feasibilityResult;
+		}
 	}
 
 }
