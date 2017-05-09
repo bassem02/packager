@@ -30,12 +30,14 @@ import tn.wevioo.entities.PackagerModel;
 import tn.wevioo.entities.PackagerModelProductModel;
 import tn.wevioo.entities.ProductInstance;
 import tn.wevioo.exceptions.PackagerException;
-import tn.wevioo.feasibility.FeasibilityResult;
+import tn.wevioo.exceptions.RestTemplateException;
+import tn.wevioo.model.feasibility.FeasibilityResult;
 import tn.wevioo.model.packager.action.PackagerInstanceAction;
 import tn.wevioo.model.request.ProductRequest;
 import tn.wevioo.service.PackagerActionHistoryService;
 import tn.wevioo.service.PackagerModelService;
 import tn.wevioo.service.ProductInstanceService;
+import tn.wevioo.service.ProductModelProductDriverPortService;
 import tn.wevioo.service.ProductModelService;
 import tn.wevioo.service.WebServiceUserService;
 
@@ -58,9 +60,13 @@ public class ProductController {
 	@Autowired
 	private ProductModelService productModelService;
 
+	@Autowired
+	ProductModelProductDriverPortService productModelProductDriverPortService;
+
 	@RequestMapping(value = "/cancelProduct", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void cancelProduct(@RequestBody ProductRequest request) throws NotFoundException, NotRespectedRulesException,
-			DriverException, PackagerException, MalformedXMLException, DataSourceException, ConverterException {
+	public void cancelProduct(@RequestBody ProductRequest request)
+			throws NotFoundException, NotRespectedRulesException, DriverException, PackagerException,
+			MalformedXMLException, DataSourceException, ConverterException, RestTemplateException {
 
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
@@ -68,7 +74,8 @@ public class ProductController {
 
 		ProductInstance productInstance = productInstanceService.findById(request.getProductId().intValue());
 
-		FeasibilityResult result = productInstance.getPackager().isProductCancelationPossible(request);
+		FeasibilityResult result = productInstance.getPackager().isProductCancelationPossible(request,
+				productModelProductDriverPortService);
 		if (result.getPossible()) {
 			PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.CANCEL,
 					webServiceUserService);
@@ -85,7 +92,7 @@ public class ProductController {
 
 	@RequestMapping(value = "/resetProduct", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 	public void resetProduct(@RequestBody ProductRequest request) throws NotFoundException, NotRespectedRulesException,
-			DriverException, PackagerException, MalformedXMLException, DataSourceException {
+			DriverException, PackagerException, MalformedXMLException, DataSourceException, RestTemplateException {
 
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
@@ -102,14 +109,14 @@ public class ProductController {
 
 	@RequestMapping(value = "/getProductInstance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ProductInstanceDTO getProductInstance(@QueryParam("productId") Integer productId)
-			throws PackagerException, DataSourceException, DriverException {
+			throws PackagerException, DataSourceException, DriverException, RestTemplateException {
 
 		return productInstanceService.convertToDTO(productInstanceService.findById(productId));
 	}
 
 	@RequestMapping(value = "/getUsageProductProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public String getUsageProductProperties(@QueryParam("productId") Integer productId)
-			throws PackagerException, DriverException, NotFoundException, DataSourceException {
+			throws PackagerException, DriverException, NotFoundException, DataSourceException, RestTemplateException {
 
 		if (productId == null) {
 			throw new NullException(NullCases.NULL, "productId parameter");
@@ -122,7 +129,7 @@ public class ProductController {
 
 	@RequestMapping(value = "/getProductProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ProductPropertiesDTO getProductProperties(@QueryParam("productId") Long productId)
-			throws NotFoundException, PackagerException, DriverException, DataSourceException {
+			throws NotFoundException, PackagerException, DriverException, DataSourceException, RestTemplateException {
 
 		if (productId == null) {
 			throw new NullException(NullCases.NULL, "productId parameter");

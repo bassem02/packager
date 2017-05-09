@@ -19,11 +19,13 @@ import tn.wevioo.entities.PackagerInstance;
 import tn.wevioo.entities.ProductInstance;
 import tn.wevioo.entities.ProductInstanceDiagnostic;
 import tn.wevioo.entities.ProductInstanceReference;
+import tn.wevioo.exceptions.RestTemplateException;
 import tn.wevioo.service.PackagerInstanceService;
 import tn.wevioo.service.PackagerModelService;
 import tn.wevioo.service.ProductInstanceDiagnosticService;
 import tn.wevioo.service.ProductInstanceReferenceService;
 import tn.wevioo.service.ProductInstanceService;
+import tn.wevioo.service.ProductModelProductDriverPortService;
 
 @Service("packagerInstanceService")
 public class PackagerInstanceServiceImpl implements PackagerInstanceService {
@@ -42,6 +44,9 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 
 	@Autowired
 	private ProductInstanceDiagnosticService productInstanceDiagnosticService;
+
+	@Autowired
+	private ProductModelProductDriverPortService productModelProductDriverPortService;
 
 	@Override
 	public PackagerInstance saveOrUpdate(PackagerInstance packagerInstance) {
@@ -68,14 +73,16 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 		return packagerInstanceDao.findByRetailerPackagerId(retailerPackagerId);
 	}
 
-	public PackagerInstanceDTO convertToDTO(PackagerInstance packagerInstance) throws DriverException {
+	public PackagerInstanceDTO convertToDTO(PackagerInstance packagerInstance)
+			throws DriverException, RestTemplateException {
 		if (packagerInstance == null) {
 			return null;
 		}
 
 		PackagerInstanceDTO result = new PackagerInstanceDTO();
 
-		result.setCurrentState(packagerInstance.getCurrentState());
+		result.setCurrentState(
+				packagerInstance.getCurrentState(productInstanceService, productModelProductDriverPortService));
 		result.setPackagerModel(packagerInstance.getPackagerModel().getRetailerKey());
 		result.setRetailerPackagerId(packagerInstance.getRetailerPackagerId());
 		List<ProductInstanceDTO> productInstanceDTOs = new ArrayList<ProductInstanceDTO>();
@@ -111,7 +118,8 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 
 			List<ProductInstanceReferenceDTO> productInstanceReferenceDTOs = new ArrayList<ProductInstanceReferenceDTO>();
 			for (ProductInstanceReference productInstanceReference : productInstance.getProductInstanceReferences()) {
-				productInstanceReferenceDTOs.add(productInstanceReferenceService.convertToDTO(productInstanceReference));
+				productInstanceReferenceDTOs
+						.add(productInstanceReferenceService.convertToDTO(productInstanceReference));
 			}
 			productInstanceHeaderDTO.setReferences(productInstanceReferenceDTOs);
 

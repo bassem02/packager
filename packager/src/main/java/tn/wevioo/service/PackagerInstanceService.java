@@ -6,6 +6,7 @@ import nordnet.drivers.contract.exceptions.DriverException;
 import tn.wevioo.dto.packager.PackagerInstanceDTO;
 import tn.wevioo.dto.packager.PackagerInstanceHeaderDTO;
 import tn.wevioo.entities.PackagerInstance;
+import tn.wevioo.exceptions.RestTemplateException;
 
 public interface PackagerInstanceService {
 
@@ -19,7 +20,8 @@ public interface PackagerInstanceService {
 
 	public List<PackagerInstance> findAll();
 
-	public PackagerInstanceDTO convertToDTO(PackagerInstance packagerInstance) throws DriverException;
+	public PackagerInstanceDTO convertToDTO(PackagerInstance packagerInstance)
+			throws DriverException, RestTemplateException;
 
 	public Boolean isRetailerPackagerIdFree(String retailerPackagerId);
 

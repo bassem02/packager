@@ -43,13 +43,15 @@ import nordnet.drivers.contract.types.Action;
 import tn.wevioo.ManualDriver;
 import tn.wevioo.ManualDriverFactory;
 import tn.wevioo.exceptions.PackagerException;
-import tn.wevioo.feasibility.FeasibilityResult;
+import tn.wevioo.exceptions.RestTemplateException;
+import tn.wevioo.model.feasibility.FeasibilityResult;
 import tn.wevioo.model.packager.action.PackagerInstanceAction;
 import tn.wevioo.model.request.PackagerRequest;
 import tn.wevioo.model.request.PackagerTransformationRequest;
 import tn.wevioo.model.request.ProductRequest;
 import tn.wevioo.service.PackagerInstanceService;
 import tn.wevioo.service.ProductInstanceService;
+import tn.wevioo.service.ProductModelProductDriverPortService;
 import tn.wevioo.service.ProductModelService;
 import tn.wevioo.service.WebServiceUserService;
 
@@ -331,6 +333,7 @@ public class PackagerModel implements java.io.Serializable {
 		}
 
 		for (ProductRequest productRequest : requests) {
+			@SuppressWarnings("unused")
 			ProductModel productModel = productModelService.findByRetailerKey(productRequest.getModel());
 
 			switch (action) {
@@ -394,7 +397,6 @@ public class PackagerModel implements java.io.Serializable {
 		Map<String, Integer> productOccurences = new HashMap<String, Integer>();
 
 		if (requests != null) {
-			System.out.println("model = " + requests);
 			for (ProductRequest productRequest : requests) {
 				if (productOccurences.containsKey(productRequest.getModel())) {
 					productOccurences.put(productRequest.getModel(),
@@ -562,6 +564,7 @@ public class PackagerModel implements java.io.Serializable {
 			throw new MalformedXMLException(MalformedCases.INVALID_SCHEMA, ex.getMalformedXML(), ex);
 		}
 
+		@SuppressWarnings("unused")
 		List<ProductRequest> productsAsList = new ArrayList<ProductRequest>(request.getProducts());
 		// request.getProducts().addAll(this.completeWithMissingProducts(productsAsList));
 		try {
@@ -694,8 +697,10 @@ public class PackagerModel implements java.io.Serializable {
 	protected PackagerInstance instantiateDestinationFromSplitMerge(PackagerTransformationRequest request,
 			PackagerActionHistory history, ProductModelService productModelService,
 			ProductInstanceService productInstanceService, WebServiceUserService webServiceUserService,
-			ManualDriverFactory manualDriverFactory, ManualDriver manualDriver) throws PackagerException,
-			DriverException, NotFoundException, DataSourceException, NotRespectedRulesException, MalformedXMLException {
+			ManualDriverFactory manualDriverFactory, ManualDriver manualDriver,
+			ProductModelProductDriverPortService productModelProductDriverPortService)
+			throws PackagerException, DriverException, NotFoundException, DataSourceException,
+			NotRespectedRulesException, MalformedXMLException, RestTemplateException {
 
 		PackagerInstance result = new PackagerInstance();
 		// creating the product instances
@@ -717,7 +722,6 @@ public class PackagerModel implements java.io.Serializable {
 		}
 
 		// moving existing product instances
-		System.out.println("aaa " + request.getProducts());
 		for (ProductRequest pr : request.getChangeProductRequests()) {
 			ProductInstance productInstance = productInstanceService.findById(pr.getProductId().intValue());
 
@@ -729,7 +733,7 @@ public class PackagerModel implements java.io.Serializable {
 
 			if (pr.getProperties() != null) {
 				piDestination.changeProperties(pr.getProperties(), history, webServiceUserService,
-						productInstanceService, manualDriverFactory);
+						productInstanceService, manualDriverFactory, productModelProductDriverPortService);
 			}
 		}
 

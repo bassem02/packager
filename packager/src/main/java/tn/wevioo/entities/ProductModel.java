@@ -29,6 +29,7 @@ import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import nordnet.drivers.contract.exceptions.DriverException;
 import tn.wevioo.ManualDriver;
 import tn.wevioo.ManualDriverFactory;
+import tn.wevioo.exceptions.RestTemplateException;
 import tn.wevioo.model.product.action.ProductInstanceAction;
 import tn.wevioo.service.ProductInstanceService;
 import tn.wevioo.service.WebServiceUserService;
@@ -214,28 +215,32 @@ public class ProductModel implements java.io.Serializable {
 		String url = "http://localhost:8093";
 		RestTemplate rest = new RestTemplate();
 
-		String createdProductDriverPPId = (String) rest
-				.getForObject(url + "/manual/createProductManual?properties=" + properties, String.class);
+		try {
+			String createdProductDriverPPId = (String) rest
+					.getForObject(url + "/createProductManual?properties=" + properties, String.class);
 
-		// ManualDriver createdProductDriver =
-		// manualDriverFactory.createProduct(properties);
-		manualDriver.setProviderProductId(createdProductDriverPPId);
-		ProductInstance createdProductInstance = new ProductInstance(manualDriver);
-		createdProductInstance.setProductModel(this);
-		createdProductInstance.setCreationDate(new Date());
-		createdProductInstance.setLastUpdate(new Date());
-		createdProductInstance.setLastKnownState("INPROGRESS");
-		createdProductInstance.setLastKnownStateUpdate(new Date());
+			// ManualDriver createdProductDriver =
+			// manualDriverFactory.createProduct(properties);
+			manualDriver.setProviderProductId(createdProductDriverPPId);
+			ProductInstance createdProductInstance = new ProductInstance(manualDriver);
+			createdProductInstance.setProductModel(this);
+			createdProductInstance.setCreationDate(new Date());
+			createdProductInstance.setLastUpdate(new Date());
+			createdProductInstance.setLastKnownState("INPROGRESS");
+			createdProductInstance.setLastKnownStateUpdate(new Date());
 
-		ProductActionHistory productHistory = new ProductActionHistory(ProductInstanceAction.CREATE, null,
-				createdProductInstance, properties, webServiceUserService, productInstanceService);
-		history.addProductAction(productHistory);
+			ProductActionHistory productHistory = new ProductActionHistory(ProductInstanceAction.CREATE, null,
+					createdProductInstance, properties, webServiceUserService, productInstanceService);
+			history.addProductAction(productHistory);
 
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("A new product [" + this.getRetailerKey() + "] has been successfully created.");
+			if (LOGGER.isInfoEnabled()) {
+				LOGGER.info("A new product [" + this.getRetailerKey() + "] has been successfully created.");
+			}
+
+			return createdProductInstance;
+		} catch (Exception e) {
+			throw new RestTemplateException("ProductDriver's project has occured a problem");
 		}
-
-		return createdProductInstance;
 	}
 
 	// @Transient

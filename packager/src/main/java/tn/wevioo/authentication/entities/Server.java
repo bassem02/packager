@@ -1,14 +1,16 @@
 package tn.wevioo.authentication.entities;
 // Generated 13 avr. 2017 17:13:26 by Hibernate Tools 5.1.2.Final
 
+import static javax.persistence.GenerationType.IDENTITY;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -25,6 +27,8 @@ import javax.persistence.UniqueConstraint;
 @Table(name = "server", catalog = "test_authentification_manager", uniqueConstraints = {
 		@UniqueConstraint(columnNames = "ip"), @UniqueConstraint(columnNames = "name") })
 public class Server implements java.io.Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private Long id;
 	private Users usersByModifierId;

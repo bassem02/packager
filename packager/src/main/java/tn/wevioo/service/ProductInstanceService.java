@@ -6,6 +6,7 @@ import nordnet.drivers.contract.exceptions.DriverException;
 import tn.wevioo.dto.product.ProductInstanceDTO;
 import tn.wevioo.dto.product.ProductPropertiesDTO;
 import tn.wevioo.entities.ProductInstance;
+import tn.wevioo.exceptions.RestTemplateException;
 
 public interface ProductInstanceService {
 
@@ -17,8 +18,9 @@ public interface ProductInstanceService {
 
 	public List<ProductInstance> findAll();
 
-	public ProductInstanceDTO convertToDTO(ProductInstance findById) throws DriverException;
+	public ProductInstanceDTO convertToDTO(ProductInstance findById) throws DriverException, RestTemplateException;
 
-	public ProductPropertiesDTO convertToPropertiesDTO(ProductInstance productInstance) throws DriverException;
+	ProductPropertiesDTO convertToPropertiesDTO(ProductInstance productInstance)
+			throws DriverException, RestTemplateException;
 
 }

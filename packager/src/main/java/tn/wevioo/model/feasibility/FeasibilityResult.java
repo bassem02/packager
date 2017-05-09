@@ -1,4 +1,4 @@
-package tn.wevioo.feasibility;
+package tn.wevioo.model.feasibility;
 
 /**
  * The class FeasibilityResult allows providing a result when verifying if an action is possible or not.

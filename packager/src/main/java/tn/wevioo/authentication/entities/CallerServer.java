@@ -18,6 +18,8 @@ import javax.persistence.Table;
 @Table(name = "caller_server", catalog = "test_authentification_manager")
 public class CallerServer implements java.io.Serializable {
 
+	private static final long serialVersionUID = 1L;
+
 	private CallerServerId id;
 	private Caller caller;
 	private Server server;

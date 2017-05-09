@@ -10,7 +10,8 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class CallerWebServiceId implements java.io.Serializable {
 
-	private long callerId;
+	private static final long serialVersionUID = 1L;
+	long callerId;
 	private long webServiceId;
 
 	public CallerWebServiceId() {

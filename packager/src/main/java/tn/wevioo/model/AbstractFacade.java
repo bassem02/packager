@@ -1,4 +1,4 @@
-package tn.wevioo.dto.impl;
+package tn.wevioo.model;
 
 import nordnet.architecture.exceptions.NNException;
 import nordnet.architecture.exceptions.NNImplicitException;

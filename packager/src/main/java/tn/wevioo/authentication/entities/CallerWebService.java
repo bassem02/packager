@@ -18,7 +18,8 @@ import javax.persistence.Table;
 @Table(name = "caller_web_service", catalog = "test_authentification_manager")
 public class CallerWebService implements java.io.Serializable {
 
-	private CallerWebServiceId id;
+	private static final long serialVersionUID = 1L;
+	CallerWebServiceId id;
 	private Caller caller;
 	private WebService webService;
 

@@ -3,6 +3,7 @@ package tn.wevioo.authentication.entities;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -17,6 +18,8 @@ import javax.persistence.UniqueConstraint;
 @Entity
 @Table(name = "scope", catalog = "test_authentification_manager", uniqueConstraints = @UniqueConstraint(columnNames = "label"))
 public class Scope implements java.io.Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private long id;
 	private String label;
