@@ -42,26 +42,26 @@ public class Controller {
 		return productService.findById(id);
 	}
 
-	@RequestMapping(value = "/manual/createProductManual", method = RequestMethod.GET)
+	@RequestMapping(value = "/createProductManual", method = RequestMethod.GET)
 	public String createProductManual(@QueryParam("properties") String properties)
 			throws DriverException, MalformedXMLException, NotRespectedRulesException {
 
 		return manualDriverFactory.createProduct(properties).getProviderProductId();
 	}
 
-	@RequestMapping(value = "/manual/getReferences", method = RequestMethod.GET)
+	@RequestMapping(value = "/getReferences", method = RequestMethod.GET)
 	public List<tn.wevioo.tools.Reference> getReferences(@QueryParam("ppid") String ppid) throws DriverException {
 
 		return manualDriver.getReference(ppid);
 	}
 
-	@RequestMapping(value = "/manual/getCurrentState", method = RequestMethod.GET)
+	@RequestMapping(value = "/getCurrentState", method = RequestMethod.GET)
 	public String getCurrentState(@QueryParam("ref") String ref) throws DriverException {
 
 		return manualDriver.getCurrentState(ref).toString();
 	}
 
-	@RequestMapping(value = "/manual/suspendProduct", method = RequestMethod.GET)
+	@RequestMapping(value = "/suspendProduct", method = RequestMethod.GET)
 	public String suspendProduct(@QueryParam("properties") String properties, @QueryParam("ppid") String ppid)
 			throws DriverException, MalformedXMLException, NotRespectedRulesException, SAXException, IOException,
 			ParserConfigurationException {
@@ -70,7 +70,7 @@ public class Controller {
 		return "suspended";
 	}
 
-	@RequestMapping(value = "/manual/activateProduct", method = RequestMethod.GET)
+	@RequestMapping(value = "/activateProduct", method = RequestMethod.GET)
 	public String activateProduct(@QueryParam("properties") String properties, @QueryParam("ppid") String ppid)
 			throws DriverException, MalformedXMLException, NotRespectedRulesException, SAXException, IOException,
 			ParserConfigurationException {
@@ -79,7 +79,7 @@ public class Controller {
 		return "activated";
 	}
 
-	@RequestMapping(value = "/manual/reactivateProduct", method = RequestMethod.GET)
+	@RequestMapping(value = "/reactivateProduct", method = RequestMethod.GET)
 	public String reactivateProduct(@QueryParam("properties") String properties, @QueryParam("ppid") String ppid)
 			throws DriverException, MalformedXMLException, NotRespectedRulesException, SAXException, IOException,
 			ParserConfigurationException {
@@ -88,7 +88,7 @@ public class Controller {
 		return "reactivated";
 	}
 
-	@RequestMapping(value = "/manual/cancelProduct", method = RequestMethod.GET)
+	@RequestMapping(value = "/cancelProduct", method = RequestMethod.GET)
 	public String cancelProduct(@QueryParam("properties") String properties, @QueryParam("ppid") String ppid)
 			throws DriverException, MalformedXMLException, NotRespectedRulesException, SAXException, IOException,
 			ParserConfigurationException {
@@ -97,7 +97,7 @@ public class Controller {
 		return "canceled";
 	}
 
-	@RequestMapping(value = "/manual/resetProduct", method = RequestMethod.GET)
+	@RequestMapping(value = "/resetProduct", method = RequestMethod.GET)
 	public String resetProduct(@QueryParam("properties") String properties, @QueryParam("ppid") String ppid)
 			throws DriverException, MalformedXMLException, NotRespectedRulesException, SAXException, IOException,
 			ParserConfigurationException {
@@ -106,32 +106,32 @@ public class Controller {
 		return "canceled";
 	}
 
-	@RequestMapping(value = "/manual/performGetUsageProperties", method = RequestMethod.GET)
+	@RequestMapping(value = "/performGetUsageProperties", method = RequestMethod.GET)
 	public String performGetUsageProperties(@QueryParam("ppid") String ppid) throws DriverException, JAXBException {
 
 		return manualDriver.performGetUsageProperties(ppid);
 	}
 
-	@RequestMapping(value = "/manual/getProductProperties", method = RequestMethod.GET)
+	@RequestMapping(value = "/getProductProperties", method = RequestMethod.GET)
 	public String getProductProperties(@QueryParam("ppid") String ppid) throws DriverException, JAXBException {
 
 		return manualDriver.getProductProperties(ppid);
 	}
 
-	@RequestMapping(value = "/manual/getSelfDiagnostics", method = RequestMethod.GET)
+	@RequestMapping(value = "/getSelfDiagnostics", method = RequestMethod.GET)
 	public String getSelfDiagnostics() throws DriverException, JAXBException {
 
 		return manualDriver.getSelfDiagnostics().toString();
 	}
 
-	@RequestMapping(value = "/manual/isPropertiesChangePossible", method = RequestMethod.GET)
+	@RequestMapping(value = "/isPropertiesChangePossible", method = RequestMethod.GET)
 	public FeasibilityTestResult isPropertiesChangePossible(@QueryParam("properties") String properties)
 			throws DriverException, JAXBException, MalformedXMLException {
 
 		return manualDriver.isPropertiesChangePossible(properties);
 	}
 
-	@RequestMapping(value = "/manual/changePropertiesManual", method = RequestMethod.GET)
+	@RequestMapping(value = "/changePropertiesManual", method = RequestMethod.GET)
 	public String changePropertiesManual(@QueryParam("properties") String properties, @QueryParam("ppid") String ppid)
 			throws DriverException, JAXBException, MalformedXMLException, NotRespectedRulesException, SAXException,
 			IOException, ParserConfigurationException {
