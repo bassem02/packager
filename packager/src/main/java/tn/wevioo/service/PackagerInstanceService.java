@@ -22,7 +22,7 @@ public interface PackagerInstanceService {
 	public List<PackagerInstance> findAll();
 
 	public PackagerInstanceDTO convertToDTO(PackagerInstance packagerInstance)
-			throws DriverException, RestTemplateException;
+			throws DriverException, RestTemplateException, NotFoundException;
 
 	public Boolean isRetailerPackagerIdFree(String retailerPackagerId);
 

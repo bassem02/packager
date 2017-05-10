@@ -22,6 +22,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.architecture.exceptions.implicit.NullException;
 import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 /*import nordnet.packager.bo.packager.action.NullException;
@@ -76,7 +77,8 @@ public class PackagerActionHistory implements java.io.Serializable {
 		this.packagerActionPackagerHeaderSources = packagerActionPackagerHeaderSources;
 	}
 
-	public PackagerActionHistory(PackagerInstanceAction action, WebServiceUserService webServiceUserService) {
+	public PackagerActionHistory(PackagerInstanceAction action, WebServiceUserService webServiceUserService)
+			throws NotFoundException {
 
 		if (action == null) {
 			throw new NullException(NullCases.NULL, "action parameter");

@@ -7,6 +7,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import nordnet.architecture.exceptions.explicit.NotFoundException;
+import nordnet.architecture.exceptions.implicit.NullException;
+import nordnet.architecture.exceptions.implicit.NullException.NullCases;
+import nordnet.architecture.exceptions.utils.ErrorCode;
 import nordnet.drivers.contract.exceptions.DriverException;
 import tn.wevioo.dao.ProductInstanceDAO;
 import tn.wevioo.dto.product.ProductInstanceDTO;
@@ -53,8 +57,16 @@ public class ProductInstanceServiceImpl implements ProductInstanceService {
 	}
 
 	@Override
-	public ProductInstance findById(int id) {
-		return productInstanceDAO.findOne(id);
+	public ProductInstance findById(int id) throws NotFoundException {
+		if (((Integer) id == null)) {
+			throw new NullException(NullCases.NULL_EMPTY, "id parameter");
+		}
+		ProductInstance result = productInstanceDAO.findOne(id);
+
+		if (result == null) {
+			throw new NotFoundException(new ErrorCode("0.2.1.3.2"), new Object[] { "Product instance", " id", id });
+		}
+		return result;
 	}
 
 	@Override
@@ -64,7 +76,7 @@ public class ProductInstanceServiceImpl implements ProductInstanceService {
 
 	@Override
 	public ProductInstanceDTO convertToDTO(ProductInstance productInstance)
-			throws DriverException, RestTemplateException {
+			throws DriverException, RestTemplateException, NotFoundException {
 
 		ProductInstanceDTO productInstanceDTO = new ProductInstanceDTO();
 		productInstanceDTO.setProductId(productInstance.getIdProductInstance().longValue());
@@ -89,7 +101,7 @@ public class ProductInstanceServiceImpl implements ProductInstanceService {
 
 	@Override
 	public ProductPropertiesDTO convertToPropertiesDTO(ProductInstance productInstance)
-			throws DriverException, RestTemplateException {
+			throws DriverException, RestTemplateException, NotFoundException {
 
 		ProductInstanceDTO productInstanceDTO = convertToDTO(productInstance);
 

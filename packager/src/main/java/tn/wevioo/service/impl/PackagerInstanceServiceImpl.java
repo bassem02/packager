@@ -98,7 +98,7 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 	}
 
 	public PackagerInstanceDTO convertToDTO(PackagerInstance packagerInstance)
-			throws DriverException, RestTemplateException {
+			throws DriverException, RestTemplateException, NotFoundException {
 		if (packagerInstance == null) {
 			return null;
 		}

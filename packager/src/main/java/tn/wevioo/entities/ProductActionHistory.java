@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.architecture.exceptions.implicit.NullException;
 import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import tn.wevioo.model.product.action.ProductInstanceAction;
@@ -70,7 +71,7 @@ public class ProductActionHistory implements java.io.Serializable {
 
 	public ProductActionHistory(ProductInstanceAction action, ProductInstance source, ProductInstance destination,
 			String properties, WebServiceUserService webServiceUserService,
-			ProductInstanceService productInstanceService) {
+			ProductInstanceService productInstanceService) throws NotFoundException {
 
 		if (action == null) {
 			throw new NullException(NullCases.NULL, "action parameter");

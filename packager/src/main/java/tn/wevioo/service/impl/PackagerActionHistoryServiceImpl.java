@@ -49,7 +49,7 @@ public class PackagerActionHistoryServiceImpl implements PackagerActionHistorySe
 		List<PackagerActionHistory> result = packagerActionHistoryDao.findAll();
 
 		if (result == null) {
-			throw new NotFoundException(new ErrorCode("0.2.1.3.2"), new Object[] { "packager action history" });
+			throw new NotFoundException(new ErrorCode("0.2.1.3.2"), new Object[] { "packager action histories" });
 		}
 		return result;
 	}

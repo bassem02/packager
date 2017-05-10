@@ -2,6 +2,7 @@ package tn.wevioo.service;
 
 import java.util.List;
 
+import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.drivers.contract.exceptions.DriverException;
 import tn.wevioo.dto.product.ProductInstanceDTO;
 import tn.wevioo.dto.product.ProductPropertiesDTO;
@@ -14,13 +15,14 @@ public interface ProductInstanceService {
 
 	public void delete(ProductInstance productInstance);
 
-	public ProductInstance findById(int id);
+	public ProductInstance findById(int id) throws NotFoundException;
 
 	public List<ProductInstance> findAll();
 
-	public ProductInstanceDTO convertToDTO(ProductInstance findById) throws DriverException, RestTemplateException;
+	public ProductInstanceDTO convertToDTO(ProductInstance findById)
+			throws DriverException, RestTemplateException, NotFoundException;
 
 	ProductPropertiesDTO convertToPropertiesDTO(ProductInstance productInstance)
-			throws DriverException, RestTemplateException;
+			throws DriverException, RestTemplateException, NotFoundException;
 
 }

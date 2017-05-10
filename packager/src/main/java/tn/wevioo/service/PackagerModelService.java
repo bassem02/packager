@@ -12,11 +12,11 @@ public interface PackagerModelService {
 
 	public void delete(PackagerModel packagerModel);
 
-	public PackagerModel findById(int id);
+	public PackagerModel findById(int id) throws NotFoundException;
 
 	public PackagerModel findByRetailerKey(String retailerKey) throws NotFoundException;
 
-	public List<PackagerModel> findAll();
+	public List<PackagerModel> findAll() throws NotFoundException;
 
 	public PackagerModelDTO convertToDTO(PackagerModel packagerModel);
 

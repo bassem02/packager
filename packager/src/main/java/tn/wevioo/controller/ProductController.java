@@ -111,7 +111,7 @@ public class ProductController {
 
 	@RequestMapping(value = "/getProductInstance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ProductInstanceDTO getProductInstance(@QueryParam("productId") Integer productId)
-			throws PackagerException, DataSourceException, DriverException, RestTemplateException {
+			throws PackagerException, DataSourceException, DriverException, RestTemplateException, NotFoundException {
 
 		return productInstanceService.convertToDTO(productInstanceService.findById(productId));
 	}

@@ -374,7 +374,7 @@ public class PackagerInstance implements java.io.Serializable {
 	@Transient
 	public State getCurrentState(ProductInstanceService productInstanceService,
 			ProductModelProductDriverPortService productModelProductDriverPortService)
-			throws DriverException, RestTemplateException {
+			throws DriverException, RestTemplateException, NotFoundException {
 		List<State> productStates = new ArrayList<State>();
 
 		for (ProductInstance productInstance : getProducts()) {
@@ -412,7 +412,7 @@ public class PackagerInstance implements java.io.Serializable {
 
 	private List<ProductRequest> completeMissingExistingProducts(List<ProductRequest> requests, Boolean excludeCanceled,
 			ProductModelProductDriverPortService productModelProductDriverPortService)
-			throws PackagerException, RestTemplateException {
+			throws PackagerException, RestTemplateException, NotFoundException {
 		List<Long> productIdentifiers = new ArrayList<Long>();
 
 		for (ProductRequest pr : requests) {
@@ -473,7 +473,7 @@ public class PackagerInstance implements java.io.Serializable {
 	public void updateReferences(PackagerActionHistory packagerHistory, WebServiceUserService webServiceUserService,
 			ProductInstanceService productInstanceService,
 			ProductModelProductDriverPortService productModelProductDriverPortService)
-			throws DriverException, RestTemplateException {
+			throws DriverException, RestTemplateException, NotFoundException {
 
 		if (packagerHistory == null) {
 			throw new NullException(NullCases.NULL, "packagerHistory parameter");
@@ -865,7 +865,7 @@ public class PackagerInstance implements java.io.Serializable {
 	public void updateSelfDiagnostics(PackagerActionHistory packagerHistory,
 			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService,
 			ProductModelProductDriverPortService productModelProductDriverPortService)
-			throws DriverException, RestTemplateException {
+			throws DriverException, RestTemplateException, NotFoundException {
 		if (packagerHistory == null) {
 			throw new NullException(NullCases.NULL, "packagerHistory parameter");
 		}
@@ -1215,7 +1215,7 @@ public class PackagerInstance implements java.io.Serializable {
 
 	private List<ProductRequest> removeCanceledProductRequests(List<ProductRequest> requests,
 			ProductModelProductDriverPortService productModelProductDriverPortService)
-			throws DriverException, RestTemplateException {
+			throws DriverException, RestTemplateException, NotFoundException {
 
 		if (requests == null) {
 			throw new NullException(NullCases.NULL, "requests parameter");

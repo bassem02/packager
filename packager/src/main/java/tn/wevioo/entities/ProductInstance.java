@@ -37,6 +37,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import nordnet.architecture.exceptions.explicit.MalformedXMLException;
+import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
 import nordnet.architecture.exceptions.implicit.NullException;
 import nordnet.architecture.exceptions.implicit.NullException.NullCases;
@@ -255,7 +256,7 @@ public class ProductInstance implements java.io.Serializable {
 
 	@Transient
 	public State getCurrentState(ProductModelProductDriverPortService productModelProductDriverPortService)
-			throws DriverException, RestTemplateException {
+			throws DriverException, RestTemplateException, NotFoundException {
 
 		int port = productModelProductDriverPortService.findByProductModel(this.getProductModel().getRetailerKey())
 				.getProductDriverPort();
@@ -356,7 +357,7 @@ public class ProductInstance implements java.io.Serializable {
 	public void updateReferences(PackagerActionHistory packagerHistory, WebServiceUserService webServiceUserService,
 			ProductInstanceService productInstanceService,
 			ProductModelProductDriverPortService productModelProductDriverPortService)
-			throws DriverException, RestTemplateException {
+			throws DriverException, RestTemplateException, NotFoundException {
 
 		if (packagerHistory == null) {
 			throw new NullException(NullCases.NULL, "packagerHistory parameter");
@@ -439,8 +440,8 @@ public class ProductInstance implements java.io.Serializable {
 
 	public void activate(final String properties, PackagerActionHistory packagerHistory,
 			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService,
-			ProductModelProductDriverPortService productModelProductDriverPortService)
-			throws DriverException, MalformedXMLException, NotRespectedRulesException, RestTemplateException {
+			ProductModelProductDriverPortService productModelProductDriverPortService) throws DriverException,
+			MalformedXMLException, NotRespectedRulesException, RestTemplateException, NotFoundException {
 
 		if ((properties != null) && (properties.trim().length() == 0)) {
 			throw new NullException(NullCases.EMPTY, "properties parameter");
@@ -498,7 +499,8 @@ public class ProductInstance implements java.io.Serializable {
 	public void reactivate(final String properties, PackagerActionHistory packagerHistory,
 			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService,
 			ProductModelProductDriverPortService productModelProductDriverPortService)
-			throws NotRespectedRulesException, MalformedXMLException, DriverException, RestTemplateException {
+			throws NotRespectedRulesException, MalformedXMLException, DriverException, RestTemplateException,
+			NotFoundException {
 		if ((properties != null) && (properties.trim().length() == 0)) {
 			throw new NullException(NullCases.EMPTY, "properties parameter");
 		}
@@ -554,8 +556,8 @@ public class ProductInstance implements java.io.Serializable {
 
 	public void cancel(final String properties, PackagerActionHistory packagerHistory,
 			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService,
-			ProductModelProductDriverPortService productModelProductDriverPortService)
-			throws DriverException, MalformedXMLException, NotRespectedRulesException, RestTemplateException {
+			ProductModelProductDriverPortService productModelProductDriverPortService) throws DriverException,
+			MalformedXMLException, NotRespectedRulesException, RestTemplateException, NotFoundException {
 
 		if ((properties != null) && (properties.trim().length() == 0)) {
 			throw new NullException(NullCases.EMPTY, "properties parameter");
@@ -612,8 +614,8 @@ public class ProductInstance implements java.io.Serializable {
 
 	public void reset(final String properties, PackagerActionHistory packagerHistory,
 			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService,
-			ProductModelProductDriverPortService productModelProductDriverPortService)
-			throws DriverException, MalformedXMLException, NotRespectedRulesException, RestTemplateException {
+			ProductModelProductDriverPortService productModelProductDriverPortService) throws DriverException,
+			MalformedXMLException, NotRespectedRulesException, RestTemplateException, NotFoundException {
 
 		if ((properties != null) && (properties.trim().length() == 0)) {
 			throw new NullException(NullCases.EMPTY, "properties parameter");
@@ -670,7 +672,7 @@ public class ProductInstance implements java.io.Serializable {
 
 	@Transient
 	public String getUsageProperties(ProductModelProductDriverPortService productModelProductDriverPortService)
-			throws DriverException, RestTemplateException {
+			throws DriverException, RestTemplateException, NotFoundException {
 
 		int port = productModelProductDriverPortService.findByProductModel(this.getProductModel().getRetailerKey())
 				.getProductDriverPort();
@@ -690,7 +692,7 @@ public class ProductInstance implements java.io.Serializable {
 	public void updateSelfDiagnostics(PackagerActionHistory packagerHistory,
 			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService,
 			ProductModelProductDriverPortService productModelProductDriverPortService)
-			throws DriverException, RestTemplateException {
+			throws DriverException, RestTemplateException, NotFoundException {
 		if (packagerHistory == null) {
 			throw new NullException(NullCases.NULL, "packagerHistory parameter");
 		}
@@ -806,8 +808,8 @@ public class ProductInstance implements java.io.Serializable {
 	public void changeProperties(final String properties, PackagerActionHistory packagerActionHistory,
 			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService,
 			ManualDriverFactory manualDriverFactory,
-			ProductModelProductDriverPortService productModelProductDriverPortService)
-			throws DriverException, MalformedXMLException, NotRespectedRulesException, RestTemplateException {
+			ProductModelProductDriverPortService productModelProductDriverPortService) throws DriverException,
+			MalformedXMLException, NotRespectedRulesException, RestTemplateException, NotFoundException {
 
 		if ((properties == null) || (properties.trim().length() == 0)) {
 			throw new NullException(NullCases.NULL_EMPTY, "properties parameter");
@@ -867,8 +869,9 @@ public class ProductInstance implements java.io.Serializable {
 	}
 
 	public FeasibilityResult isPropertiesChangePossible(String properties,
-			ProductModelProductDriverPortService productModelProductDriverPortService) throws DriverException,
-			MalformedXMLException, PackagerException, NotRespectedRulesException, RestTemplateException {
+			ProductModelProductDriverPortService productModelProductDriverPortService)
+			throws DriverException, MalformedXMLException, PackagerException, NotRespectedRulesException,
+			RestTemplateException, NotFoundException {
 
 		if ((properties == null) || (properties.trim().length() == 0)) {
 			throw new NullException(NullCases.NULL_EMPTY, "properties parameter");
