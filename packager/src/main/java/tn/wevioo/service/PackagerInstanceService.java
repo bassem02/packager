@@ -2,6 +2,7 @@ package tn.wevioo.service;
 
 import java.util.List;
 
+import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.drivers.contract.exceptions.DriverException;
 import tn.wevioo.dto.packager.PackagerInstanceDTO;
 import tn.wevioo.dto.packager.PackagerInstanceHeaderDTO;
@@ -14,9 +15,9 @@ public interface PackagerInstanceService {
 
 	public void delete(PackagerInstance packagerInstance);
 
-	public PackagerInstance findById(int id);
+	public PackagerInstance findById(int id) throws NotFoundException;
 
-	public PackagerInstance findByRetailerPackagerId(String retailerPackagerId);
+	public PackagerInstance findByRetailerPackagerId(String retailerPackagerId) throws NotFoundException;
 
 	public List<PackagerInstance> findAll();
 

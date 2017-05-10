@@ -7,6 +7,10 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import nordnet.architecture.exceptions.explicit.NotFoundException;
+import nordnet.architecture.exceptions.implicit.NullException;
+import nordnet.architecture.exceptions.implicit.NullException.NullCases;
+import nordnet.architecture.exceptions.utils.ErrorCode;
 import nordnet.drivers.contract.exceptions.DriverException;
 import tn.wevioo.dao.PackagerInstanceDao;
 import tn.wevioo.dto.packager.PackagerInstanceDTO;
@@ -59,8 +63,16 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 	}
 
 	@Override
-	public PackagerInstance findById(int id) {
-		return packagerInstanceDao.findOne(id);
+	public PackagerInstance findById(int id) throws NotFoundException {
+		if (((Integer) id == null)) {
+			throw new NullException(NullCases.NULL_EMPTY, "id parameter");
+		}
+		PackagerInstance result = packagerInstanceDao.findOne(id);
+
+		if (result == null) {
+			throw new NotFoundException(new ErrorCode("0.2.1.3.2"), new Object[] { "Packager instance", " id", id });
+		}
+		return result;
 	}
 
 	@Override
@@ -69,8 +81,20 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 	}
 
 	@Override
-	public PackagerInstance findByRetailerPackagerId(String retailerPackagerId) {
-		return packagerInstanceDao.findByRetailerPackagerId(retailerPackagerId);
+	public PackagerInstance findByRetailerPackagerId(String retailerPackagerId) throws NotFoundException {
+		if ((retailerPackagerId == null) || (retailerPackagerId.length() == 0)) {
+			throw new NullException(NullCases.NULL_EMPTY, "retailerPackagerId parameter");
+		}
+
+		PackagerInstance result = packagerInstanceDao.findByRetailerPackagerId(retailerPackagerId);
+
+		if (result == null) {
+			throw new NotFoundException(new ErrorCode("0.2.1.3.2"),
+					new Object[] { "Packager instance", " retailerPackagerId", retailerPackagerId });
+		}
+
+		return result;
+
 	}
 
 	public PackagerInstanceDTO convertToDTO(PackagerInstance packagerInstance)
@@ -97,6 +121,11 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 
 	@Override
 	public Boolean isRetailerPackagerIdFree(String retailerPackagerId) {
+
+		if ((retailerPackagerId == null) || (retailerPackagerId.length() == 0)) {
+			throw new NullException(NullCases.NULL_EMPTY, "retailerPackagerId parameter");
+		}
+
 		return packagerInstanceDao.findByRetailerPackagerId(retailerPackagerId) == null;
 	}
 
