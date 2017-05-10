@@ -2,6 +2,7 @@ package tn.wevioo.service;
 
 import java.util.List;
 
+import nordnet.architecture.exceptions.explicit.NotFoundException;
 import tn.wevioo.entities.Parameters;
 import tn.wevioo.entities.type.ActionEnum;
 
@@ -11,10 +12,10 @@ public interface ParametersService {
 
 	void delete(Parameters parameters);
 
-	Parameters findById(int id);
+	Parameters findById(int id) throws NotFoundException;
 
 	List<Parameters> findAll();
 
-	Parameters findByActionAndTypeProduct(ActionEnum action, String productType);
+	Parameters findByActionAndTypeProduct(ActionEnum action, String productType) throws NotFoundException;
 
 }

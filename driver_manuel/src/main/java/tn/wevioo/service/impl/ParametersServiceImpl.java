@@ -5,6 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import nordnet.architecture.exceptions.explicit.NotFoundException;
+import nordnet.architecture.exceptions.implicit.NullException;
+import nordnet.architecture.exceptions.implicit.NullException.NullCases;
+import nordnet.architecture.exceptions.utils.ErrorCode;
 import tn.wevioo.dao.ParametersDAO;
 import tn.wevioo.entities.Parameters;
 import tn.wevioo.entities.type.ActionEnum;
@@ -27,8 +31,17 @@ public class ParametersServiceImpl implements ParametersService {
 	}
 
 	@Override
-	public Parameters findById(int id) {
-		return parametersDAO.findOne(id);
+	public Parameters findById(int id) throws NotFoundException {
+		if (((Integer) id == null)) {
+			throw new NullException(NullCases.NULL_EMPTY, "id parameter");
+		}
+
+		Parameters result = parametersDAO.findOne(id);
+
+		if (result == null) {
+			throw new NotFoundException(new ErrorCode("0.2.1.3.2"), new Object[] { "Parameters", " id", id });
+		}
+		return result;
 	}
 
 	@Override
@@ -37,8 +50,23 @@ public class ParametersServiceImpl implements ParametersService {
 	}
 
 	@Override
-	public Parameters findByActionAndTypeProduct(ActionEnum action, String productType) {
-		return parametersDAO.findByActionAndTypeProduct(action, productType);
+	public Parameters findByActionAndTypeProduct(ActionEnum action, String productType) throws NotFoundException {
+		if ((productType == null) || (productType.length() == 0)) {
+			throw new NullException(NullCases.NULL_EMPTY, "productType parameter");
+		}
+
+		if ((action == null)) {
+			throw new NullException(NullCases.NULL_EMPTY, "action parameter");
+		}
+
+		Parameters result = parametersDAO.findByActionAndTypeProduct(action, productType);
+
+		if (result == null) {
+			throw new NotFoundException(new ErrorCode("0.2.1.3.2"),
+					new Object[] { "Parameters", " action and productType", action + " and " + productType });
+		}
+
+		return result;
 	}
 
 }

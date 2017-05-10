@@ -15,7 +15,7 @@ public interface ProductService {
 
 	void delete(Product product);
 
-	Product findById(long id);
+	Product findById(long id) throws NotFoundException;
 
 	List<Product> findAll();
 

@@ -12,6 +12,8 @@ import nordnet.architecture.exceptions.explicit.DataSourceException;
 import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
 import nordnet.architecture.exceptions.explicit.WebServiceException;
+import nordnet.architecture.exceptions.implicit.NullException;
+import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import nordnet.architecture.exceptions.utils.ErrorCode;
 import tn.wevioo.dao.ProductDAO;
 import tn.wevioo.entities.EndUserHistory;
@@ -56,8 +58,17 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public Product findById(long id) {
-		return productDAO.findById(id);
+	public Product findById(long id) throws NotFoundException {
+
+		if (((Long) id == null)) {
+			throw new NullException(NullCases.NULL_EMPTY, "id parameter");
+		}
+		Product result = productDAO.findById(id);
+
+		if (result == null) {
+			throw new NotFoundException(new ErrorCode("0.2.1.3.2"), new Object[] { "Product history", " id", id });
+		}
+		return result;
 	}
 
 	@Override

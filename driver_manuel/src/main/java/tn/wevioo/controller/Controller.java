@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.xml.sax.SAXException;
 
 import nordnet.architecture.exceptions.explicit.MalformedXMLException;
+import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
 import nordnet.drivers.contract.exceptions.DriverException;
 import nordnet.drivers.contract.types.FeasibilityTestResult;
@@ -37,7 +38,7 @@ public class Controller {
 	private ProductService productService;
 
 	@RequestMapping(value = "/getProduct/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public Product getProduct(@PathVariable("id") long id) {
+	public Product getProduct(@PathVariable("id") long id) throws NotFoundException {
 
 		return productService.findById(id);
 	}

@@ -5,6 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import nordnet.architecture.exceptions.explicit.NotFoundException;
+import nordnet.architecture.exceptions.implicit.NullException;
+import nordnet.architecture.exceptions.implicit.NullException.NullCases;
+import nordnet.architecture.exceptions.utils.ErrorCode;
 import tn.wevioo.dao.EndUserHistoryDAO;
 import tn.wevioo.entities.EndUserHistory;
 import tn.wevioo.service.EndUserHistoryService;
@@ -26,8 +30,16 @@ public class EndUserHistoryServiceImpl implements EndUserHistoryService {
 	}
 
 	@Override
-	public EndUserHistory findById(int id) {
-		return endUserHistoryDAO.findOne(id);
+	public EndUserHistory findById(int id) throws NotFoundException {
+		if (((Integer) id == null)) {
+			throw new NullException(NullCases.NULL_EMPTY, "id parameter");
+		}
+		EndUserHistory result = endUserHistoryDAO.findOne(id);
+
+		if (result == null) {
+			throw new NotFoundException(new ErrorCode("0.2.1.3.2"), new Object[] { "End user history", " id", id });
+		}
+		return result;
 	}
 
 	@Override

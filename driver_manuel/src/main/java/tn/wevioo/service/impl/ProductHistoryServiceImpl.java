@@ -5,6 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import nordnet.architecture.exceptions.explicit.NotFoundException;
+import nordnet.architecture.exceptions.implicit.NullException;
+import nordnet.architecture.exceptions.implicit.NullException.NullCases;
+import nordnet.architecture.exceptions.utils.ErrorCode;
 import tn.wevioo.dao.ProductHistoryDAO;
 import tn.wevioo.entities.ProductHistory;
 import tn.wevioo.service.ProductHistoryService;
@@ -27,8 +31,16 @@ public class ProductHistoryServiceImpl implements ProductHistoryService {
 	}
 
 	@Override
-	public ProductHistory findById(int id) {
-		return productHistoryDAO.findOne(id);
+	public ProductHistory findById(int id) throws NotFoundException {
+		if (((Integer) id == null)) {
+			throw new NullException(NullCases.NULL_EMPTY, "id parameter");
+		}
+		ProductHistory result = productHistoryDAO.findOne(id);
+
+		if (result == null) {
+			throw new NotFoundException(new ErrorCode("0.2.1.3.2"), new Object[] { "Product history", " id", id });
+		}
+		return result;
 	}
 
 	@Override
