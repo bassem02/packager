@@ -95,7 +95,7 @@ public class ProductInstanceServiceImpl implements ProductInstanceService {
 
 		ProductPropertiesDTO productPropertiesDTO = new ProductPropertiesDTO();
 		BeanUtils.copyProperties(productInstanceDTO, productPropertiesDTO);
-		productPropertiesDTO.setProperties(productInstance.getProductProperties());
+		productPropertiesDTO.setProperties(productInstance.getProductProperties(productModelProductDriverPortService));
 
 		return productPropertiesDTO;
 	}

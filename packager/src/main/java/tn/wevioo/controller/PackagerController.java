@@ -39,6 +39,7 @@ import tn.wevioo.exceptions.RestTemplateException;
 import tn.wevioo.model.AbstractFacade;
 import tn.wevioo.model.feasibility.FeasibilityResult;
 import tn.wevioo.model.packager.action.PackagerInstanceAction;
+import tn.wevioo.model.request.MergePackagersRequest;
 import tn.wevioo.model.request.PackagerRequest;
 import tn.wevioo.model.request.PackagerTransformationRequest;
 import tn.wevioo.model.request.SplitPackagerRequest;
@@ -90,7 +91,7 @@ public class PackagerController extends AbstractFacade {
 		PackagerInstance createdPackagerInstance = null;
 		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.CREATE, webServiceUserService);
 		createdPackagerInstance = packagerModel.instantiate(request, history, productModelService, manualDriverFactory,
-				manualDriver, webServiceUserService, productInstanceService);
+				manualDriver, webServiceUserService, productInstanceService, productModelProductDriverPortService);
 
 		packagerInstanceService.saveOrUpdate(createdPackagerInstance);
 		packagerActionHistoryService.saveOrUpdate(history);
@@ -100,7 +101,7 @@ public class PackagerController extends AbstractFacade {
 
 	@RequestMapping(value = "/getPackagerInstance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public PackagerInstanceDTO getPackagerInstance(@QueryParam("retailerPackagerId") String retailerPackagerId)
-			throws DriverException, RestTemplateException {
+			throws DriverException, RestTemplateException, NotFoundException {
 		return packagerInstanceService
 				.convertToDTO(packagerInstanceService.findByRetailerPackagerId(retailerPackagerId));
 	}
@@ -252,7 +253,7 @@ public class PackagerController extends AbstractFacade {
 
 		for (ProductInstance pi : packagerInstance.getProducts()) {
 			ProductPropertiesDTO productPropertiesDTO = new ProductPropertiesDTO();
-			productPropertiesDTO.setProperties(pi.getProductProperties());
+			productPropertiesDTO.setProperties(pi.getProductProperties(productModelProductDriverPortService));
 			result.add(productPropertiesDTO);
 		}
 
@@ -294,7 +295,8 @@ public class PackagerController extends AbstractFacade {
 		PackagerActionHistory packagerHistory = new PackagerActionHistory(PackagerInstanceAction.UPDATE_SELF_DIAGNOSTIC,
 				webServiceUserService);
 		PackagerInstance packager = packagerInstanceService.findByRetailerPackagerId(retailerPackagerId);
-		packager.updateSelfDiagnostics(packagerHistory, webServiceUserService, productInstanceService);
+		packager.updateSelfDiagnostics(packagerHistory, webServiceUserService, productInstanceService,
+				productModelProductDriverPortService);
 		packagerActionHistoryService.saveOrUpdate(packagerHistory);
 		packagerInstanceService.saveOrUpdate(packager);
 
@@ -326,7 +328,7 @@ public class PackagerController extends AbstractFacade {
 	@RequestMapping(value = "/isProductTranslocationPossible", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public FeasibilityResult isProductTranslocationPossible(@RequestBody PackagerTransformationRequest request)
 			throws DriverException, DataSourceException, PackagerException, SAXException, IOException,
-			ParserConfigurationException, RestTemplateException {
+			ParserConfigurationException, RestTemplateException, NotFoundException {
 
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
@@ -404,6 +406,22 @@ public class PackagerController extends AbstractFacade {
 			fResult.setPossible(false);
 			return fResult;
 		}
+	}
+
+	@RequestMapping(value = "/mergePackagers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public PackagerInstanceDTO mergePackagers(@RequestBody MergePackagersRequest request) throws PackagerException,
+			NotFoundException, NotRespectedRulesException, DriverException, MalformedXMLException, DataSourceException,
+			RestTemplateException, SAXException, IOException, ParserConfigurationException {
+
+		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.MERGE, webServiceUserService);
+		PackagerInstance mergedPackagerInstance = PackagerInstance.merge(request.getSource1(), request.getSource2(),
+				request.getDestination(), history, manualDriverFactory, packagerInstanceService, packagerModelService,
+				productInstanceService, webServiceUserService, productModelProductDriverPortService, manualDriver,
+				productModelService);
+		packagerInstanceService.saveOrUpdate(mergedPackagerInstance);
+		packagerActionHistoryService.saveOrUpdate(history);
+
+		return packagerInstanceService.convertToDTO(mergedPackagerInstance);
 	}
 
 	// @RequestMapping(value = "/createNewDeliveryDemand", method =

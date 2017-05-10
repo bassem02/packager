@@ -79,7 +79,8 @@ public class ProductController {
 		if (result.getPossible()) {
 			PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.CANCEL,
 					webServiceUserService);
-			productInstance.cancel(request.getProperties(), history, webServiceUserService, productInstanceService);
+			productInstance.cancel(request.getProperties(), history, webServiceUserService, productInstanceService,
+					productModelProductDriverPortService);
 			history.addDestination(productInstance.getPackager());
 			history.addSource(productInstance.getPackager());
 			history.setLastUpdate(new Date());
@@ -101,7 +102,8 @@ public class ProductController {
 		ProductInstance productInstance = productInstanceService.findById(request.getProductId().intValue());
 
 		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.RESET, webServiceUserService);
-		productInstance.reset(request.getProperties(), history, webServiceUserService, productInstanceService);
+		productInstance.reset(request.getProperties(), history, webServiceUserService, productInstanceService,
+				productModelProductDriverPortService);
 		history.addDestination(productInstance.getPackager());
 		history.addSource(productInstance.getPackager());
 		packagerActionHistoryService.saveOrUpdate(history);
@@ -124,7 +126,7 @@ public class ProductController {
 
 		ProductInstance productInstace = productInstanceService.findById(productId);
 
-		return productInstace.getUsageProperties();
+		return productInstace.getUsageProperties(productModelProductDriverPortService);
 	}
 
 	@RequestMapping(value = "/getProductProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

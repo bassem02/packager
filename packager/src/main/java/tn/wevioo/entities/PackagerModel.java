@@ -242,7 +242,8 @@ public class PackagerModel implements java.io.Serializable {
 
 	public PackagerInstance instantiate(PackagerRequest request, PackagerActionHistory history,
 			ProductModelService productModelService, ManualDriverFactory manualDriverFactory, ManualDriver manualDriver,
-			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService)
+			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService,
+			ProductModelProductDriverPortService productModelProductDriverPortService)
 			throws DriverException, NotRespectedRulesException, MalformedXMLException, PackagerException,
 			NotFoundException, DataSourceException {
 		if (request == null) {
@@ -291,7 +292,8 @@ public class PackagerModel implements java.io.Serializable {
 		}
 
 		try {
-			result.updateReferences(history, webServiceUserService, productInstanceService);
+			result.updateReferences(history, webServiceUserService, productInstanceService,
+					productModelProductDriverPortService);
 		} catch (Exception e) {
 			if (LOGGER.isWarnEnabled()) {
 				LOGGER.warn("Updating references didn't succeeded !", e);
@@ -738,7 +740,8 @@ public class PackagerModel implements java.io.Serializable {
 		}
 
 		try {
-			result.updateReferences(history, webServiceUserService, productInstanceService);
+			result.updateReferences(history, webServiceUserService, productInstanceService,
+					productModelProductDriverPortService);
 		} catch (Exception e) {
 			return result;
 		}

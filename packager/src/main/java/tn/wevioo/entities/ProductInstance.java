@@ -109,9 +109,7 @@ public class ProductInstance implements java.io.Serializable {
 			throw new NullException(NullCases.NULL, "productDriver parameter");
 		}
 		setProviderProductId(productDriver.getProviderProductId());
-		// this.providerProductId = productDriver.getProviderProductId();
 		setProductDriver(productDriver);
-		// this.productDriver = productDriver;
 	}
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -285,7 +283,8 @@ public class ProductInstance implements java.io.Serializable {
 	}
 
 	public void suspend(final String properties, PackagerActionHistory packagerHistory,
-			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService)
+			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService,
+			ProductModelProductDriverPortService productModelProductDriverPortService)
 			throws DriverException, MalformedXMLException, NotRespectedRulesException, RestTemplateException {
 
 		if ((properties != null) && (properties.trim().length() == 0)) {
@@ -297,7 +296,9 @@ public class ProductInstance implements java.io.Serializable {
 		}
 
 		try {
-			String url = "http://localhost:8093";
+			int port = productModelProductDriverPortService.findByProductModel(this.getProductModel().getRetailerKey())
+					.getProductDriverPort();
+			String url = "http://localhost:" + port;
 			RestTemplate rest = new RestTemplate();
 
 			@SuppressWarnings("unused")
@@ -317,7 +318,8 @@ public class ProductInstance implements java.io.Serializable {
 			// (this.productModel.getDriverFactory().getDriverInternalConfiguration().areReferencesChangedOnSuspension())
 			// {
 			try {
-				this.updateReferences(packagerHistory, webServiceUserService, productInstanceService);
+				this.updateReferences(packagerHistory, webServiceUserService, productInstanceService,
+						productModelProductDriverPortService);
 			} catch (DriverException e) {
 				this.productInstanceReferences.clear();
 			}
@@ -332,11 +334,14 @@ public class ProductInstance implements java.io.Serializable {
 	}
 
 	@Transient
-	public String getProductProperties() throws DriverException, RestTemplateException {
+	public String getProductProperties(ProductModelProductDriverPortService productModelProductDriverPortService)
+			throws DriverException, RestTemplateException {
 		// return this.getProductDriver().getProductProperties();
 
 		try {
-			String url = "http://localhost:8093";
+			int port = productModelProductDriverPortService.findByProductModel(this.getProductModel().getRetailerKey())
+					.getProductDriverPort();
+			String url = "http://localhost:" + port;
 			RestTemplate rest = new RestTemplate();
 
 			String result = (String) rest
@@ -349,13 +354,17 @@ public class ProductInstance implements java.io.Serializable {
 	}
 
 	public void updateReferences(PackagerActionHistory packagerHistory, WebServiceUserService webServiceUserService,
-			ProductInstanceService productInstanceService) throws DriverException, RestTemplateException {
+			ProductInstanceService productInstanceService,
+			ProductModelProductDriverPortService productModelProductDriverPortService)
+			throws DriverException, RestTemplateException {
 
 		if (packagerHistory == null) {
 			throw new NullException(NullCases.NULL, "packagerHistory parameter");
 		}
 
-		String url = "http://localhost:8093";
+		int port = productModelProductDriverPortService.findByProductModel(this.getProductModel().getRetailerKey())
+				.getProductDriverPort();
+		String url = "http://localhost:" + port;
 		RestTemplate rest = new RestTemplate();
 
 		try {
@@ -429,7 +438,8 @@ public class ProductInstance implements java.io.Serializable {
 	}
 
 	public void activate(final String properties, PackagerActionHistory packagerHistory,
-			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService)
+			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService,
+			ProductModelProductDriverPortService productModelProductDriverPortService)
 			throws DriverException, MalformedXMLException, NotRespectedRulesException, RestTemplateException {
 
 		if ((properties != null) && (properties.trim().length() == 0)) {
@@ -440,7 +450,9 @@ public class ProductInstance implements java.io.Serializable {
 			throw new NullException(NullCases.NULL, "packagerHistory parameter");
 		}
 
-		String url = "http://localhost:8093";
+		int port = productModelProductDriverPortService.findByProductModel(this.getProductModel().getRetailerKey())
+				.getProductDriverPort();
+		String url = "http://localhost:" + port;
 		RestTemplate rest = new RestTemplate();
 
 		try {
@@ -468,7 +480,8 @@ public class ProductInstance implements java.io.Serializable {
 			// (this.productModel.getDriverFactory().getDriverInternalConfiguration().areReferencesChangedOnActivation())
 			// {
 			try {
-				this.updateReferences(packagerHistory, webServiceUserService, productInstanceService);
+				this.updateReferences(packagerHistory, webServiceUserService, productInstanceService,
+						productModelProductDriverPortService);
 			} catch (DriverException e) {
 				this.productInstanceReferences.clear();
 			}
@@ -483,7 +496,8 @@ public class ProductInstance implements java.io.Serializable {
 	}
 
 	public void reactivate(final String properties, PackagerActionHistory packagerHistory,
-			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService)
+			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService,
+			ProductModelProductDriverPortService productModelProductDriverPortService)
 			throws NotRespectedRulesException, MalformedXMLException, DriverException, RestTemplateException {
 		if ((properties != null) && (properties.trim().length() == 0)) {
 			throw new NullException(NullCases.EMPTY, "properties parameter");
@@ -493,7 +507,9 @@ public class ProductInstance implements java.io.Serializable {
 			throw new NullException(NullCases.NULL, "packagerHistory parameter");
 		}
 
-		String url = "http://localhost:8093";
+		int port = productModelProductDriverPortService.findByProductModel(this.getProductModel().getRetailerKey())
+				.getProductDriverPort();
+		String url = "http://localhost:" + port;
 		RestTemplate rest = new RestTemplate();
 
 		try {
@@ -521,7 +537,8 @@ public class ProductInstance implements java.io.Serializable {
 			// (this.productModel.getDriverFactory().getDriverInternalConfiguration()
 			// .areReferencesChangedOnReactivation()) {
 			try {
-				this.updateReferences(packagerHistory, webServiceUserService, productInstanceService);
+				this.updateReferences(packagerHistory, webServiceUserService, productInstanceService,
+						productModelProductDriverPortService);
 			} catch (DriverException e) {
 				this.productInstanceReferences.clear();
 			}
@@ -536,7 +553,8 @@ public class ProductInstance implements java.io.Serializable {
 	}
 
 	public void cancel(final String properties, PackagerActionHistory packagerHistory,
-			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService)
+			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService,
+			ProductModelProductDriverPortService productModelProductDriverPortService)
 			throws DriverException, MalformedXMLException, NotRespectedRulesException, RestTemplateException {
 
 		if ((properties != null) && (properties.trim().length() == 0)) {
@@ -547,7 +565,9 @@ public class ProductInstance implements java.io.Serializable {
 			throw new NullException(NullCases.NULL, "packagerHistory parameter");
 		}
 
-		String url = "http://localhost:8093";
+		int port = productModelProductDriverPortService.findByProductModel(this.getProductModel().getRetailerKey())
+				.getProductDriverPort();
+		String url = "http://localhost:" + port;
 		RestTemplate rest = new RestTemplate();
 
 		try {
@@ -575,7 +595,8 @@ public class ProductInstance implements java.io.Serializable {
 			// (this.productModel.getDriverFactory().getDriverInternalConfiguration().areReferencesChangedOnCancelation())
 			// {
 			try {
-				this.updateReferences(packagerHistory, webServiceUserService, productInstanceService);
+				this.updateReferences(packagerHistory, webServiceUserService, productInstanceService,
+						productModelProductDriverPortService);
 			} catch (DriverException e) {
 				this.productInstanceReferences.clear();
 			}
@@ -590,7 +611,8 @@ public class ProductInstance implements java.io.Serializable {
 	}
 
 	public void reset(final String properties, PackagerActionHistory packagerHistory,
-			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService)
+			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService,
+			ProductModelProductDriverPortService productModelProductDriverPortService)
 			throws DriverException, MalformedXMLException, NotRespectedRulesException, RestTemplateException {
 
 		if ((properties != null) && (properties.trim().length() == 0)) {
@@ -601,7 +623,9 @@ public class ProductInstance implements java.io.Serializable {
 			throw new NullException(NullCases.NULL, "packagerHistory parameter");
 		}
 
-		String url = "http://localhost:8093";
+		int port = productModelProductDriverPortService.findByProductModel(this.getProductModel().getRetailerKey())
+				.getProductDriverPort();
+		String url = "http://localhost:" + port;
 		RestTemplate rest = new RestTemplate();
 
 		try {
@@ -622,14 +646,15 @@ public class ProductInstance implements java.io.Serializable {
 			packagerHistory.addProductAction(history);
 
 			// this.resetLastKnownState();
-			this.setLastKnownState("RESETED");
+			this.setLastKnownState("RESET");
 			this.setLastKnownStateUpdate(new Date());
 
 			// if
 			// (this.productModel.getDriverFactory().getDriverInternalConfiguration().areReferencesChangedOnReset())
 			// {
 			try {
-				this.updateReferences(packagerHistory, webServiceUserService, productInstanceService);
+				this.updateReferences(packagerHistory, webServiceUserService, productInstanceService,
+						productModelProductDriverPortService);
 			} catch (DriverException e) {
 				this.productInstanceReferences.clear();
 			}
@@ -644,9 +669,12 @@ public class ProductInstance implements java.io.Serializable {
 	}
 
 	@Transient
-	public String getUsageProperties() throws DriverException, RestTemplateException {
+	public String getUsageProperties(ProductModelProductDriverPortService productModelProductDriverPortService)
+			throws DriverException, RestTemplateException {
 
-		String url = "http://localhost:8093";
+		int port = productModelProductDriverPortService.findByProductModel(this.getProductModel().getRetailerKey())
+				.getProductDriverPort();
+		String url = "http://localhost:" + port;
 		RestTemplate rest = new RestTemplate();
 
 		try {
@@ -660,7 +688,8 @@ public class ProductInstance implements java.io.Serializable {
 	}
 
 	public void updateSelfDiagnostics(PackagerActionHistory packagerHistory,
-			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService)
+			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService,
+			ProductModelProductDriverPortService productModelProductDriverPortService)
 			throws DriverException, RestTemplateException {
 		if (packagerHistory == null) {
 			throw new NullException(NullCases.NULL, "packagerHistory parameter");
@@ -669,7 +698,9 @@ public class ProductInstance implements java.io.Serializable {
 		// Map<String, String> newDriverDiagnostics =
 		// this.getProductDriver().getSelfDiagnostics();
 
-		String url = "http://localhost:8093";
+		int port = productModelProductDriverPortService.findByProductModel(this.getProductModel().getRetailerKey())
+				.getProductDriverPort();
+		String url = "http://localhost:" + port;
 		RestTemplate rest = new RestTemplate();
 
 		try {
@@ -793,7 +824,9 @@ public class ProductInstance implements java.io.Serializable {
 
 		// this.getProductDriver().changeProperties(properties);
 
-		String url = "http://localhost:8093";
+		int port = productModelProductDriverPortService.findByProductModel(this.getProductModel().getRetailerKey())
+				.getProductDriverPort();
+		String url = "http://localhost:" + port;
 		RestTemplate rest = new RestTemplate();
 
 		try {
@@ -821,7 +854,8 @@ public class ProductInstance implements java.io.Serializable {
 		// (manualDriverFactory.getDriverInternalConfiguration().areReferencesChangedOnChangeProperties())
 		// {
 		try {
-			this.updateReferences(packagerActionHistory, webServiceUserService, productInstanceService);
+			this.updateReferences(packagerActionHistory, webServiceUserService, productInstanceService,
+					productModelProductDriverPortService);
 		} catch (DriverException e) {
 			this.getProductInstanceReferences().clear();
 		}
@@ -845,7 +879,9 @@ public class ProductInstance implements java.io.Serializable {
 					new Object[] { String.valueOf(this.getIdProductInstance()), State.CANCELED.toString() });
 			return new FeasibilityResult(false, ex.getMessage(), null);
 		} else {
-			String url = "http://localhost:8093";
+			int port = productModelProductDriverPortService.findByProductModel(this.getProductModel().getRetailerKey())
+					.getProductDriverPort();
+			String url = "http://localhost:" + port;
 			RestTemplate rest = new RestTemplate();
 
 			try {
