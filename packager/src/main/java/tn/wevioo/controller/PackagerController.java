@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.ws.rs.QueryParam;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -192,7 +193,7 @@ public class PackagerController extends AbstractFacade {
 	@RequestMapping(value = "/isPackagerCreationPossible", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public FeasibilityResult isPackagerCreationPossible(@RequestBody PackagerRequest request)
 			throws PackagerException, DriverException, DataSourceException, NotRespectedRulesException, SAXException,
-			IOException, ParserConfigurationException {
+			IOException, ParserConfigurationException, TransformerException {
 
 		if (request == null) {
 			FeasibilityResult fFeasibilityResult = new FeasibilityResult();
@@ -307,7 +308,8 @@ public class PackagerController extends AbstractFacade {
 	@RequestMapping(value = "/translocateProductInstances", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public void translocateProductInstances(@RequestBody PackagerTransformationRequest request)
 			throws PackagerException, DriverException, MalformedXMLException, DataSourceException, NotFoundException,
-			NotRespectedRulesException, SAXException, IOException, ParserConfigurationException, RestTemplateException {
+			NotRespectedRulesException, SAXException, IOException, ParserConfigurationException, RestTemplateException,
+			TransformerException {
 
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
@@ -328,7 +330,7 @@ public class PackagerController extends AbstractFacade {
 	@RequestMapping(value = "/isProductTranslocationPossible", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public FeasibilityResult isProductTranslocationPossible(@RequestBody PackagerTransformationRequest request)
 			throws DriverException, DataSourceException, PackagerException, SAXException, IOException,
-			ParserConfigurationException, RestTemplateException, NotFoundException {
+			ParserConfigurationException, RestTemplateException, NotFoundException, TransformerException {
 
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
@@ -344,9 +346,9 @@ public class PackagerController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/splitPackager", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void splitPackager(@RequestBody SplitPackagerRequest request)
-			throws PackagerException, DriverException, DataSourceException, MalformedXMLException, NotFoundException,
-			NotRespectedRulesException, SAXException, IOException, ParserConfigurationException, RestTemplateException {
+	public void splitPackager(@RequestBody SplitPackagerRequest request) throws PackagerException, DriverException,
+			DataSourceException, MalformedXMLException, NotFoundException, NotRespectedRulesException, SAXException,
+			IOException, ParserConfigurationException, RestTemplateException, TransformerException {
 		if (request.getSource() == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
 		}
@@ -373,7 +375,7 @@ public class PackagerController extends AbstractFacade {
 	@RequestMapping(value = "/isSplitPackagerPossible", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public FeasibilityResult isSplitPackagerPossible(@RequestBody SplitPackagerRequest request)
 			throws PackagerException, DataSourceException, DriverException, NotFoundException, MalformedXMLException,
-			SAXException, IOException, ParserConfigurationException, RestTemplateException {
+			SAXException, IOException, ParserConfigurationException, RestTemplateException, TransformerException {
 		FeasibilityResult fResult = new FeasibilityResult();
 		if (request.getSource() == null) {
 			NullException exp = new NullException(NullCases.NULL, "request parameter");
@@ -411,7 +413,7 @@ public class PackagerController extends AbstractFacade {
 	@RequestMapping(value = "/mergePackagers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public PackagerInstanceDTO mergePackagers(@RequestBody MergePackagersRequest request) throws PackagerException,
 			NotFoundException, NotRespectedRulesException, DriverException, MalformedXMLException, DataSourceException,
-			RestTemplateException, SAXException, IOException, ParserConfigurationException {
+			RestTemplateException, SAXException, IOException, ParserConfigurationException, TransformerException {
 
 		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.MERGE, webServiceUserService);
 		PackagerInstance mergedPackagerInstance = PackagerInstance.merge(request.getSource1(), request.getSource2(),

@@ -3,6 +3,9 @@ package tn.wevioo.entities;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,21 +19,28 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.client.RestTemplate;
 
 import nordnet.architecture.exceptions.NNImplicitException;
 import nordnet.architecture.exceptions.explicit.MalformedXMLException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
+import nordnet.architecture.exceptions.explicit.ResourceAccessException;
 import nordnet.architecture.exceptions.implicit.NullException;
 import nordnet.architecture.exceptions.implicit.NullException.NullCases;
+import nordnet.architecture.exceptions.utils.ErrorCode;
 import nordnet.drivers.contract.exceptions.DriverException;
 import tn.wevioo.ManualDriver;
 import tn.wevioo.ManualDriverFactory;
 import tn.wevioo.exceptions.RestTemplateException;
 import tn.wevioo.model.product.action.ProductInstanceAction;
+import tn.wevioo.model.request.ProductRequest;
 import tn.wevioo.service.ProductInstanceService;
 import tn.wevioo.service.WebServiceUserService;
 
@@ -243,14 +253,41 @@ public class ProductModel implements java.io.Serializable {
 		}
 	}
 
-	// @Transient
-	// public ManualDriverFactory getDriverFactory() throws DriverException {
-	// try {
-	// return manualDriverFactory;
-	// } catch (NoSuchBeanDefinitionException ex) {
-	// throw new DriverException(new ErrorCode("1.2.1.4.2"),
-	// this.productDriverFactoryBeanName, ex);
-	// }
-	// }
+	@Transient
+	public ProductRequest getDefaultRequest() throws ResourceAccessException {
+		ProductRequest result = new ProductRequest();
+		result.setModel(this.getRetailerKey());
+
+		String properties = new String("");
+		try {
+			BufferedReader br = new BufferedReader(
+					new InputStreamReader(this.getDefaultTemplateResource().getInputStream()));
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				properties = properties.concat(line + System.getProperty("line.separator"));
+			}
+			br.close();
+		} catch (IOException ex) {
+			throw new ResourceAccessException(new ErrorCode("0.1.1.2.7"),
+					new Object[] { this.getDefaultTemplateUrlV2() }, ex);
+		}
+		result.setProperties(properties);
+
+		return result;
+	}
+
+	@Transient
+	public Resource getDefaultTemplateResource() {
+
+		DefaultResourceLoader loader = new DefaultResourceLoader();
+		return loader.getResource(this.getDefaultTemplateUrlV2());
+	}
+
+	@Transient
+	public Resource getDefaultConfigurationResource() {
+
+		ResourceLoader loader = new DefaultResourceLoader();
+		return loader.getResource(this.getDefaultConfigurationUri());
+	}
 
 }
