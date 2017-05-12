@@ -270,7 +270,9 @@ public class ManualDriverFactory
 	}
 
 	static Object parse(String properties) throws SAXException, IOException, ParserConfigurationException {
-		DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		DocumentBuilder db = dbf.newDocumentBuilder();
 		InputSource is = new InputSource();
 		is.setCharacterStream(new StringReader(properties));
 
@@ -279,6 +281,7 @@ public class ManualDriverFactory
 		Document doc = db.parse(is);
 
 		NodeList node = doc.getElementsByTagName("manual:productProperties");
+		// NodeList node = doc.getElementsByTagName("productProperties");
 		Element element = (Element) node.item(0);
 
 		NodeList hexacleNode = element.getElementsByTagName("manual:hexacle");
