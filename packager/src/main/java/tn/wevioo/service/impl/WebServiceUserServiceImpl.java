@@ -3,6 +3,8 @@ package tn.wevioo.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import nordnet.architecture.exceptions.explicit.NotFoundException;
@@ -45,6 +47,18 @@ public class WebServiceUserServiceImpl implements WebServiceUserService {
 	@Override
 	public List<WebServiceUser> findAll() {
 		return webServiceUserDAO.findAll();
+	}
+
+	public WebServiceUser getWebserviceUser() {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		String currentPrincipalName = authentication.getName();
+
+		WebServiceUser result = webServiceUserDAO.findByLogin(currentPrincipalName);
+
+		return result;
+
 	}
 
 }

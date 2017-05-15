@@ -2,8 +2,11 @@ package tn.wevioo.dto.product;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 /**
- * The class FProductInstanceReference represents the Facade Object for an Instance reference.
+ * The class FProductInstanceReference represents the Facade Object for an
+ * Instance reference.
  * 
  * @author vberezan
  * @since 2.0.0
@@ -11,8 +14,8 @@ import java.util.Date;
 public class ProductInstanceReferenceDTO {
 
 	/**
-	 * This attribute contains the type of this reference. This type is not constrained in the database, as the drivers
-	 * define it.
+	 * This attribute contains the type of this reference. This type is not
+	 * constrained in the database, as the drivers define it.
 	 */
 	private String referenceType;
 
@@ -22,11 +25,13 @@ public class ProductInstanceReferenceDTO {
 	private String referenceValue;
 
 	/**
-	 * The date when this product reference has been created into the database. This attribute did not exist into the
-	 * version 1.x of the Packager application. It has been added on the version 2.0.0 in order to have information
-	 * about the relevance of this information. The database must be completed with the required new field on the mapped
-	 * table.
+	 * The date when this product reference has been created into the database.
+	 * This attribute did not exist into the version 1.x of the Packager
+	 * application. It has been added on the version 2.0.0 in order to have
+	 * information about the relevance of this information. The database must be
+	 * completed with the required new field on the mapped table.
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd KK:mm:ss")
 	private Date creationDate;
 
 	public Date getCreationDate() {

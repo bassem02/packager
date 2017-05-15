@@ -204,7 +204,7 @@ public class ProductInstance implements java.io.Serializable {
 		this.lastKnownStateUpdate = lastKnownStateUpdate;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "productInstance")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "productInstance", cascade = CascadeType.ALL)
 	public Set<ProductInstanceReference> getProductInstanceReferences() {
 		return this.productInstanceReferences;
 	}
@@ -225,7 +225,7 @@ public class ProductInstance implements java.io.Serializable {
 		this.shippingDemands = shippingDemands;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "productInstance")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "productInstance", cascade = CascadeType.ALL)
 	public Set<ProductInstanceDiagnostic> getProductInstanceDiagnostics() {
 		return this.productInstanceDiagnostics;
 	}
@@ -408,7 +408,7 @@ public class ProductInstance implements java.io.Serializable {
 	}
 
 	public void addReference(ProductInstanceReference reference) {
-		if (this.productInstanceReferences == null) {
+		if (this.getProductInstanceReferences() == null) {
 			this.productInstanceReferences = new HashSet<ProductInstanceReference>();
 		}
 

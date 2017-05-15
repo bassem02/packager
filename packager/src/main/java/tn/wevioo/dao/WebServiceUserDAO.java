@@ -6,4 +6,6 @@ import tn.wevioo.entities.WebServiceUser;
 
 public interface WebServiceUserDAO extends JpaRepository<WebServiceUser, Integer> {
 
+	public WebServiceUser findByLogin(String login);
+
 }

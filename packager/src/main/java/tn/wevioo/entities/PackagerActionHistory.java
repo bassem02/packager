@@ -87,7 +87,7 @@ public class PackagerActionHistory implements java.io.Serializable {
 		// this.packagerAction = action;
 		this.packagerAction = action.toString();
 		this.creationDate = new Date();
-		this.webServiceUser = webServiceUserService.findById(7);
+		this.webServiceUser = webServiceUserService.getWebserviceUser();
 		setLastUpdate(new Date());
 	}
 
@@ -235,7 +235,7 @@ public class PackagerActionHistory implements java.io.Serializable {
 			throw new NullException(NullCases.NULL, "action parameter");
 		}
 
-		if (this.productActionHistories == null) {
+		if (this.getProductActionHistories() == null) {
 			this.productActionHistories = new TreeSet<ProductActionHistory>(
 					new ProductActionHistoryCreationDateComparator());
 		}

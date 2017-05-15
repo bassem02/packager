@@ -1,6 +1,5 @@
 package tn.wevioo.service.impl;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import tn.wevioo.dto.product.ProductInstanceDiagnosticDTO;
@@ -14,10 +13,9 @@ public class ProductInstanceDiagnosticServiceImpl implements ProductInstanceDiag
 	public ProductInstanceDiagnosticDTO convertToDTO(ProductInstanceDiagnostic productInstanceDiagnostic) {
 
 		ProductInstanceDiagnosticDTO productInstanceDiagnosticDTO = new ProductInstanceDiagnosticDTO();
-		// fProductInstanceDiagnostic.setCreationDate(productInstanceDiagnostic.getCreationDate());
-		// fProductInstanceDiagnostic.setDiagnosticKey(productInstanceDiagnostic.getDiagnosticKey());
-		// fProductInstanceDiagnostic.setDiagnosticValue(productInstanceDiagnostic.getDiagnosticValue());
-		BeanUtils.copyProperties(productInstanceDiagnostic, productInstanceDiagnosticDTO);
+		productInstanceDiagnosticDTO.setCreationDate(productInstanceDiagnostic.getCreationDate());
+		productInstanceDiagnosticDTO.setDiagnosticKey(productInstanceDiagnostic.getDiagnosticKey());
+		productInstanceDiagnosticDTO.setDiagnosticValue(productInstanceDiagnostic.getDiagnosticValue());
 
 		return productInstanceDiagnosticDTO;
 	}

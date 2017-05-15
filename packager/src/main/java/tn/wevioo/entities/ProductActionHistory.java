@@ -83,10 +83,7 @@ public class ProductActionHistory implements java.io.Serializable {
 
 		this.productAction = action.name();
 		this.properties = properties;
-		// this.webServiceUser =
-		// PackagerLogicTierBeanFactory.getWebServiceUserService().getAuthenticatedUser();
-
-		this.webServiceUser = webServiceUserService.findById(7);
+		this.webServiceUser = webServiceUserService.getWebserviceUser();
 		setLastUpdate(new Date());
 		this.creationDate = new Date();
 

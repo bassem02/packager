@@ -2,6 +2,8 @@ package tn.wevioo.dto.product.action;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import tn.wevioo.dto.product.ProductInstanceDTO;
 
 /**
@@ -19,6 +21,8 @@ public class ProductActionHistoryDTO {
 	/**
 	 * The date when current action history is saved into database.
 	 */
+
+	@JsonFormat(pattern = "yyyy-MM-dd KK:mm:ss")
 	private Date creationDate;
 
 	/**

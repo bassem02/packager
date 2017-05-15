@@ -4,6 +4,9 @@ spring:
     username: root
     password: 
     driverClassName: com.mysql.jdbc.Driver    
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS : false    
   jpa:
     database: MYSQL
     show-sql: true
@@ -22,3 +25,4 @@ authentication:
     validation-query: select 1;
 server:
   port: 8092
+  

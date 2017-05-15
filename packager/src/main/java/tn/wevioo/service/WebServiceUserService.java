@@ -15,4 +15,6 @@ public interface WebServiceUserService {
 
 	public List<WebServiceUser> findAll();
 
+	public WebServiceUser getWebserviceUser();
+
 }

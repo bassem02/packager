@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import tn.wevioo.dto.product.ProductInstanceHeaderDTO;
 
 /**
@@ -38,6 +40,8 @@ public class PackagerInstanceHeaderDTO {
 	/**
 	 * The package creation date.
 	 */
+
+	@JsonFormat(pattern = "yyyy-MM-dd KK:mm:ss")
 	private Date creationDate;
 
 	/**

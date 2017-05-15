@@ -3,7 +3,6 @@ package tn.wevioo.security;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -13,7 +12,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import tn.wevioo.authentication.service.ServerService;
+import nordnet.architecture.exceptions.explicit.NotFoundException;
+import tn.wevioo.service.AuthorizedIpAddressService;
+import tn.wevioo.service.WebServiceUserService;
 
 @Configuration
 @EnableGlobalMethodSecurity(securedEnabled = true)
@@ -21,21 +22,23 @@ import tn.wevioo.authentication.service.ServerService;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
-	public ServerService serverService;
+	public AuthorizedIpAddressService authorizedIpAddressService;
 
 	@Autowired
-	@Qualifier("authenticationDatasource")
 	private DataSource datasource;
+
+	@Autowired
+	public WebServiceUserService webServiceUserService;
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
 		auth.jdbcAuthentication().dataSource(datasource)
 				.usersByUsernameQuery(
-						"select username as principal, password as credentials, true from users where username= ?")
+						"select login as principal, password as credentials, true from web_service_user where login= ?")
 				.authoritiesByUsernameQuery(
-						"select users.username as principal,authorities.authority as role from users,authorities where users.username=? and users.authority_id=authorities.id")
-				.rolePrefix("ROLE_ADMIN");
+						"select login as principal,role as role from web_service_user where login=?")
+				.rolePrefix("ADMIN");
 
 	}
 
@@ -48,8 +51,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.addFilterAfter(customFilter(), BasicAuthenticationFilter.class);
 	}
 
-	private CustomFilter customFilter() {
-		return new CustomFilter(serverService);
+	private CustomFilter customFilter() throws NotFoundException {
+		return new CustomFilter(authorizedIpAddressService, webServiceUserService);
 	}
 
 }

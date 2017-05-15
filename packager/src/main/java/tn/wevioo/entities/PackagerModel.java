@@ -268,15 +268,13 @@ public class PackagerModel implements java.io.Serializable {
 		result.setCreationDate(new Date());
 
 		result.setLastUpdate(new Date());
-		/*
-		 * result
-		 * .setRetailer(PackagerLogicTierBeanFactory.getWebServiceUserService().
-		 * getAuthenticatedUser() .getRetailer());
-		 */
-		Retailer retailer = new Retailer();
-		retailer.setIdRetailer(1);
-		retailer.setName("NORDNET.COM");
-		result.setRetailer(retailer);
+
+		result.setRetailer(webServiceUserService.getWebserviceUser().getRetailer());
+
+		// Retailer retailer = new Retailer();
+		// retailer.setIdRetailer(1);
+		// retailer.setName("NORDNET.COM");
+		// result.setRetailer(retailer);
 
 		history.setPackagerModel(this.getRetailerKey());
 		history.setRetailerPackagerId(request.getRetailerPackagerId());
@@ -774,10 +772,7 @@ public class PackagerModel implements java.io.Serializable {
 		result.setPackagerModel(this);
 		result.setLastUpdate(new Date());
 
-		Retailer retailer = new Retailer();
-		retailer.setIdRetailer(1);
-		retailer.setName("NORDNET.COM");
-		result.setRetailer(retailer);
+		result.setRetailer(webServiceUserService.getWebserviceUser().getRetailer());
 
 		for (ProductRequest pr : request.getCreationProductRequests()) {
 			ProductModel productModel = productModelService.findByRetailerKey(pr.getModel());

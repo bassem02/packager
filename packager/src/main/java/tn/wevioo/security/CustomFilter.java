@@ -18,7 +18,10 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
 import org.springframework.web.filter.GenericFilterBean;
 
-import tn.wevioo.authentication.service.ServerService;
+import tn.wevioo.entities.AuthorizedIpAddress;
+import tn.wevioo.entities.WebServiceUser;
+import tn.wevioo.service.AuthorizedIpAddressService;
+import tn.wevioo.service.WebServiceUserService;
 
 @EnableAutoConfiguration(exclude = JpaRepositoriesAutoConfiguration.class)
 public class CustomFilter extends GenericFilterBean {
@@ -33,14 +36,18 @@ public class CustomFilter extends GenericFilterBean {
 
 	public static final String WADL = "_wadl";
 
-	private final ServerService serverService;
+	private final AuthorizedIpAddressService authorizedIpAddressService;
 
-	public CustomFilter(ServerService serverService) {
-		this.serverService = serverService;
+	WebServiceUserService webServiceUserService;
+
+	public CustomFilter(AuthorizedIpAddressService authorizedIpAddressService,
+			WebServiceUserService webServiceUserService) {
+		this.authorizedIpAddressService = authorizedIpAddressService;
+		this.webServiceUserService = webServiceUserService;
 	}
 
-	public ServerService getServerService() {
-		return serverService;
+	public AuthorizedIpAddressService getAuthorizedIpAddressService() {
+		return authorizedIpAddressService;
 	}
 
 	public boolean authenticate(HttpServletRequest httpServletRequest) {
@@ -70,15 +77,26 @@ public class CustomFilter extends GenericFilterBean {
 		final String password = tokenizer.nextToken();
 		final String ip = LOCALHOST_IPV6.equals(httpServletRequest.getRemoteAddr()) ? LOCALHOST_IPV4
 				: httpServletRequest.getRemoteAddr();
-		checkAuthentication = checkAuthentication(user, password, ip);
+		checkAuthentication = checkAuthentication(user, password, ip, webServiceUserService.getWebserviceUser());
 		return checkAuthentication;
 	}
 
-	private boolean checkAuthentication(String username, String password, String ip) {
+	private boolean checkAuthentication(String username, String password, String ip, WebServiceUser webServiceUser) {
 
-		// return usersDAO.checkUserPass(username, password);
-		return (serverService.findByIp(ip) != null);
+		AuthorizedIpAddress authorizedIpAddress = authorizedIpAddressService.findByWebServiceUser(webServiceUser);
+		return checkAdresseIp(ip, authorizedIpAddress.getAddress());
 
+	}
+
+	private boolean checkAdresseIp(String authentificationIp, String authorizedIp) {
+
+		String ch1 = "";
+		String ch2 = "";
+
+		ch1 = authorizedIp.substring(0, authorizedIp.indexOf("*"));
+		ch2 = authentificationIp.substring(0, authorizedIp.indexOf("*"));
+
+		return ch1.equals(ch2);
 	}
 
 	@Override

@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.Set;
 import java.util.SortedSet;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import tn.wevioo.dto.product.action.ProductActionHistoryDTO;
 
 /**
@@ -21,6 +23,8 @@ public class PackagerActionHistoryDTO {
 	/**
 	 * The date when this history is saved into the database.
 	 */
+
+	@JsonFormat(pattern = "yyyy-MM-dd KK:mm:ss")
 	private Date creationDate;
 
 	/**

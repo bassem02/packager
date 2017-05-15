@@ -64,7 +64,7 @@ public class ProductController {
 	ProductModelProductDriverPortService productModelProductDriverPortService;
 
 	@RequestMapping(value = "/cancelProduct", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void cancelProduct(@RequestBody ProductRequest request)
+	public ProductInstanceDTO cancelProduct(@RequestBody ProductRequest request)
 			throws NotFoundException, NotRespectedRulesException, DriverException, PackagerException,
 			MalformedXMLException, DataSourceException, ConverterException, RestTemplateException {
 
@@ -85,6 +85,9 @@ public class ProductController {
 			history.addSource(productInstance.getPackager());
 			history.setLastUpdate(new Date());
 			packagerActionHistoryService.saveOrUpdate(history);
+
+			return productInstanceService.convertToDTO(productInstance);
+
 		} else {
 			throw new PackagerException(new ErrorCode("0.2.2.1"), result.getExceptionCause());
 		}
@@ -92,8 +95,9 @@ public class ProductController {
 	}
 
 	@RequestMapping(value = "/resetProduct", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void resetProduct(@RequestBody ProductRequest request) throws NotFoundException, NotRespectedRulesException,
-			DriverException, PackagerException, MalformedXMLException, DataSourceException, RestTemplateException {
+	public ProductInstanceDTO resetProduct(@RequestBody ProductRequest request)
+			throws NotFoundException, NotRespectedRulesException, DriverException, PackagerException,
+			MalformedXMLException, DataSourceException, RestTemplateException {
 
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
@@ -107,6 +111,9 @@ public class ProductController {
 		history.addDestination(productInstance.getPackager());
 		history.addSource(productInstance.getPackager());
 		packagerActionHistoryService.saveOrUpdate(history);
+
+		return productInstanceService.convertToDTO(productInstance);
+
 	}
 
 	@RequestMapping(value = "/getProductInstance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

@@ -2,10 +2,13 @@ package tn.wevioo.dto.product;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 /**
- * The class FProductInstanceDiagnostic allows retrieving information about a product instance diagnostic. Its
- * attributes are got from the database and are guaranteed to be up to date. However, nothing guarantees the database is
- * up to date regarding the true provider system.
+ * The class FProductInstanceDiagnostic allows retrieving information about a
+ * product instance diagnostic. Its attributes are got from the database and are
+ * guaranteed to be up to date. However, nothing guarantees the database is up
+ * to date regarding the true provider system.
  * 
  * @author bflorea
  * @since 2.9.0
@@ -26,6 +29,7 @@ public class ProductInstanceDiagnosticDTO {
 	/**
 	 * Date when the diagnostic has been computed.
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd KK:mm:ss")
 	private Date creationDate;
 
 	public String getDiagnosticKey() {

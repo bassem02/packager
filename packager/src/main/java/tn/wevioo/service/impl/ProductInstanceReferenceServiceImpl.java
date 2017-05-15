@@ -1,6 +1,5 @@
 package tn.wevioo.service.impl;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import tn.wevioo.dto.product.ProductInstanceReferenceDTO;
@@ -14,10 +13,11 @@ public class ProductInstanceReferenceServiceImpl implements ProductInstanceRefer
 	public ProductInstanceReferenceDTO convertToDTO(ProductInstanceReference productInstanceReference) {
 
 		ProductInstanceReferenceDTO productInstanceReferenceDTO = new ProductInstanceReferenceDTO();
-		// fProductInstanceReference.setCreationDate(productInstanceReference.getCreationDate());
-		// fProductInstanceReference.setReferenceType(productInstanceReference.getDiscriminatorType());
-		// fProductInstanceReference.setReferenceValue(productInstanceReference.getDiscriminatorValue());
-		BeanUtils.copyProperties(productInstanceReference, productInstanceReferenceDTO);
+		productInstanceReferenceDTO.setCreationDate(productInstanceReference.getCreationDate());
+		productInstanceReferenceDTO.setReferenceType(productInstanceReference.getDiscriminatorType());
+		productInstanceReferenceDTO.setReferenceValue(productInstanceReference.getDiscriminatorValue());
+		// BeanUtils.copyProperties(productInstanceReference,
+		// productInstanceReferenceDTO);
 		return productInstanceReferenceDTO;
 	}
 
