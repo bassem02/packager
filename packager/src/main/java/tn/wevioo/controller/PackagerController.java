@@ -22,6 +22,7 @@ import nordnet.architecture.exceptions.explicit.DataSourceException;
 import nordnet.architecture.exceptions.explicit.MalformedXMLException;
 import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
+import nordnet.architecture.exceptions.explicit.ResourceAccessException;
 import nordnet.architecture.exceptions.implicit.NullException;
 import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import nordnet.drivers.contract.exceptions.DriverException;
@@ -31,6 +32,8 @@ import tn.wevioo.dto.packager.PackagerInstanceDTO;
 import tn.wevioo.dto.packager.PackagerInstanceHeaderDTO;
 import tn.wevioo.dto.packager.PackagerModelDTO;
 import tn.wevioo.dto.product.ProductPropertiesDTO;
+import tn.wevioo.dto.response.SplitResponseDTO;
+import tn.wevioo.dto.response.TranslocateProductResponseDTO;
 import tn.wevioo.entities.PackagerActionHistory;
 import tn.wevioo.entities.PackagerInstance;
 import tn.wevioo.entities.PackagerModel;
@@ -51,6 +54,7 @@ import tn.wevioo.service.ProductInstanceService;
 import tn.wevioo.service.ProductModelProductDriverPortService;
 import tn.wevioo.service.ProductModelService;
 import tn.wevioo.service.WebServiceUserService;
+import tn.wevioo.xml.impl.PackagerXmlMergerImpl;
 
 @RestController
 @EnableAutoConfiguration(exclude = JpaRepositoriesAutoConfiguration.class)
@@ -108,7 +112,7 @@ public class PackagerController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/suspendPackager", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void suspendPackager(@RequestBody PackagerRequest request) throws NotFoundException,
+	public PackagerInstanceDTO suspendPackager(@RequestBody PackagerRequest request) throws NotFoundException,
 			NotRespectedRulesException, DriverException, PackagerException, MalformedXMLException, DataSourceException,
 			SAXException, IOException, ParserConfigurationException, RestTemplateException {
 		if (request == null) {
@@ -119,10 +123,12 @@ public class PackagerController extends AbstractFacade {
 		packagerInstance.suspend(request, productModelService, manualDriverFactory, packagerActionHistoryService,
 				webServiceUserService, productInstanceService, productModelProductDriverPortService);
 
+		return packagerInstanceService.convertToDTO(packagerInstance);
+
 	}
 
 	@RequestMapping(value = "/activatePackager", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void activatePackager(@RequestBody PackagerRequest request) throws DriverException,
+	public PackagerInstanceDTO activatePackager(@RequestBody PackagerRequest request) throws DriverException,
 			NotRespectedRulesException, MalformedXMLException, PackagerException, NotFoundException,
 			DataSourceException, SAXException, IOException, ParserConfigurationException, RestTemplateException {
 
@@ -136,12 +142,14 @@ public class PackagerController extends AbstractFacade {
 		packagerInstance.activate(request, productModelService, manualDriverFactory, packagerActionHistoryService,
 				webServiceUserService, productInstanceService, productModelProductDriverPortService);
 
+		return packagerInstanceService.convertToDTO(packagerInstance);
 	}
 
 	@RequestMapping(value = "/reactivatePackager", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void reactivatePackager(@RequestBody PackagerRequest request) throws NotRespectedRulesException,
-			NotFoundException, DriverException, PackagerException, MalformedXMLException, DataSourceException,
-			SAXException, IOException, ParserConfigurationException, RestTemplateException {
+	public PackagerInstanceDTO reactivatePackager(@RequestBody PackagerRequest request)
+			throws NotRespectedRulesException, NotFoundException, DriverException, PackagerException,
+			MalformedXMLException, DataSourceException, SAXException, IOException, ParserConfigurationException,
+			RestTemplateException {
 		if (request == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
 		}
@@ -151,10 +159,12 @@ public class PackagerController extends AbstractFacade {
 
 		packagerInstance.reactivate(request, productModelService, manualDriverFactory, packagerActionHistoryService,
 				webServiceUserService, productInstanceService, productModelProductDriverPortService);
+
+		return packagerInstanceService.convertToDTO(packagerInstance);
 	}
 
 	@RequestMapping(value = "/cancelPackager", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void cancelPackager(@RequestBody PackagerRequest request) throws NotRespectedRulesException,
+	public PackagerInstanceDTO cancelPackager(@RequestBody PackagerRequest request) throws NotRespectedRulesException,
 			NotFoundException, DriverException, PackagerException, MalformedXMLException, DataSourceException,
 			SAXException, IOException, ParserConfigurationException, RestTemplateException {
 		if (request == null) {
@@ -166,10 +176,12 @@ public class PackagerController extends AbstractFacade {
 
 		packagerInstance.cancel(request, productModelService, manualDriverFactory, packagerActionHistoryService,
 				webServiceUserService, productInstanceService, productModelProductDriverPortService);
+
+		return packagerInstanceService.convertToDTO(packagerInstance);
 	}
 
 	@RequestMapping(value = "/resetPackager", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void resetPackager(@RequestBody PackagerRequest request) throws NotRespectedRulesException,
+	public PackagerInstanceDTO resetPackager(@RequestBody PackagerRequest request) throws NotRespectedRulesException,
 			NotFoundException, DriverException, PackagerException, MalformedXMLException, DataSourceException,
 			SAXException, IOException, ParserConfigurationException, RestTemplateException {
 		if (request == null) {
@@ -181,6 +193,8 @@ public class PackagerController extends AbstractFacade {
 
 		packagerInstance.reset(request, productModelService, manualDriverFactory, packagerActionHistoryService,
 				webServiceUserService, productInstanceService, productModelProductDriverPortService);
+
+		return packagerInstanceService.convertToDTO(packagerInstance);
 	}
 
 	@RequestMapping(value = "/isRetailerPackagerIdFree", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -306,7 +320,7 @@ public class PackagerController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/translocateProductInstances", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void translocateProductInstances(@RequestBody PackagerTransformationRequest request)
+	public TranslocateProductResponseDTO translocateProductInstances(@RequestBody PackagerTransformationRequest request)
 			throws PackagerException, DriverException, MalformedXMLException, DataSourceException, NotFoundException,
 			NotRespectedRulesException, SAXException, IOException, ParserConfigurationException, RestTemplateException,
 			TransformerException {
@@ -325,6 +339,14 @@ public class PackagerController extends AbstractFacade {
 
 		packagerInstanceService.saveOrUpdate(originalPackagerInstance);
 		packagerActionHistoryService.saveOrUpdate(history);
+
+		TranslocateProductResponseDTO translocateProductResponseDTO = new TranslocateProductResponseDTO();
+		translocateProductResponseDTO.setSource(packagerInstanceService
+				.convertToDTO(packagerInstanceService.findByRetailerPackagerId(request.getRetailerPackagerId())));
+		translocateProductResponseDTO.setDestination(packagerInstanceService.convertToDTO(
+				packagerInstanceService.findByRetailerPackagerId(request.getDestinationRetailerPackagerId())));
+
+		return translocateProductResponseDTO;
 	}
 
 	@RequestMapping(value = "/isProductTranslocationPossible", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -346,9 +368,9 @@ public class PackagerController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/splitPackager", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void splitPackager(@RequestBody SplitPackagerRequest request) throws PackagerException, DriverException,
-			DataSourceException, MalformedXMLException, NotFoundException, NotRespectedRulesException, SAXException,
-			IOException, ParserConfigurationException, RestTemplateException, TransformerException {
+	public SplitResponseDTO splitPackager(@RequestBody SplitPackagerRequest request) throws PackagerException,
+			DriverException, DataSourceException, MalformedXMLException, NotFoundException, NotRespectedRulesException,
+			SAXException, IOException, ParserConfigurationException, RestTemplateException, TransformerException {
 		if (request.getSource() == null) {
 			throw new NullException(NullCases.NULL, "request parameter");
 		}
@@ -369,6 +391,19 @@ public class PackagerController extends AbstractFacade {
 			}
 		}
 		packagerActionHistoryService.saveOrUpdate(history);
+
+		SplitResponseDTO splitResponseDTO = new SplitResponseDTO();
+		splitResponseDTO.setSource(packagerInstanceService.convertToDTO(
+				packagerInstanceService.findByRetailerPackagerId(request.getSource().getRetailerPackagerId())));
+
+		splitResponseDTO.setDestination1(packagerInstanceService.convertToDTO(packagerInstanceService
+				.findByRetailerPackagerId(request.getDestination1().getDestinationRetailerPackagerId())));
+
+		if (request.getDestination2() != null)
+			splitResponseDTO.setDestination2(packagerInstanceService.convertToDTO(packagerInstanceService
+					.findByRetailerPackagerId(request.getDestination2().getDestinationRetailerPackagerId())));
+
+		return splitResponseDTO;
 
 	}
 
@@ -424,6 +459,20 @@ public class PackagerController extends AbstractFacade {
 		packagerActionHistoryService.saveOrUpdate(history);
 
 		return packagerInstanceService.convertToDTO(mergedPackagerInstance);
+	}
+
+	@RequestMapping(value = "/testMerge", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public String testMerge() throws MalformedXMLException, NotRespectedRulesException, ParserConfigurationException,
+			SAXException, IOException, TransformerException, NotFoundException, ResourceAccessException {
+
+		PackagerXmlMergerImpl packagerXmlMergerImpl = new PackagerXmlMergerImpl();
+
+		String xml2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><manual:productProperties xmlns:gtypes=\"http://www.nordnet.com/generic/types\"\nxmlns:manual=\"http://www.nordnet.com/manualDriver\"\nxmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\nxsi:schemaLocation=\"http://www.nordnet.com/manualDriver nordnet-manual-driver.xsd\"><manual:hexacle>1432</manual:hexacle><manual:idClient>idclient</manual:idClient><manual:typeProduct>test</manual:typeProduct><manual:infoCompl>compl</manual:infoCompl></manual:productProperties>";
+		String xml1 = "<manual:productProperties xmlns:manual=\"http://www.nordnet.com/manualDriver\"><manual:typeProduct>Wimax axione</manual:typeProduct></manual:productProperties>";
+
+		// return XmlMerger.merge(xml2, xml1);
+
+		return packagerXmlMergerImpl.merge(xml2, xml1);
 	}
 
 	// @RequestMapping(value = "/createNewDeliveryDemand", method =

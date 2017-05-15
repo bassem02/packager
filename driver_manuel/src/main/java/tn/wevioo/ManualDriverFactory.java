@@ -136,27 +136,17 @@ public class ManualDriverFactory
 		ProductProperties productProperties = (ProductProperties) properties;
 		String ref = null;
 
-		// ref = "ref";
 		try {
 			ref = idGenerator.generateIdentifier(null);
 		} catch (AlgorithmException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
 		Product product = new Product();
-		// try {
-		// product =
-		// super.getDriverToolFactory().getObjectConverter().convert(productProperties,
-		// Product.class);
 		product.setCurrentHexacle(productProperties.getHexacle());
 		product.setIdClientInterne(productProperties.getIdClient());
 		product.setInfoCompl(productProperties.getInfoCompl());
 		product.setTypeProduct(productProperties.getTypeProduct());
-		// } catch (ConverterException e) {
-		// LOGGER.error("The mapping isn't done", e);
-		// throw new DriverException(e);
-		// }
 		LOGGER.info("Provider product id generated " + ref + " ...");
 		product.setProviderProductId(ref);
 
@@ -326,41 +316,46 @@ public class ManualDriverFactory
 		if (action == null) {
 			throw new NullException(NullCases.NULL, "action");
 		}
-		switch (action) {
-		case CREATE_PRODUCT:
-			validateXmlPropertiesParameter(properties,
-					getDriverInternalConfiguration().areCreateProductPropertiesRequired());
-			break;
-		case ACTIVATE:
-			validateXmlPropertiesParameter(properties,
-					getDriverInternalConfiguration().areActivatePropertiesRequired());
-			break;
-		case REACTIVATE:
-			validateXmlPropertiesParameter(properties,
-					getDriverInternalConfiguration().areReactivatePropertiesRequired());
-			break;
-		case SUSPEND:
-			validateXmlPropertiesParameter(properties, getDriverInternalConfiguration().areSuspendPropertiesRequired());
-			break;
-		case CANCEL:
-			validateXmlPropertiesParameter(properties, getDriverInternalConfiguration().areCancelPropertiesRequired());
-			break;
-		case CHANGE_PROPERTIES:
-		case TRANSFORMATION:
-			validateXmlPropertiesParameter(properties, true);
-			break;
-		case DELETE:
-			validateXmlPropertiesParameter(properties, getDriverInternalConfiguration().areDeletePropertiesRequired());
-			break;
-		case RESET:
-			validateXmlPropertiesParameter(properties, getDriverInternalConfiguration().areResetPropertiesRequired());
-			break;
-		case GET_USAGE_PROPERTIES:
-			validateXmlPropertiesParameter(properties, false);
-			break;
-		default:
-			throw new UnsupportedOperationException("The action " + action + " is not supported.");
-		}
+		// switch (action) {
+		// case CREATE_PRODUCT:
+		// validateXmlPropertiesParameter(properties,
+		// getDriverInternalConfiguration().areCreateProductPropertiesRequired());
+		// break;
+		// case ACTIVATE:
+		// validateXmlPropertiesParameter(properties,
+		// getDriverInternalConfiguration().areActivatePropertiesRequired());
+		// break;
+		// case REACTIVATE:
+		// validateXmlPropertiesParameter(properties,
+		// getDriverInternalConfiguration().areReactivatePropertiesRequired());
+		// break;
+		// case SUSPEND:
+		// validateXmlPropertiesParameter(properties,
+		// getDriverInternalConfiguration().areSuspendPropertiesRequired());
+		// break;
+		// case CANCEL:
+		// validateXmlPropertiesParameter(properties,
+		// getDriverInternalConfiguration().areCancelPropertiesRequired());
+		// break;
+		// case CHANGE_PROPERTIES:
+		// case TRANSFORMATION:
+		// validateXmlPropertiesParameter(properties, true);
+		// break;
+		// case DELETE:
+		// validateXmlPropertiesParameter(properties,
+		// getDriverInternalConfiguration().areDeletePropertiesRequired());
+		// break;
+		// case RESET:
+		// validateXmlPropertiesParameter(properties,
+		// getDriverInternalConfiguration().areResetPropertiesRequired());
+		// break;
+		// case GET_USAGE_PROPERTIES:
+		// validateXmlPropertiesParameter(properties, false);
+		// break;
+		// default:
+		// throw new UnsupportedOperationException("The action " + action + " is
+		// not supported.");
+		// }
 
 		if (properties != null) {
 			return parse(properties);

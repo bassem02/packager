@@ -990,9 +990,9 @@ public class PackagerInstance implements java.io.Serializable {
 							new Object[] { cpr.getProductId(), productState });
 				}
 			}
-			//
-			// this.mergeUserPropertiesWithExisting(moveTransformationRequest);
-			// this.mergeUserPropertiesWithExisting(moveChangePropertiesRequest);
+
+			this.mergeUserPropertiesWithExisting(moveTransformationRequest, productModelProductDriverPortService);
+			this.mergeUserPropertiesWithExisting(moveChangePropertiesRequest, productModelProductDriverPortService);
 
 			List<ProductRequest> futureProducts = new ArrayList<ProductRequest>();
 			futureProducts = this.completeMissingExistingProducts(futureProducts, true,
@@ -1772,10 +1772,6 @@ public class PackagerInstance implements java.io.Serializable {
 				.mergeUserPropertiesWithDefault(destination.getCreationProductRequests(), false, productModelService);
 		createProductRequests = destinationPackagerModel.mergeUserPropertiesWithDefaultConfiguration(
 				destination.getCreationProductRequests(), productModelService);
-
-		// List<ProductRequest> createProductRequests =
-		// destination.getCreationProductRequests();
-		// createProductRequests = destination.getCreationProductRequests();
 
 		try {
 			PackagerModel.verifyXmlProperties(PackagerInstanceAction.CREATE,
