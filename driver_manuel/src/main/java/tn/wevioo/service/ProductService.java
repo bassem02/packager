@@ -42,4 +42,7 @@ public interface ProductService {
 	boolean validateCreation(String typeProduct)
 			throws DataSourceException, NotFoundException, NotRespectedRulesException;
 
+	void activateProductManual(String providerProductId)
+			throws NotFoundException, NotRespectedRulesException, DataSourceException;
+
 }

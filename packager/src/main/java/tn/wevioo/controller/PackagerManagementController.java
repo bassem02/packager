@@ -9,8 +9,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,8 +55,7 @@ import tn.wevioo.service.WebServiceUserService;
 import tn.wevioo.xml.impl.PackagerXmlMergerImpl;
 
 @RestController
-@EnableAutoConfiguration(exclude = JpaRepositoriesAutoConfiguration.class)
-public class PackagerController extends AbstractFacade {
+public class PackagerManagementController extends AbstractFacade {
 
 	@Autowired
 	private PackagerInstanceService packagerInstanceService;
@@ -459,6 +456,29 @@ public class PackagerController extends AbstractFacade {
 		packagerActionHistoryService.saveOrUpdate(history);
 
 		return packagerInstanceService.convertToDTO(mergedPackagerInstance);
+	}
+
+	@RequestMapping(value = "/changePackagerProperties", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public void changePackagerProperties(@RequestBody PackagerRequest request) throws NotFoundException,
+			NotRespectedRulesException, PackagerException, DriverException, MalformedXMLException, DataSourceException,
+			RestTemplateException, ParserConfigurationException, SAXException, IOException, TransformerException {
+
+		if (request == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+
+		PackagerInstance packagerInstance = packagerInstanceService
+				.findByRetailerPackagerId(request.getRetailerPackagerId());
+
+		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.CHANGE_PROPERTIES,
+				webServiceUserService);
+
+		packagerInstance.changeProperties(request, history, productInstanceService,
+				productModelProductDriverPortService, productModelService, manualDriverFactory, manualDriver,
+				webServiceUserService);
+
+		packagerInstanceService.saveOrUpdate(packagerInstance);
+		packagerActionHistoryService.saveOrUpdate(history);
 	}
 
 	@RequestMapping(value = "/testMerge", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

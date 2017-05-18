@@ -342,4 +342,30 @@ public class ProductServiceImpl implements ProductService {
 		return true;
 	}
 
+	@Override
+	public void activateProductManual(String providerProductId)
+			throws NotFoundException, NotRespectedRulesException, DataSourceException {
+
+		if (AbstractValidator.isNullOrEmpty(providerProductId)) {
+			LOGGER.error("The {providerProductId} can not be null or empty.");
+			throw new NotRespectedRulesException(new ErrorCode("0.2.1.1.3"), new Object[] { "providerProductId" });
+		}
+		Product product = productDAO.findByProviderProductId(providerProductId);
+		if (product == null) {
+			LOGGER.error("No Product has been found with the corresponding PPID [" + providerProductId + "].");
+			throw new NotFoundException(new ErrorCode("0.2.1.3.1"), new Object[] { "Product", providerProductId });
+		}
+
+		product.setState(StateProduct.ACTIVE);
+		productDAO.saveAndFlush(product);
+
+		ProductHistory productHistory = new ProductHistory();
+		productHistory.setDateChangementEtat(new Date());
+		productHistory.setIdProduct(product.getId());
+		productHistory.setState(StateProduct.ACTIVE);
+		productHistory.setUserChangementEtat(Constants.USER_DRIVER);
+
+		productHistoryService.saveOrUpdate(productHistory);
+	}
+
 }

@@ -224,33 +224,32 @@ public class ProductModel implements java.io.Serializable {
 
 		String url = "http://localhost:8093";
 		RestTemplate rest = new RestTemplate();
+		String createdProductDriverPPId;
 
 		try {
-			String createdProductDriverPPId = (String) rest
-					.getForObject(url + "/createProductManual?properties=" + properties, String.class);
-
-			// ManualDriver createdProductDriver =
-			// manualDriverFactory.createProduct(properties);
-			manualDriver.setProviderProductId(createdProductDriverPPId);
-			ProductInstance createdProductInstance = new ProductInstance(manualDriver);
-			createdProductInstance.setProductModel(this);
-			createdProductInstance.setCreationDate(new Date());
-			createdProductInstance.setLastUpdate(new Date());
-			createdProductInstance.setLastKnownState("INPROGRESS");
-			createdProductInstance.setLastKnownStateUpdate(new Date());
-
-			ProductActionHistory productHistory = new ProductActionHistory(ProductInstanceAction.CREATE, null,
-					createdProductInstance, properties, webServiceUserService, productInstanceService);
-			history.addProductAction(productHistory);
-
-			if (LOGGER.isInfoEnabled()) {
-				LOGGER.info("A new product [" + this.getRetailerKey() + "] has been successfully created.");
-			}
-
-			return createdProductInstance;
+			createdProductDriverPPId = (String) rest.getForObject(url + "/createProductManual?properties=" + properties,
+					String.class);
 		} catch (Exception e) {
 			throw new RestTemplateException("ProductDriver's project has occured a problem");
 		}
+		manualDriver.setProviderProductId(createdProductDriverPPId);
+		ProductInstance createdProductInstance = new ProductInstance(manualDriver);
+		createdProductInstance.setProductModel(this);
+		createdProductInstance.setCreationDate(new Date());
+		createdProductInstance.setLastUpdate(new Date());
+		createdProductInstance.setLastKnownState("INPROGRESS");
+		createdProductInstance.setLastKnownStateUpdate(new Date());
+
+		ProductActionHistory productHistory = new ProductActionHistory(ProductInstanceAction.CREATE, null,
+				createdProductInstance, properties, webServiceUserService, productInstanceService);
+		history.addProductAction(productHistory);
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("A new product [" + this.getRetailerKey() + "] has been successfully created.");
+		}
+
+		return createdProductInstance;
+
 	}
 
 	@Transient

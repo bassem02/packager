@@ -20,6 +20,7 @@ import org.xml.sax.SAXException;
 
 import nordnet.architecture.exceptions.NNException;
 import nordnet.architecture.exceptions.NNImplicitException;
+import nordnet.architecture.exceptions.explicit.DataSourceException;
 import nordnet.architecture.exceptions.explicit.MalformedXMLException;
 import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
@@ -62,6 +63,75 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 		super();
 	}
 
+	public void delete(final String properties, String ppid)
+			throws DriverException, MalformedXMLException, NotRespectedRulesException, SAXException, IOException,
+			ParserConfigurationException, DataSourceException, NotFoundException {
+
+		Object parsedProperties = null;
+
+		try {
+			parsedProperties = startDeleteManual(properties, ppid);
+			performDeleteManual(parsedProperties, ppid);
+		} catch (DriverException ex) {
+			failDeleteManual(properties, ex, ppid);
+			throw ex;
+		} catch (NotRespectedRulesException ex) {
+			failDeleteManual(properties, ex, ppid);
+			throw ex;
+		} catch (MalformedXMLException ex) {
+			failDeleteManual(properties, ex, ppid);
+			throw ex;
+		} catch (NullException ex) {
+			failDeleteManual(properties, ex, ppid);
+			throw ex;
+		}
+
+		successDelete(properties);
+	}
+
+	protected void successDeleteManual(String properties, String ppid) throws DriverException {
+		this.getHistoricalReportLogger().info(
+				"The product " + this.getClass().getSimpleName() + " [" + ppid + "] has been successfully deleted.");
+	}
+
+	protected void performDeleteManual(Object arg0, String ppid)
+			throws DriverException, NotRespectedRulesException, DataSourceException, NotFoundException {
+
+		productService.delete(productService.findByProviderProductId(ppid));
+	}
+
+	protected void failDeleteManual(final String properties, final Exception cause, String ppid)
+			throws DriverException {
+		if (cause == null) {
+			throw new NullException(NullCases.NULL, "cause");
+		}
+
+		String errorCode = "N/A";
+		if (cause instanceof NNException) {
+			errorCode = ((NNException) cause).getErrorCode().toString();
+		} else {
+			if (cause instanceof NNImplicitException) {
+				errorCode = ((NNImplicitException) cause).getErrorCode().toString();
+			}
+		}
+
+		this.getHistoricalReportLogger()
+				.error("The product " + this.getClass().getSimpleName() + " [" + ppid
+						+ "] cannot be deleted because of exception " + cause.getClass().getSimpleName() + "/"
+						+ errorCode + ":" + cause.getMessage());
+	}
+
+	protected Object startDeleteManual(final String properties, String ppid) throws DriverException,
+			MalformedXMLException, NotRespectedRulesException, SAXException, IOException, ParserConfigurationException {
+		Object result = null;
+		result = ManualDriverFactory.parse(properties);
+		if (!this.getCurrentState(ppid).equals(State.CANCELED)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.2.13"), new Object[] { ppid, State.CANCELED });
+		}
+
+		return result;
+	}
+
 	public void resetManual(final String properties, String ppid) throws DriverException, MalformedXMLException,
 			NotRespectedRulesException, SAXException, IOException, ParserConfigurationException {
 
@@ -91,11 +161,6 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 		if (cause == null) {
 			throw new NullException(NullCases.NULL, "cause");
 		}
-		// will lose the error log if we put the condition here
-		// if((properties != null) && (properties.trim().length() == 0)){
-		// throw new NullException(NullCases.EMPTY, "properties");
-		// }
-
 		String errorCode = "N/A";
 		if (cause instanceof NNException) {
 			errorCode = ((NNException) cause).getErrorCode().toString();
@@ -369,13 +434,10 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 		result = ManualDriverFactory.parse(properties);
 
 		State productState = this.getCurrentState(ppid);
-		// if (!productState.equals(State.ACTIVE) &&
-		// !productState.equals(State.ACTIVABLE)
-		// && !productState.equals(State.INPROGRESS) &&
-		// !productState.equals(State.DELIVERED)) {
-		// throw new NotRespectedRulesException(new ErrorCode("1.2.2.12"), new
-		// Object[] { ppid, productState });
-		// }
+		if (!productState.equals(State.ACTIVE) && !productState.equals(State.ACTIVABLE)
+				&& !productState.equals(State.INPROGRESS) && !productState.equals(State.DELIVERED)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.2.12"), new Object[] { ppid, productState });
+		}
 
 		return result;
 	}
@@ -389,17 +451,7 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 			LOGGER.error(e1);
 			throw new DriverException(e1);
 		}
-
-		// try {
-		//
-		// return
-		// super.getDriverToolFactory().getObjectConverter().convert(status.toString(),
-		// State.class);
 		return State.valueOf(status.toString());
-		// } catch (ConverterException e) {
-		// LOGGER.error("The mapping isn't done", e);
-		// throw new DriverException(e);
-		// }
 	}
 
 	public State getCurrentState(String ref) throws DriverException {
@@ -411,17 +463,8 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 			LOGGER.error(e1);
 			throw new DriverException(e1);
 		}
-
-		// try {
-		//
-		// return
-		// super.getDriverToolFactory().getObjectConverter().convert(status.toString(),
-		// State.class);
 		return State.valueOf(status.toString());
-		// } catch (ConverterException e) {
-		// LOGGER.error("The mapping isn't done", e);
-		// throw new DriverException(e);
-		// }
+
 	}
 
 	public void setProductService(ProductService productService) {
@@ -463,18 +506,10 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 			throw new DriverException(e1);
 		}
 		ProductProperties productProperties = new ProductProperties();
-		// try {
-		// productProperties =
-		// super.getDriverToolFactory().getObjectConverter().convert(product,
-		// ProductProperties.class);
 		productProperties.setHexacle(product.getCurrentHexacle());
 		productProperties.setIdClient(product.getIdClientInterne());
 		productProperties.setInfoCompl(product.getInfoCompl());
 		productProperties.setTypeProduct(product.getTypeProduct());
-		// } catch (ConverterException e) {
-		// LOGGER.error("The mapping isn't done", e);
-		// throw new DriverException(e);
-		// }
 		String xml = null;
 		try {
 			xml = generateXmlProductProperties(productProperties);
@@ -495,18 +530,10 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 			throw new DriverException(e1);
 		}
 		ProductProperties productProperties = new ProductProperties();
-		// try {
-		// productProperties =
-		// super.getDriverToolFactory().getObjectConverter().convert(product,
-		// ProductProperties.class);
 		productProperties.setHexacle(product.getCurrentHexacle());
 		productProperties.setIdClient(product.getIdClientInterne());
 		productProperties.setInfoCompl(product.getInfoCompl());
 		productProperties.setTypeProduct(product.getTypeProduct());
-		// } catch (ConverterException e) {
-		// LOGGER.error("The mapping isn't done", e);
-		// throw new DriverException(e);
-		// }
 		String xml = null;
 		try {
 			xml = generateXmlProductProperties(productProperties);
@@ -564,7 +591,13 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 	protected void performActivateManual(Object properties, String ppid)
 			throws DriverException, NotRespectedRulesException {
 		LOGGER.info("Activate the product: " + ppid);
-		return;
+		try {
+			this.productService.activateProductManual(ppid);
+		} catch (NNException e) {
+			LOGGER.error(e);
+			throw new DriverException(e);
+		}
+		LOGGER.info("The Activate is done");
 	}
 
 	@Override
@@ -645,18 +678,8 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 			LOGGER.error(e1);
 			throw new DriverException(e1);
 		}
-
-		// try {
-		// usageProperties =
-		// super.getDriverToolFactory().getObjectConverter().convert(product,
-		// UsageProperties.class);
 		usageProperties.setDateInstallation(product.getCreationDate().toString());
 		usageProperties.setRefExterne(product.getRefExterne());
-		// } catch (ConverterException e) {
-		// LOGGER.error("The mapping isn't done", e);
-		// throw new DriverException(e);
-		// }
-
 		String result = null;
 		try {
 			result = super.generateXmlProperties(usageProperties);
@@ -694,18 +717,8 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 			LOGGER.error(e1);
 			throw new DriverException(e1);
 		}
-
-		// try {
-		// usageProperties =
-		// super.getDriverToolFactory().getObjectConverter().convert(product,
-		// UsageProperties.class);
 		usageProperties.setDateInstallation(product.getCreationDate().toString());
 		usageProperties.setRefExterne(product.getRefExterne());
-		// } catch (ConverterException e) {
-		// LOGGER.error("The mapping isn't done", e);
-		// throw new DriverException(e);
-		// }
-
 		String result = null;
 		try {
 			result = generateXmlUsageProperties(usageProperties);
@@ -856,11 +869,6 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 		if (cause == null) {
 			throw new NullException(NullCases.NULL, "cause");
 		}
-		// will lose the error log if we put the condition here
-		// if((properties == null) || (properties.trim().length() == 0)){
-		// throw new NullException(NullCases.NULL_EMPTY, "properties");
-		// }
-
 		String errorCode = "N/A";
 		if (cause instanceof NNException) {
 			errorCode = ((NNException) cause).getErrorCode().toString();

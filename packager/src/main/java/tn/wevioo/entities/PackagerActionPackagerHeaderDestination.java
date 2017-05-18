@@ -63,7 +63,7 @@ public class PackagerActionPackagerHeaderDestination implements java.io.Serializ
 		this.id = id;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_packager_action_history", nullable = false)
 	public PackagerActionHistory getPackagerActionHistory() {
 		return this.packagerActionHistory;
@@ -73,7 +73,7 @@ public class PackagerActionPackagerHeaderDestination implements java.io.Serializ
 		this.packagerActionHistory = packagerActionHistory;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_retailer")
 	public Retailer getRetailer() {
 		return this.retailer;

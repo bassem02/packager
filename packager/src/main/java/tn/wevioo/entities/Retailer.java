@@ -78,7 +78,7 @@ public class Retailer implements java.io.Serializable {
 		this.name = name;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "retailer")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "retailer")
 	public Set<PackagerInstance> getPackagerInstances() {
 		return this.packagerInstances;
 	}
@@ -87,7 +87,7 @@ public class Retailer implements java.io.Serializable {
 		this.packagerInstances = packagerInstances;
 	}
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "retailer_packager_model", catalog = "nn_packager_management_recette", joinColumns = {
 			@JoinColumn(name = "id_retailer", nullable = false, updatable = false) }, inverseJoinColumns = {
 					@JoinColumn(name = "id_packager_model", nullable = false, updatable = false) })

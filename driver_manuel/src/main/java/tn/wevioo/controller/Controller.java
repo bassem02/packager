@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.xml.sax.SAXException;
 
+import nordnet.architecture.exceptions.explicit.DataSourceException;
 import nordnet.architecture.exceptions.explicit.MalformedXMLException;
 import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
@@ -23,6 +24,7 @@ import nordnet.drivers.contract.types.FeasibilityTestResult;
 import tn.wevioo.ManualDriver;
 import tn.wevioo.ManualDriverFactory;
 import tn.wevioo.entities.Product;
+import tn.wevioo.service.ParametersService;
 import tn.wevioo.service.ProductService;
 
 @RestController
@@ -36,6 +38,9 @@ public class Controller {
 
 	@Autowired
 	private ProductService productService;
+
+	@Autowired
+	private ParametersService parametersService;
 
 	@RequestMapping(value = "/getProduct/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public Product getProduct(@PathVariable("id") long id) throws NotFoundException {
@@ -140,6 +145,15 @@ public class Controller {
 		manualDriver.changePropertiesManual(properties, ppid);
 
 		return "properties changed";
+	}
+
+	@RequestMapping(value = "/deleteProduct", method = RequestMethod.DELETE)
+	public void deleteProduct(@QueryParam("properties") String properties, @QueryParam("ppid") String ppid)
+			throws DriverException, JAXBException, MalformedXMLException, NotRespectedRulesException, SAXException,
+			IOException, ParserConfigurationException, DataSourceException, NotFoundException {
+
+		manualDriver.delete(properties, ppid);
+
 	}
 
 }

@@ -5,8 +5,6 @@ import java.util.Date;
 import javax.ws.rs.QueryParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,8 +40,7 @@ import tn.wevioo.service.ProductModelService;
 import tn.wevioo.service.WebServiceUserService;
 
 @RestController
-@EnableAutoConfiguration(exclude = JpaRepositoriesAutoConfiguration.class)
-public class ProductController {
+public class ProductManagementController {
 
 	@Autowired
 	private ProductInstanceService productInstanceService;

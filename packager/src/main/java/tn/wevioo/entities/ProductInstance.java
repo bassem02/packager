@@ -113,7 +113,7 @@ public class ProductInstance implements java.io.Serializable {
 		setProductDriver(productDriver);
 	}
 
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(name = "packager_instance_product_instance", joinColumns = {
 			@JoinColumn(name = "id_product_instance", nullable = false, updatable = false) }, inverseJoinColumns = {
 					@JoinColumn(name = "id_packager_instance", nullable = false, updatable = false) })
@@ -146,7 +146,7 @@ public class ProductInstance implements java.io.Serializable {
 		this.originalProductInstance = originalProductInstance;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_product_model", nullable = false)
 	public ProductModel getProductModel() {
 		return this.productModel;
@@ -204,7 +204,7 @@ public class ProductInstance implements java.io.Serializable {
 		this.lastKnownStateUpdate = lastKnownStateUpdate;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "productInstance", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "productInstance", cascade = CascadeType.ALL)
 	public Set<ProductInstanceReference> getProductInstanceReferences() {
 		return this.productInstanceReferences;
 	}
@@ -225,7 +225,7 @@ public class ProductInstance implements java.io.Serializable {
 		this.shippingDemands = shippingDemands;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "productInstance", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "productInstance", cascade = CascadeType.ALL)
 	public Set<ProductInstanceDiagnostic> getProductInstanceDiagnostics() {
 		return this.productInstanceDiagnostics;
 	}
@@ -373,7 +373,7 @@ public class ProductInstance implements java.io.Serializable {
 					url + "/getReferences?ppid=" + this.providerProductId, tn.wevioo.tools.Reference[].class);
 			List<tn.wevioo.tools.Reference> newDriverReferences = Arrays.asList(newDriverReference);
 
-			if (this.productInstanceReferences != null) {
+			if (this.getProductInstanceReferences() != null) {
 				this.productInstanceReferences.clear();
 			} else {
 				this.productInstanceReferences = new HashSet<ProductInstanceReference>();
@@ -514,44 +514,45 @@ public class ProductInstance implements java.io.Serializable {
 		String url = "http://localhost:" + port;
 		RestTemplate rest = new RestTemplate();
 
-		try {
-			@SuppressWarnings("unused")
-			String result = (String) rest.getForObject(
-					url + "/reactivateProduct?properties=" + properties + "&ppid=" + this.getProviderProductId(),
-					String.class);
+		// try {
+		@SuppressWarnings("unused")
+		String result = (String) rest.getForObject(
+				url + "/reactivateProduct?properties=" + properties + "&ppid=" + this.getProviderProductId(),
+				String.class);
 
-			ProductActionHistory history = null;
+		ProductActionHistory history = null;
 
-			if (this.originalProductInstance == null) {
-				history = new ProductActionHistory(ProductInstanceAction.REACTIVATE, this, this, properties,
-						webServiceUserService, productInstanceService);
-			} else {
-				history = new ProductActionHistory(ProductInstanceAction.REACTIVATE, this.originalProductInstance, this,
-						properties, webServiceUserService, productInstanceService);
-			}
-			packagerHistory.addProductAction(history);
-
-			// this.resetLastKnownState();
-			this.setLastKnownState("ACTIVE");
-			this.setLastKnownStateUpdate(new Date());
-
-			// if
-			// (this.productModel.getDriverFactory().getDriverInternalConfiguration()
-			// .areReferencesChangedOnReactivation()) {
-			try {
-				this.updateReferences(packagerHistory, webServiceUserService, productInstanceService,
-						productModelProductDriverPortService);
-			} catch (DriverException e) {
-				this.productInstanceReferences.clear();
-			}
-			// }
-
-			if (LOGGER.isInfoEnabled()) {
-				LOGGER.info("Product [" + getIdProductInstance() + "] has been successfully reactivated.");
-			}
-		} catch (Exception e) {
-			throw new RestTemplateException("ProductDriver's project has occured a problem");
+		if (this.originalProductInstance == null) {
+			history = new ProductActionHistory(ProductInstanceAction.REACTIVATE, this, this, properties,
+					webServiceUserService, productInstanceService);
+		} else {
+			history = new ProductActionHistory(ProductInstanceAction.REACTIVATE, this.originalProductInstance, this,
+					properties, webServiceUserService, productInstanceService);
 		}
+		packagerHistory.addProductAction(history);
+
+		// this.resetLastKnownState();
+		this.setLastKnownState("ACTIVE");
+		this.setLastKnownStateUpdate(new Date());
+
+		// if
+		// (this.productModel.getDriverFactory().getDriverInternalConfiguration()
+		// .areReferencesChangedOnReactivation()) {
+		try {
+			this.updateReferences(packagerHistory, webServiceUserService, productInstanceService,
+					productModelProductDriverPortService);
+		} catch (DriverException e) {
+			this.productInstanceReferences.clear();
+		}
+		// }
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Product [" + getIdProductInstance() + "] has been successfully reactivated.");
+		}
+		// } catch (Exception e) {
+		// throw new RestTemplateException("ProductDriver's project has occured
+		// a problem");
+		// }
 	}
 
 	public void cancel(final String properties, PackagerActionHistory packagerHistory,
@@ -577,39 +578,39 @@ public class ProductInstance implements java.io.Serializable {
 			String result = (String) rest.getForObject(
 					url + "/cancelProduct?properties=" + properties + "&ppid=" + this.getProviderProductId(),
 					String.class);
-
-			ProductActionHistory history = null;
-
-			if (this.originalProductInstance == null) {
-				history = new ProductActionHistory(ProductInstanceAction.CANCEL, this, this, properties,
-						webServiceUserService, productInstanceService);
-			} else {
-				history = new ProductActionHistory(ProductInstanceAction.CANCEL, this.originalProductInstance, this,
-						properties, webServiceUserService, productInstanceService);
-			}
-			packagerHistory.addProductAction(history);
-
-			// this.resetLastKnownState();
-			this.setLastKnownState("CANCELED");
-			this.setLastKnownStateUpdate(new Date());
-
-			// if
-			// (this.productModel.getDriverFactory().getDriverInternalConfiguration().areReferencesChangedOnCancelation())
-			// {
-			try {
-				this.updateReferences(packagerHistory, webServiceUserService, productInstanceService,
-						productModelProductDriverPortService);
-			} catch (DriverException e) {
-				this.productInstanceReferences.clear();
-			}
-			// }
-
-			if (LOGGER.isInfoEnabled()) {
-				LOGGER.info("Product [" + getIdProductInstance() + "] has been successfully canceled.");
-			}
 		} catch (Exception e) {
 			throw new RestTemplateException("ProductDriver's project has occured a problem");
 		}
+		ProductActionHistory history = null;
+
+		if (this.originalProductInstance == null) {
+			history = new ProductActionHistory(ProductInstanceAction.CANCEL, this, this, properties,
+					webServiceUserService, productInstanceService);
+		} else {
+			history = new ProductActionHistory(ProductInstanceAction.CANCEL, this.originalProductInstance, this,
+					properties, webServiceUserService, productInstanceService);
+		}
+		packagerHistory.addProductAction(history);
+
+		// this.resetLastKnownState();
+		this.setLastKnownState("CANCELED");
+		this.setLastKnownStateUpdate(new Date());
+
+		// if
+		// (this.productModel.getDriverFactory().getDriverInternalConfiguration().areReferencesChangedOnCancelation())
+		// {
+		try {
+			this.updateReferences(packagerHistory, webServiceUserService, productInstanceService,
+					productModelProductDriverPortService);
+		} catch (DriverException e) {
+			this.productInstanceReferences.clear();
+		}
+		// }
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Product [" + getIdProductInstance() + "] has been successfully canceled.");
+		}
+
 	}
 
 	public void reset(final String properties, PackagerActionHistory packagerHistory,
@@ -962,6 +963,47 @@ public class ProductInstance implements java.io.Serializable {
 		// --- end correction ---
 
 		return result;
+	}
+
+	public void delete(final String properties, PackagerActionHistory packagerHistory, Boolean ignoreProviderException,
+			WebServiceUserService webServiceUserService, ProductInstanceService productInstanceService,
+			ProductModelProductDriverPortService productModelProductDriverPortService) throws DriverException,
+			MalformedXMLException, NotRespectedRulesException, NotFoundException, RestTemplateException {
+
+		if ((properties != null) && (properties.trim().length() == 0)) {
+			throw new NullException(NullCases.EMPTY, "properties parameter");
+		}
+
+		if (packagerHistory == null) {
+			throw new NullException(NullCases.NULL, "packagerHistory parameter");
+		}
+
+		int port = productModelProductDriverPortService.findByProductModel(this.getProductModel().getRetailerKey())
+				.getProductDriverPort();
+		String url = "http://localhost:" + port;
+		RestTemplate rest = new RestTemplate();
+
+		try {
+			rest.delete(url + "/deleteProduct?properties=" + properties + "&ppid=" + this.getProviderProductId(),
+					Product.class);
+		} catch (Exception e) {
+			throw new RestTemplateException("ProductDriver's project has occured a problem");
+		}
+
+		ProductActionHistory history = null;
+
+		if (this.originalProductInstance == null) {
+			history = new ProductActionHistory(ProductInstanceAction.DELETE, this, this, properties,
+					webServiceUserService, productInstanceService);
+		} else {
+			history = new ProductActionHistory(ProductInstanceAction.DELETE, this.originalProductInstance, this,
+					properties, webServiceUserService, productInstanceService);
+		}
+		packagerHistory.addProductAction(history);
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Product [" + getIdProductInstance() + "] has been successfully deleted.");
+		}
 	}
 
 }

@@ -64,7 +64,7 @@ public class ShippableItemModel implements java.io.Serializable {
 		this.referenceName = referenceName;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "shippableItemModel")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "shippableItemModel")
 	public Set<PackagerModelShippableItemConfiguration> getPackagerModelShippableItemConfigurations() {
 		return this.packagerModelShippableItemConfigurations;
 	}
@@ -74,7 +74,7 @@ public class ShippableItemModel implements java.io.Serializable {
 		this.packagerModelShippableItemConfigurations = packagerModelShippableItemConfigurations;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "shippableItemModel")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "shippableItemModel")
 	public Set<ProductModelShippableItemConfiguration> getProductModelShippableItemConfigurations() {
 		return this.productModelShippableItemConfigurations;
 	}

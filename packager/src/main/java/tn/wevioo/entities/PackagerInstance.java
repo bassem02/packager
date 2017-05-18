@@ -88,7 +88,7 @@ public class PackagerInstance implements java.io.Serializable {
 	public PackagerInstance() {
 	}
 
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(name = "packager_instance_product_instance", joinColumns = {
 			@JoinColumn(name = "id_packager_instance", nullable = false, updatable = false) }, inverseJoinColumns = {
 					@JoinColumn(name = "id_product_instance", nullable = false, updatable = false) })
@@ -134,7 +134,7 @@ public class PackagerInstance implements java.io.Serializable {
 		this.idPackagerInstance = idPackagerInstance;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_packager_model", nullable = false)
 	public PackagerModel getPackagerModel() {
 		return this.packagerModel;
@@ -1837,6 +1837,201 @@ public class PackagerInstance implements java.io.Serializable {
 			this.packagerModel.verifyProductOccurences(fullProductRequests);
 		}
 		return source;
+	}
+
+	public void delete(PackagerRequest request, Boolean ignoreUncanceledState, Boolean ignoreProviderException,
+			ProductInstanceService productInstanceService,
+			ProductModelProductDriverPortService productModelProductDriverPortService,
+			ProductModelService productModelService, ManualDriverFactory manualDriverFactory,
+			WebServiceUserService webServiceUserService, PackagerActionHistoryService packagerActionHistoryService)
+			throws NotRespectedRulesException, DriverException, NotFoundException, MalformedXMLException,
+			PackagerException, DataSourceException, SAXException, IOException, ParserConfigurationException,
+			RestTemplateException {
+
+		if (request == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+
+		if (ignoreUncanceledState == null) {
+			throw new NullException(NullCases.NULL, "ignoreUncanceledState parameter");
+		}
+
+		if (!request.getRetailerPackagerId().equals(this.retailerPackagerId)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.9"),
+					new Object[] { request.getRetailerPackagerId(), this.retailerPackagerId });
+		}
+
+		if (!ignoreUncanceledState) {
+
+			// --- TH : if we ignore uncanceled state, it is useless to make a
+			// call to provider system
+
+			State currentState = null;
+			try {
+				currentState = this.getCurrentState(productInstanceService, productModelProductDriverPortService);
+			} catch (DriverException e) {
+				if (!ignoreProviderException) {
+					throw e;
+				}
+			}
+
+			if (currentState == null || !currentState.equals(State.CANCELED)) {
+				throw new NotRespectedRulesException(new ErrorCode("1.2.2.18"),
+						new Object[] { this.retailerPackagerId, "DELETABLE" });
+			}
+		}
+
+		request.validate(PackagerInstanceAction.DELETE);
+		List<ProductRequest> asList = new ArrayList<ProductRequest>(request.getProducts());
+		verifyProductModels(asList);
+		asList = completeProductModels(asList);
+		request.setProducts(new HashSet<ProductRequest>(asList));
+		PackagerModel.verifyXmlProperties(PackagerInstanceAction.DELETE, asList, productModelService,
+				manualDriverFactory);
+
+		PackagerActionHistory history = new PackagerActionHistory(PackagerInstanceAction.DELETE, webServiceUserService);
+
+		if (this.packagerModel.isMultithreadedActions()) {
+			// PackagerTaskExecutor packagerTaskExecutor =
+			// (PackagerTaskExecutor) PackagerLogicTierBeanFactory
+			// .getInstance().getBean("deletePackagerTaskExecutor");
+			// packagerTaskExecutor.initialize(this, request, history,
+			// ignoreProviderException);
+			// packagerTaskExecutor.execute();
+		} else {
+
+			// --- browsing all product instances of current packager
+
+			for (ProductInstance productInstance : this.products) {
+
+				// --- performing deletion on current product instance
+
+				ProductRequest productRequest = this.getProductRequest(request, productInstance.getIdProductInstance());
+
+				if (productRequest == null) {
+					try {
+						productInstance.delete(null, history, ignoreProviderException, webServiceUserService,
+								productInstanceService, productModelProductDriverPortService);
+					} catch (UnsupportedActionException e) {
+						// If the deletion action is not supported the process
+						// continues
+						if (LOGGER.isWarnEnabled()) {
+							LOGGER.warn("Delete opperation not supported for productInstance ["
+									+ productInstance.getIdProductInstance() + "]");
+						}
+					}
+				} else {
+					try {
+						productInstance.delete(productRequest.getProperties(), history, ignoreProviderException,
+								webServiceUserService, productInstanceService, productModelProductDriverPortService);
+					} catch (UnsupportedActionException e) {
+						// If the deletion action is not supported the process
+						// continues
+						if (LOGGER.isWarnEnabled()) {
+							LOGGER.warn("Delete opperation not supported for productInstance ["
+									+ productInstance.getIdProductInstance() + "]");
+						}
+					}
+				}
+			}
+		}
+
+		history.addSource(this);
+
+		packagerActionHistoryService.saveOrUpdate(history);
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Packager [" + this.getRetailerPackagerId() + "] has been successfully deleted.");
+		}
+	}
+
+	public void changeProperties(PackagerRequest request, PackagerActionHistory history,
+			ProductInstanceService productInstanceService,
+			ProductModelProductDriverPortService productModelProductDriverPortService,
+			ProductModelService productModelService, ManualDriverFactory manualDriverFactory, ManualDriver manualDriver,
+			WebServiceUserService webServiceUserService) throws NotRespectedRulesException, NotFoundException,
+			MalformedXMLException, DriverException, PackagerException, DataSourceException, RestTemplateException,
+			ParserConfigurationException, SAXException, IOException, TransformerException {
+		request = prepareRequestForChangeProperties(request, productInstanceService,
+				productModelProductDriverPortService, productModelService, manualDriverFactory);
+
+		for (ProductRequest pr : request.getChangeProductRequests()) {
+			ProductInstance pi = this.getProductInstance(pr.getProductId());
+			pi.changeProperties(pr.getProperties(), history, webServiceUserService, productInstanceService,
+					manualDriverFactory, productModelProductDriverPortService);
+		}
+
+		for (ProductRequest pr : request.getCreationProductRequests()) {
+			ProductModel pm = productModelService.findByRetailerKey(pr.getModel());
+			ProductInstance pi = pm.instantiate(pr.getProperties(), history, manualDriverFactory, manualDriver,
+					webServiceUserService, productInstanceService);
+			this.addProductInstance(pi);
+			pi.updateReferences(history, webServiceUserService, productInstanceService,
+					productModelProductDriverPortService);
+		}
+
+		history.addSource(this);
+		history.addDestination(this);
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Packager [" + this.getRetailerPackagerId() + "]'s properties have been successfully changed.");
+		}
+	}
+
+	private PackagerRequest prepareRequestForChangeProperties(PackagerRequest request,
+			ProductInstanceService productInstanceService,
+			ProductModelProductDriverPortService productModelProductDriverPortService,
+			ProductModelService productModelService, ManualDriverFactory manualDriverFactory)
+			throws NotRespectedRulesException, NotFoundException, MalformedXMLException, DriverException,
+			PackagerException, DataSourceException, ParserConfigurationException, SAXException, IOException,
+			TransformerException, RestTemplateException {
+		if (request == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+
+		if (request.getRetailerPackagerId() == null) {
+			throw new NullException(NullCases.NULL, "retailer packager id parameter");
+		}
+
+		if (this.getCurrentState(productInstanceService, productModelProductDriverPortService).equals(State.CANCELED)) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.2.17"),
+					new Object[] { this.getIdPackagerInstance(), State.CANCELED.toString() });
+		}
+
+		if (!request.getRetailerPackagerId().equals(this.getRetailerPackagerId())) {
+			throw new NotRespectedRulesException(new ErrorCode("1.2.1.1.9"),
+					new Object[] { request.getRetailerPackagerId(), this.getRetailerPackagerId() });
+		}
+
+		request.validate(PackagerInstanceAction.CHANGE_PROPERTIES);
+		List<ProductRequest> propertiesChangeRequests = request.getChangeProductRequests();
+		propertiesChangeRequests = this.mergeUserPropertiesWithExisting(propertiesChangeRequests,
+				productModelProductDriverPortService);
+		propertiesChangeRequests = this.completeProductModels(propertiesChangeRequests);
+		this.verifyProductModels(propertiesChangeRequests);
+		PackagerModel.verifyXmlProperties(PackagerInstanceAction.CHANGE_PROPERTIES, propertiesChangeRequests,
+				productModelService, manualDriverFactory);
+
+		List<ProductRequest> creationRequests = request.getCreationProductRequests();
+		creationRequests = this.getPackagerModel().mergeUserPropertiesWithDefault(creationRequests, false,
+				productModelService);
+		creationRequests = this.getPackagerModel().mergeUserPropertiesWithDefaultConfiguration(creationRequests,
+				productModelService);
+		PackagerModel.verifyXmlProperties(PackagerInstanceAction.CREATE, creationRequests, productModelService,
+				manualDriverFactory);
+
+		List<ProductRequest> fullProductRequests = new ArrayList<ProductRequest>();
+		fullProductRequests.addAll(propertiesChangeRequests);
+		fullProductRequests.addAll(creationRequests);
+		fullProductRequests = completeMissingExistingProducts(fullProductRequests, true,
+				productModelProductDriverPortService);
+		this.getPackagerModel().verifyProductOccurences(fullProductRequests);
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Request is ready to change properties.");
+		}
+
+		return request;
 	}
 
 }

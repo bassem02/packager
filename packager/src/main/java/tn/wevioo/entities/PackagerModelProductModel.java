@@ -77,7 +77,7 @@ public class PackagerModelProductModel implements java.io.Serializable {
 		this.packagerModel = packagerModel;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_product_model", nullable = false)
 	public ProductModel getProductModel() {
 		return this.productModel;

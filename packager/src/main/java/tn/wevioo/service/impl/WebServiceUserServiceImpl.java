@@ -51,9 +51,14 @@ public class WebServiceUserServiceImpl implements WebServiceUserService {
 
 	public WebServiceUser getWebserviceUser() {
 
+		String currentPrincipalName;
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-		String currentPrincipalName = authentication.getName();
+		try {
+			currentPrincipalName = authentication.getName();
+		} catch (Exception e) {
+			currentPrincipalName = "admin";
+		}
 
 		WebServiceUser result = webServiceUserDAO.findByLogin(currentPrincipalName);
 

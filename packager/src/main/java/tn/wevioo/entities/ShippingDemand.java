@@ -67,7 +67,7 @@ public class ShippingDemand implements java.io.Serializable {
 		this.packId = packId;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_packager_instance")
 	public PackagerInstance getPackagerInstance() {
 		return this.packagerInstance;
@@ -115,7 +115,7 @@ public class ShippingDemand implements java.io.Serializable {
 		this.declined = declined;
 	}
 
-	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "shippingDemands")
+	@ManyToMany(fetch = FetchType.EAGER, mappedBy = "shippingDemands")
 	public Set<ProductInstance> getProductInstances() {
 		return this.productInstances;
 	}

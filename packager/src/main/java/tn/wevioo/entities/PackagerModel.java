@@ -226,7 +226,7 @@ public class PackagerModel implements java.io.Serializable {
 		this.packagerModelPossibleTransformationsesForIdPackagerModelTo = packagerModelPossibleTransformationsesForIdPackagerModelTo;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "packagerModel")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "packagerModel")
 	public Set<PackagerModelProductModel> getPackagerModelProductModels() {
 		return this.packagerModelProductModels;
 	}
@@ -270,11 +270,6 @@ public class PackagerModel implements java.io.Serializable {
 		result.setLastUpdate(new Date());
 
 		result.setRetailer(webServiceUserService.getWebserviceUser().getRetailer());
-
-		// Retailer retailer = new Retailer();
-		// retailer.setIdRetailer(1);
-		// retailer.setName("NORDNET.COM");
-		// result.setRetailer(retailer);
 
 		history.setPackagerModel(this.getRetailerKey());
 		history.setRetailerPackagerId(request.getRetailerPackagerId());
@@ -414,7 +409,7 @@ public class PackagerModel implements java.io.Serializable {
 
 		for (String key : productOccurences.keySet()) {
 			boolean foundConfig = false;
-			for (PackagerModelProductModel config : this.packagerModelProductModels) {
+			for (PackagerModelProductModel config : this.getPackagerModelProductModels()) {
 				if (config.getProductModel().getRetailerKey().equals(key)) {
 					foundConfig = true;
 					if (productOccurences.get(key) < config.getMinimumInstances()) {
