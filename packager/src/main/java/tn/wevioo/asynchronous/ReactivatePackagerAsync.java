@@ -6,15 +6,6 @@ import org.springframework.stereotype.Component;
 import tn.wevioo.controller.PackagerManagementController;
 import tn.wevioo.model.request.PackagerRequest;
 
-/**
- * The class ReactivatePackagerAsync implements the action which perform a
- * packager reactivation asynchronously.
- * 
- * @author mleahu
- * @author vberezan
- * @since 2.0.0
- */
-
 @Component
 public class ReactivatePackagerAsync extends AbstractAsyncAction {
 	/**
@@ -41,9 +32,6 @@ public class ReactivatePackagerAsync extends AbstractAsyncAction {
 		this.request = request;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	protected void doAction() throws Exception {
 		packagerManagementController.reactivatePackager(request);
 	}

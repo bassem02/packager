@@ -459,7 +459,7 @@ public class PackagerManagementController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/changePackagerProperties", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void changePackagerProperties(@RequestBody PackagerRequest request) throws NotFoundException,
+	public PackagerInstanceDTO changePackagerProperties(@RequestBody PackagerRequest request) throws NotFoundException,
 			NotRespectedRulesException, PackagerException, DriverException, MalformedXMLException, DataSourceException,
 			RestTemplateException, ParserConfigurationException, SAXException, IOException, TransformerException {
 
@@ -479,6 +479,8 @@ public class PackagerManagementController extends AbstractFacade {
 
 		packagerInstanceService.saveOrUpdate(packagerInstance);
 		packagerActionHistoryService.saveOrUpdate(history);
+
+		return packagerInstanceService.convertToDTO(packagerInstance);
 	}
 
 	@RequestMapping(value = "/testMerge", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

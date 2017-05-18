@@ -23,12 +23,20 @@ import nordnet.architecture.exceptions.implicit.NullException;
 import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import tn.wevioo.asynchronous.ActivatePackagerAsync;
 import tn.wevioo.asynchronous.CancelPackagerAsync;
+import tn.wevioo.asynchronous.ChangePackagerPropertiesAsync;
 import tn.wevioo.asynchronous.CreatePackagerAsync;
+import tn.wevioo.asynchronous.MergePackagerAsync;
 import tn.wevioo.asynchronous.ReactivatePackagerAsync;
+import tn.wevioo.asynchronous.ResetPackagerAsync;
+import tn.wevioo.asynchronous.SplitPackagerAsync;
 import tn.wevioo.asynchronous.SuspendPackagerAsync;
+import tn.wevioo.asynchronous.TranslocateProductInstancesAsync;
 import tn.wevioo.entities.ActionTicket;
 import tn.wevioo.exceptions.PackagerException;
+import tn.wevioo.model.request.MergePackagersRequest;
 import tn.wevioo.model.request.PackagerRequest;
+import tn.wevioo.model.request.PackagerTransformationRequest;
+import tn.wevioo.model.request.SplitPackagerRequest;
 import tn.wevioo.service.ActionTicketService;
 
 @RestController
@@ -55,6 +63,21 @@ public class AsynchronousPackagerManagementController {
 
 	@Autowired
 	private SuspendPackagerAsync suspendPackagerAsync;
+
+	@Autowired
+	private ChangePackagerPropertiesAsync changePackagerPropertiesAsync;
+
+	@Autowired
+	private ResetPackagerAsync resetPackagerAsync;
+
+	@Autowired
+	private MergePackagerAsync mergePackagerAsync;
+
+	@Autowired
+	private SplitPackagerAsync splitPackagerAsync;
+
+	@Autowired
+	private TranslocateProductInstancesAsync translocateProductInstancesAsync;
 
 	@RequestMapping(value = "/findActionTicket", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ActionTicket findActionTicket(@QueryParam("actionId") String actionId)
@@ -256,6 +279,178 @@ public class AsynchronousPackagerManagementController {
 		taskExecutor.setQueueCapacity(25);
 		taskExecutor.initialize();
 		taskExecutor.execute(suspendPackagerAsync);
+
+		return actionTicket.getIdActionTicket();
+	}
+
+	@RequestMapping(value = "/changePackagerPropertiesAsynchronous", method = RequestMethod.PUT)
+	public String changePackagerProperties(@RequestBody PackagerRequest request)
+			throws DataSourceException, PackagerException {
+		ActionTicket actionTicket = null;
+
+		if (request == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+
+		if ((request.getRetailerPackagerId() == null) || (request.getRetailerPackagerId().trim().length() == 0)) {
+			throw new NullException(NullCases.NULL_EMPTY, "request.retailerPackagerId parameter");
+		}
+
+		try {
+			actionTicket = actionTicketService.instantiateNewActionTicket("changePackagerProperties",
+					request.getRetailerPackagerId());
+		} catch (NotRespectedRulesException e) {
+			throw new PackagerException(e);
+		}
+
+		changePackagerPropertiesAsync.setRequest(request);
+		changePackagerPropertiesAsync.setTicketIdentifier(actionTicket.getIdActionTicket());
+		taskExecutor = new ThreadPoolTaskExecutor();
+		taskExecutor.setCorePoolSize(5);
+		taskExecutor.setMaxPoolSize(10);
+		taskExecutor.setQueueCapacity(25);
+		taskExecutor.initialize();
+		taskExecutor.execute(changePackagerPropertiesAsync);
+
+		return actionTicket.getIdActionTicket();
+	}
+
+	@RequestMapping(value = "/resetPackagerAsynchronous", method = RequestMethod.PUT)
+	public String resetPackager(@RequestBody PackagerRequest request) throws DataSourceException, PackagerException {
+		ActionTicket actionTicket = null;
+
+		if (request == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+
+		if ((request.getRetailerPackagerId() == null) || (request.getRetailerPackagerId().trim().length() == 0)) {
+			throw new NullException(NullCases.NULL_EMPTY, "request.retailerPackagerId parameter");
+		}
+
+		try {
+			actionTicket = actionTicketService.instantiateNewActionTicket("resetPackager",
+					request.getRetailerPackagerId());
+		} catch (NotRespectedRulesException e) {
+			throw new PackagerException(e);
+		}
+
+		resetPackagerAsync.setRequest(request);
+		resetPackagerAsync.setTicketIdentifier(actionTicket.getIdActionTicket());
+		taskExecutor = new ThreadPoolTaskExecutor();
+		taskExecutor.setCorePoolSize(5);
+		taskExecutor.setMaxPoolSize(10);
+		taskExecutor.setQueueCapacity(25);
+		taskExecutor.initialize();
+		taskExecutor.execute(resetPackagerAsync);
+
+		return actionTicket.getIdActionTicket();
+	}
+
+	@RequestMapping(value = "/mergePackagersAsynchronous", method = RequestMethod.POST)
+	public String mergePackagers(@RequestBody MergePackagersRequest request)
+			throws PackagerException, DataSourceException {
+
+		ActionTicket actionTicket = null;
+
+		if (request.getSource1() == null) {
+			throw new NullException(NullCases.NULL, "source1 parameter");
+		}
+
+		if ((request.getSource1().getRetailerPackagerId() == null)
+				|| (request.getSource1().getRetailerPackagerId().trim().length() == 0)) {
+			throw new NullException(NullCases.NULL_EMPTY, "source1.retailerPackagerId parameter");
+		}
+
+		if (request.getSource2() == null) {
+			throw new NullException(NullCases.NULL, "source2 parameter");
+		}
+
+		if ((request.getSource2().getRetailerPackagerId() == null)
+				|| (request.getSource2().getRetailerPackagerId().trim().length() == 0)) {
+			throw new NullException(NullCases.NULL_EMPTY, "source2.retailerPackagerId parameter");
+		}
+
+		try {
+			actionTicket = actionTicketService.instantiateNewActionTicket("mergePackagers",
+					request.getSource1().getRetailerPackagerId() + " - "
+							+ request.getSource2().getRetailerPackagerId());
+		} catch (NotRespectedRulesException e) {
+			throw new PackagerException(e);
+		}
+
+		mergePackagerAsync.setRequest(request);
+		mergePackagerAsync.setTicketIdentifier(actionTicket.getIdActionTicket());
+		taskExecutor = new ThreadPoolTaskExecutor();
+		taskExecutor.setCorePoolSize(5);
+		taskExecutor.setMaxPoolSize(10);
+		taskExecutor.setQueueCapacity(25);
+		taskExecutor.initialize();
+		taskExecutor.execute(mergePackagerAsync);
+
+		return actionTicket.getIdActionTicket();
+	}
+
+	@RequestMapping(value = "/splitPackagerAsynchronous", method = RequestMethod.POST)
+	public String splitPackager(@RequestBody SplitPackagerRequest request)
+			throws PackagerException, DataSourceException {
+		ActionTicket actionTicket = null;
+
+		if (request.getSource() == null) {
+			throw new NullException(NullCases.NULL, "source parameter");
+		}
+
+		if ((request.getSource().getRetailerPackagerId() == null)
+				|| (request.getSource().getRetailerPackagerId().trim().length() == 0)) {
+			throw new NullException(NullCases.NULL_EMPTY, "source.retailerPackagerId parameter");
+		}
+
+		try {
+			actionTicket = actionTicketService.instantiateNewActionTicket("splitPackager",
+					request.getSource().getRetailerPackagerId());
+		} catch (NotRespectedRulesException e) {
+			throw new PackagerException(e);
+		}
+
+		splitPackagerAsync.setRequest(request);
+		splitPackagerAsync.setTicketIdentifier(actionTicket.getIdActionTicket());
+		taskExecutor = new ThreadPoolTaskExecutor();
+		taskExecutor.setCorePoolSize(5);
+		taskExecutor.setMaxPoolSize(10);
+		taskExecutor.setQueueCapacity(25);
+		taskExecutor.initialize();
+		taskExecutor.execute(splitPackagerAsync);
+
+		return actionTicket.getIdActionTicket();
+	}
+
+	@RequestMapping(value = "/translocateProductInstancesAsynchronous", method = RequestMethod.POST)
+	public String translocateProductInstances(@RequestBody PackagerTransformationRequest request)
+			throws PackagerException, DataSourceException {
+		ActionTicket actionTicket = null;
+
+		if (request == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+
+		if ((request.getRetailerPackagerId() == null) || (request.getRetailerPackagerId().trim().length() == 0)) {
+			throw new NullException(NullCases.NULL_EMPTY, "request.retailerPackagerId parameter");
+		}
+
+		try {
+			actionTicket = actionTicketService.instantiateNewActionTicket("translocateProductInstances",
+					request.getRetailerPackagerId());
+		} catch (NotRespectedRulesException e) {
+			throw new PackagerException(e);
+		}
+
+		translocateProductInstancesAsync.setRequest(request);
+		translocateProductInstancesAsync.setTicketIdentifier(actionTicket.getIdActionTicket());
+		taskExecutor = new ThreadPoolTaskExecutor();
+		taskExecutor.setCorePoolSize(5);
+		taskExecutor.setMaxPoolSize(10);
+		taskExecutor.setQueueCapacity(25);
+		taskExecutor.initialize();
+		taskExecutor.execute(translocateProductInstancesAsync);
 
 		return actionTicket.getIdActionTicket();
 	}

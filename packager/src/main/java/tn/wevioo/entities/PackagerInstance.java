@@ -423,7 +423,7 @@ public class PackagerInstance implements java.io.Serializable {
 
 		ProductRequest pr = null;
 		for (ProductInstance pi : getProducts()) {
-			if (!productIdentifiers.contains(pi.getIdProductInstance())) {
+			if (!productIdentifiers.contains((long) pi.getIdProductInstance())) {
 				try {
 					if (!(excludeCanceled
 							&& pi.getCurrentState(productModelProductDriverPortService).equals(State.CANCELED))) {

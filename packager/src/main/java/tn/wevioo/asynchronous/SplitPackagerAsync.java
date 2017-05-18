@@ -1,45 +1,19 @@
 package tn.wevioo.asynchronous;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import tn.wevioo.controller.PackagerManagementController;
 import tn.wevioo.model.request.SplitPackagerRequest;
 
-/**
- * The class SplitPackagerAsync implements the action which performs a packager
- * merge asynchronously.
- * 
- * @author vberezan
- * @since 2.13.1
- */
+@Component
 public class SplitPackagerAsync extends AbstractAsyncAction {
 
-	/**
-	 * The source to give to the method splitPackager.
-	 */
 	private SplitPackagerRequest request;
 
 	@Autowired
 	private PackagerManagementController packagerManagementController;
 
-	/**
-	 * Default construcotr.
-	 * 
-	 * @param ticketIdentifier
-	 *            The identifier of the action ticket which contains the
-	 *            information about the status of the current asynchronous
-	 *            action. Cannot be null.
-	 * @param source
-	 *            The source to give to the method splitPackager.
-	 * @param destination1
-	 *            The destination1 to give to the method splitPackager.
-	 * @param destination2
-	 *            The destination2 to give to the method splitPackager.
-	 */
-
-	/**
-	 * {@inheritDoc}
-	 */
 	protected void doAction() throws Exception {
 		packagerManagementController.splitPackager(request);
 	}

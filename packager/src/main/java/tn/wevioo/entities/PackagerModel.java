@@ -412,11 +412,11 @@ public class PackagerModel implements java.io.Serializable {
 			for (PackagerModelProductModel config : this.getPackagerModelProductModels()) {
 				if (config.getProductModel().getRetailerKey().equals(key)) {
 					foundConfig = true;
-					if (productOccurences.get(key) < config.getMinimumInstances()) {
+					if ((int) productOccurences.get(key) < config.getMinimumInstances()) {
 						throw new NotRespectedRulesException(new ErrorCode("1.2.2.22"),
 								new Object[] { key, config.getMinimumInstances(), productOccurences.get(key) });
 					} else {
-						if (productOccurences.get(key) > config.getMaximumInstances()) {
+						if ((int) productOccurences.get(key) > config.getMaximumInstances()) {
 							throw new NotRespectedRulesException(new ErrorCode("1.2.2.20"),
 									new Object[] { key, config.getMaximumInstances(), productOccurences.get(key) });
 						}

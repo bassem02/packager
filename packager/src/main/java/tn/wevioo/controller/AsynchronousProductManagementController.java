@@ -14,6 +14,7 @@ import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
 import nordnet.architecture.exceptions.implicit.NullException;
 import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import tn.wevioo.asynchronous.CancelProductAsync;
+import tn.wevioo.asynchronous.ResetProductAsync;
 import tn.wevioo.entities.ActionTicket;
 import tn.wevioo.exceptions.PackagerException;
 import tn.wevioo.model.request.ProductRequest;
@@ -30,6 +31,9 @@ public class AsynchronousProductManagementController {
 
 	@Autowired
 	private CancelProductAsync cancelProductAsync;
+
+	@Autowired
+	private ResetProductAsync resetProductAsync;
 
 	@RequestMapping(value = "/cancelProductAsynchronous", method = RequestMethod.PUT)
 	public String cancelProduct(@RequestBody ProductRequest request) throws DataSourceException, PackagerException {
@@ -58,6 +62,37 @@ public class AsynchronousProductManagementController {
 		taskExecutor.setQueueCapacity(25);
 		taskExecutor.initialize();
 		taskExecutor.execute(cancelProductAsync);
+
+		return actionTicket.getIdActionTicket();
+	}
+
+	@RequestMapping(value = "/resetProductAsynchronous", method = RequestMethod.PUT)
+	public String resetProduct(@RequestBody ProductRequest request) throws DataSourceException, PackagerException {
+		ActionTicket actionTicket = null;
+
+		if (request == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+
+		if ((request.getProductId() == null)) {
+			throw new NullException(NullCases.NULL, "reuqest.productId parameter");
+		}
+
+		try {
+			actionTicket = actionTicketService.instantiateNewActionTicket("resetProduct",
+					String.valueOf(request.getProductId()));
+		} catch (NotRespectedRulesException e) {
+			throw new PackagerException(e);
+		}
+
+		resetProductAsync.setRequest(request);
+		resetProductAsync.setTicketIdentifier(actionTicket.getIdActionTicket());
+		taskExecutor = new ThreadPoolTaskExecutor();
+		taskExecutor.setCorePoolSize(5);
+		taskExecutor.setMaxPoolSize(10);
+		taskExecutor.setQueueCapacity(25);
+		taskExecutor.initialize();
+		taskExecutor.execute(resetProductAsync);
 
 		return actionTicket.getIdActionTicket();
 	}

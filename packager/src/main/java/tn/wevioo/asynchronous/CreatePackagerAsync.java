@@ -6,20 +6,9 @@ import org.springframework.stereotype.Component;
 import tn.wevioo.controller.PackagerManagementController;
 import tn.wevioo.model.request.PackagerRequest;
 
-/**
- * The class CreatePackagerAsync implements the action which perform a packager
- * creation asynchronously.
- * 
- * @author mleahu
- * @author vberezan
- * @since 2.0.0
- */
-
 @Component
 public class CreatePackagerAsync extends AbstractAsyncAction {
-	/**
-	 * The request to give to the method createPackager.
-	 */
+
 	@Autowired
 	private PackagerManagementController packagerManagementController;
 
@@ -40,9 +29,6 @@ public class CreatePackagerAsync extends AbstractAsyncAction {
 		this.request = request;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	protected void doAction() throws Exception {
 		packagerManagementController.createPackager(request);
 	}

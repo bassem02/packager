@@ -1,10 +1,12 @@
 package tn.wevioo.asynchronous;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import tn.wevioo.controller.PackagerManagementController;
 import tn.wevioo.model.request.MergePackagersRequest;
 
+@Component
 public class MergePackagerAsync extends AbstractAsyncAction {
 
 	@Autowired
