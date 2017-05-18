@@ -886,7 +886,7 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 
 	protected void successChangePropertiesManual(String properties, String ppid) throws DriverException {
 		this.getHistoricalReportLogger().info("The properties of the product " + this.getClass().getSimpleName() + " ["
-				+ ppid + "] have been successfully changed (new state=[" + this.getCurrentState() + "]).");
+				+ ppid + "] have been successfully changed (new state=[" + this.getCurrentState(ppid) + "]).");
 	}
 
 	protected void performChangePropertiesManual(Object properties, String ppid)
@@ -928,7 +928,7 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 	protected Object startChangePropertiesManual(final String properties, String ppid) throws DriverException,
 			MalformedXMLException, NotRespectedRulesException, SAXException, IOException, ParserConfigurationException {
 		Object result = ManualDriverFactory.parse(properties);
-		if (this.getCurrentState().equals(State.CANCELED)) {
+		if (this.getCurrentState(ppid).equals(State.CANCELED)) {
 			throw new NotRespectedRulesException(new ErrorCode("1.2.2.12"), new Object[] { ppid, State.CANCELED });
 		}
 
