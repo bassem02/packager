@@ -94,10 +94,7 @@ public class ProductActionHistory implements java.io.Serializable {
 
 		if (destination != null) {
 			if (action.name().equals("CREATE")) {
-				// this.destProductId =
-				// productInstanceService.findAll().get(productInstanceService.findAll().size()
-				// - 1)
-				// .getIdProductInstance() + 1;
+				this.destProductId = (int) (productInstanceService.getMaxIdProductInstance() + 1);
 			} else {
 				this.destProductId = destination.getIdProductInstance();
 			}

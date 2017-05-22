@@ -15,4 +15,6 @@ public interface PackagerActionHistoryService {
 
 	public List<PackagerActionHistory> findAll() throws NotFoundException;
 
+	public Long getMaxIdPackagerActionHistory();
+
 }

@@ -54,4 +54,9 @@ public class PackagerActionHistoryServiceImpl implements PackagerActionHistorySe
 		return result;
 	}
 
+	@Override
+	public Long getMaxIdPackagerActionHistory() {
+		return packagerActionHistoryDao.getMaxIdPackagerActionHistory();
+	}
+
 }
