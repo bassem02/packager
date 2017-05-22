@@ -86,7 +86,7 @@ public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualI
 			throw ex;
 		}
 
-		successDelete(properties);
+		successDeleteManual(properties, ppid);
 	}
 
 	protected void successDeleteManual(String properties, String ppid) throws DriverException {

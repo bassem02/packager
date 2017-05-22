@@ -7,6 +7,7 @@ import nordnet.drivers.contract.exceptions.DriverException;
 import tn.wevioo.dto.product.ProductInstanceDTO;
 import tn.wevioo.dto.product.ProductPropertiesDTO;
 import tn.wevioo.entities.ProductInstance;
+import tn.wevioo.entities.ProductModel;
 import tn.wevioo.exceptions.RestTemplateException;
 
 public interface ProductInstanceService {
@@ -24,5 +25,12 @@ public interface ProductInstanceService {
 
 	ProductPropertiesDTO convertToPropertiesDTO(ProductInstance productInstance)
 			throws DriverException, RestTemplateException, NotFoundException;
+
+	public List<ProductInstance> findByProviderProductIds(List<String> subList, ProductModel productModel);
+
+	public ProductInstance findByProviderProductId(String providerProductId, ProductModel productModel)
+			throws NotFoundException;
+
+	public long getMaxIdProductInstance();
 
 }

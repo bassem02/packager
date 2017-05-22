@@ -12,10 +12,6 @@ import tn.wevioo.controller.AsynchronousPackagerManagementController;
 /**
  * The class AbstractAsyncAction provides a convenience base which makes the
  * development of asynchronous actions easier.
- * 
- * @author mleahu
- * @author vberezan
- * @since 2.0.0
  */
 
 @Component

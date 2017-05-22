@@ -20,6 +20,7 @@ import tn.wevioo.dto.product.ProductPropertiesDTO;
 import tn.wevioo.entities.ProductInstance;
 import tn.wevioo.entities.ProductInstanceDiagnostic;
 import tn.wevioo.entities.ProductInstanceReference;
+import tn.wevioo.entities.ProductModel;
 import tn.wevioo.exceptions.RestTemplateException;
 import tn.wevioo.service.ProductInstanceDiagnosticService;
 import tn.wevioo.service.ProductInstanceReferenceService;
@@ -110,6 +111,53 @@ public class ProductInstanceServiceImpl implements ProductInstanceService {
 		productPropertiesDTO.setProperties(productInstance.getProductProperties(productModelProductDriverPortService));
 
 		return productPropertiesDTO;
+	}
+
+	@Override
+	public List<ProductInstance> findByProviderProductIds(List<String> providerProductIds, ProductModel productModel) {
+
+		if (productModel == null) {
+			throw new NullException(NullCases.NULL, "productModel attribute");
+		}
+
+		if ((providerProductIds == null) || (providerProductIds.size() == 0)) {
+			return new ArrayList<ProductInstance>();
+		}
+		List<ProductInstance> productInstances = new ArrayList<ProductInstance>();
+		for (String ppid : providerProductIds) {
+			if (productInstanceDAO.findByProviderProductIdAndProductModel(ppid, productModel) != null)
+				productInstances.add(productInstanceDAO.findByProviderProductIdAndProductModel(ppid, productModel));
+		}
+
+		return productInstances;
+	}
+
+	@Override
+	public ProductInstance findByProviderProductId(String providerProductId, ProductModel productModel)
+			throws NotFoundException {
+
+		if ((providerProductId == null) || (providerProductId.trim().length() == 0)) {
+			throw new NullException(NullCases.NULL_EMPTY, "providerProductId attribute");
+		}
+
+		if (productModel == null) {
+			throw new NullException(NullCases.NULL, "productModel attribute");
+		}
+
+		ProductInstance pi = productInstanceDAO.findByProviderProductIdAndProductModel(providerProductId, productModel);
+
+		if (pi == null) {
+			throw new NotFoundException(new ErrorCode("0.2.1.3.2"),
+					new Object[] { "product instance", "provider product identifier", providerProductId });
+		}
+
+		return pi;
+
+	}
+
+	@Override
+	public long getMaxIdProductInstance() {
+		return productInstanceDAO.getMaxIdProductInstance();
 	}
 
 }

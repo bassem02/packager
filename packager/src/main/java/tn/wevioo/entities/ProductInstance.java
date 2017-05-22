@@ -51,8 +51,11 @@ import tn.wevioo.ManualDriverFactory;
 import tn.wevioo.exceptions.PackagerException;
 import tn.wevioo.exceptions.RestTemplateException;
 import tn.wevioo.model.feasibility.FeasibilityResult;
+import tn.wevioo.model.packager.action.PackagerInstanceAction;
 import tn.wevioo.model.product.action.ProductInstanceAction;
 import tn.wevioo.model.request.DeliveryProperty;
+import tn.wevioo.model.request.ProductReferenceRequest;
+import tn.wevioo.model.request.ProductRequest;
 import tn.wevioo.service.ProductInstanceService;
 import tn.wevioo.service.ProductModelProductDriverPortService;
 import tn.wevioo.service.WebServiceUserService;
@@ -213,7 +216,7 @@ public class ProductInstance implements java.io.Serializable {
 		this.productInstanceReferences = productInstanceReferences;
 	}
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "shipping_demand_product_instance", catalog = "nn_packager_management_recette", joinColumns = {
 			@JoinColumn(name = "id_product_instance", nullable = false, updatable = false) }, inverseJoinColumns = {
 					@JoinColumn(name = "id_shipping_demand", nullable = false, updatable = false) })
@@ -1004,6 +1007,29 @@ public class ProductInstance implements java.io.Serializable {
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("Product [" + getIdProductInstance() + "] has been successfully deleted.");
 		}
+	}
+
+	public void importReferences(ProductRequest request) throws NotRespectedRulesException {
+		if (request == null) {
+			throw new NullException(NullCases.NULL, "request parameter");
+		}
+
+		request.validate(PackagerInstanceAction.IMPORT_REFERENCES);
+		List<ProductInstanceReference> newReferences = new ArrayList<ProductInstanceReference>();
+
+		ProductInstanceReference newReference = null;
+		for (ProductReferenceRequest reference : request.getReferences()) {
+			newReference = new ProductInstanceReference();
+			newReference.setCreationDate(new Date());
+			newReference.setDiscriminatorType(reference.getType());
+			newReference.setDiscriminatorValue(reference.getValue());
+			newReference.setProductInstance(this);
+
+			newReferences.add(newReference);
+		}
+
+		this.productInstanceReferences.clear();
+		this.productInstanceReferences.addAll(newReferences);
 	}
 
 }
