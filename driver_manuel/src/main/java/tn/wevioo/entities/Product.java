@@ -17,9 +17,6 @@ import tn.wevioo.entities.type.StateProduct;
 
 /**
  * Product Entity.
- * 
- * @author kad
- * 
  */
 @Entity
 @Table(name = Product.TABLE_NAME)

@@ -43,11 +43,7 @@ import tn.wevioo.utils.AbstractValidator;
 /**
  * This class implements all methods useful to manage instance of the Manual
  * product.
- * 
- * @author kad
- * 
  */
-// @RestController
 @Component
 public class ManualDriverFactory
 		extends ProductDriverFactoryImpl<ManualDriver, ManualConfiguration, ManualInternalConfiguration> {

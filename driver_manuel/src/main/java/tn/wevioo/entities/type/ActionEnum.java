@@ -3,9 +3,6 @@ package tn.wevioo.entities.type;
 /**
  * 
  * Action enumeration.
- * 
- * @author kad
- * 
  */
 public enum ActionEnum {
 	/**

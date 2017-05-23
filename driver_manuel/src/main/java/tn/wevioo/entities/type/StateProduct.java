@@ -3,9 +3,6 @@ package tn.wevioo.entities.type;
 /**
  * 
  * Status of product .
- * 
- * @author kad
- * 
  */
 public enum StateProduct {
 	/**

@@ -2,8 +2,6 @@ package tn.wevioo.utils;
 
 /**
  * This class contains all constants of the application.
- * 
- * @author kad
  */
 public final class Constants {
 

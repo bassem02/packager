@@ -25,9 +25,6 @@ import tn.wevioo.tools.properties.impl.ClassPathPropertiesFile;
  * example, the AstraSatelliteDriverInternalConfiguration can inherit this
  * class, defining the specific internal properties for the driver ASTRA
  * Satellite.
- * 
- * @author THUGUERRE
- * @since 2.0.0
  */
 public abstract class PropertyFileDriverInternalConfiguration implements DriverInternalConfiguration {
 

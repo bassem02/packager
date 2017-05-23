@@ -45,9 +45,6 @@ import tn.wevioo.service.ProductService;
 
 /**
  * The ManuelDriver driver class.
- * 
- * @author kad
- * 
  */
 @Component
 public class ManualDriver extends ProductDriverImpl<ManualConfiguration, ManualInternalConfiguration> {

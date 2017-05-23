@@ -5,9 +5,6 @@ import nordnet.tools.converter.converters.ConverterBeanFactory;
 
 /**
  * Converts a String into an instance of State.
- * 
- * @author kad
- * 
  */
 public class StatusConverter extends ConverterBeanFactory {
 

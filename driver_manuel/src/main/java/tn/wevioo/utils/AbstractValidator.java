@@ -5,9 +5,6 @@ import java.util.Map;
 
 /**
  * Abstract class validator.
- * 
- * @author kad
- * 
  */
 public abstract class AbstractValidator {
 
@@ -16,7 +13,8 @@ public abstract class AbstractValidator {
 	 * 
 	 * @param object
 	 *            object to validate
-	 * @return Boolean value indicates if any object is null and if a string, a map or a collection is empty
+	 * @return Boolean value indicates if any object is null and if a string, a
+	 *         map or a collection is empty
 	 */
 
 	@SuppressWarnings("rawtypes")

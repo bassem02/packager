@@ -11,9 +11,6 @@ import javax.persistence.Table;
 
 /**
  * this class models {@link EndUserHistory} object.
- * 
- * @author mdm
- * 
  */
 @Entity
 @Table(name = EndUserHistory.TABLE_NAME)

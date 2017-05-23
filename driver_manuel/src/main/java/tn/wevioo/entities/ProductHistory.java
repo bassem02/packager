@@ -17,9 +17,6 @@ import tn.wevioo.entities.type.StateProduct;
 
 /**
  * Product action History Entity.
- * 
- * @author amt
- * 
  */
 @Entity
 @Table(name = ProductHistory.TABLE_NAME)

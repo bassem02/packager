@@ -13,9 +13,6 @@ import tn.wevioo.entities.type.ActionEnum;
 
 /**
  * Product Entity.
- * 
- * @author kad
- * 
  */
 @Entity
 @Table(name = Parameters.TABLE_NAME)
