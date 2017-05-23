@@ -84,7 +84,7 @@ public class PackagerManagementController extends AbstractFacade {
 	@Autowired
 	ProductModelProductDriverPortService productModelProductDriverPortService;
 
-	@RequestMapping(value = "/createPackager", method = RequestMethod.POST)
+	@RequestMapping(value = "/packagerInstances", method = RequestMethod.POST)
 	public PackagerInstanceDTO createPackager(@RequestBody PackagerRequest request)
 			throws DriverException, NotRespectedRulesException, MalformedXMLException, PackagerException,
 			NotFoundException, DataSourceException, RestTemplateException {
@@ -101,7 +101,7 @@ public class PackagerManagementController extends AbstractFacade {
 		return packagerInstanceService.convertToDTO(createdPackagerInstance);
 	}
 
-	@RequestMapping(value = "/getPackagerInstance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/packagerInstances", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public PackagerInstanceDTO getPackagerInstance(@QueryParam("retailerPackagerId") String retailerPackagerId)
 			throws DriverException, RestTemplateException, NotFoundException {
 		return packagerInstanceService
@@ -245,7 +245,7 @@ public class PackagerManagementController extends AbstractFacade {
 
 	}
 
-	@RequestMapping(value = "/getPackagerInstanceHeader", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/packagerInstanceHeaders", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public PackagerInstanceHeaderDTO getPackagerInstanceHeader(
 			@QueryParam("retailerPackagerId") String retailerPackagerId)
 			throws PackagerException, NotFoundException, DataSourceException {
@@ -256,7 +256,7 @@ public class PackagerManagementController extends AbstractFacade {
 
 	}
 
-	@RequestMapping(value = "/getPackagerProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/packagerProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<ProductPropertiesDTO> getPackagerProperties(@QueryParam("retailerPackagerId") String retailerPackagerId)
 			throws NotFoundException, PackagerException, DriverException, DataSourceException, RestTemplateException {
 		List<ProductPropertiesDTO> result = new ArrayList<ProductPropertiesDTO>();
@@ -272,7 +272,7 @@ public class PackagerManagementController extends AbstractFacade {
 		return result;
 	}
 
-	@RequestMapping(value = "/getPackagerModels", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/packagerModels", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<PackagerModelDTO> getPackagerModels() throws PackagerException, DataSourceException {
 		List<PackagerModel> packagerModels = new ArrayList<PackagerModel>();
 
@@ -288,7 +288,7 @@ public class PackagerManagementController extends AbstractFacade {
 
 	}
 
-	@RequestMapping(value = "/getPackagerModel", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/packagerModels", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public PackagerModelDTO getPackagerModel(@QueryParam("packagerModelKey") String packagerModelKey)
 			throws NotFoundException, PackagerException, DataSourceException {
 		PackagerModel packagerModel = packagerModelService.findByRetailerKey(packagerModelKey);

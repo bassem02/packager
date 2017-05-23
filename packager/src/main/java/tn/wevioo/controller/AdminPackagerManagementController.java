@@ -63,7 +63,7 @@ public class AdminPackagerManagementController extends AbstractFacade {
 	@Autowired
 	private WebServiceUserService webServiceUserService;
 
-	@RequestMapping(value = "/deletePackager", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/packagerInstances", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public String deletePackager(@RequestBody PackagerRequest request,
 			@QueryParam("ignoreProviderException") Boolean ignoreProviderException,
 			@QueryParam("ignoreUncanceledState") Boolean ignoreUncanceledState)

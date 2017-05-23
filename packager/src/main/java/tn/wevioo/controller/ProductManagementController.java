@@ -6,6 +6,7 @@ import javax.ws.rs.QueryParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -113,15 +114,15 @@ public class ProductManagementController {
 
 	}
 
-	@RequestMapping(value = "/getProductInstance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ProductInstanceDTO getProductInstance(@QueryParam("productId") Integer productId)
+	@RequestMapping(value = "/productInstances/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ProductInstanceDTO getProductInstance(@PathVariable("id") Integer productId)
 			throws PackagerException, DataSourceException, DriverException, RestTemplateException, NotFoundException {
 
 		return productInstanceService.convertToDTO(productInstanceService.findById(productId));
 	}
 
-	@RequestMapping(value = "/getUsageProductProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public String getUsageProductProperties(@QueryParam("productId") Integer productId)
+	@RequestMapping(value = "/usageProductProperties/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public String getUsageProductProperties(@PathVariable("id") Integer productId)
 			throws PackagerException, DriverException, NotFoundException, DataSourceException, RestTemplateException {
 
 		if (productId == null) {
@@ -133,8 +134,8 @@ public class ProductManagementController {
 		return productInstace.getUsageProperties(productModelProductDriverPortService);
 	}
 
-	@RequestMapping(value = "/getProductProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ProductPropertiesDTO getProductProperties(@QueryParam("productId") Long productId)
+	@RequestMapping(value = "/productProperties/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ProductPropertiesDTO getProductProperties(@PathVariable("id") Long productId)
 			throws NotFoundException, PackagerException, DriverException, DataSourceException, RestTemplateException {
 
 		if (productId == null) {
@@ -146,7 +147,7 @@ public class ProductManagementController {
 		return productInstanceService.convertToPropertiesDTO(productInstace);
 	}
 
-	@RequestMapping(value = "/getProductModelConfiguration", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/productModelConfigurations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ProductModelDTO getProductModelConfiguration(@QueryParam("packagerModelKey") String packagerModelKey,
 			@QueryParam("productModelKey") String productModelKey)
 			throws PackagerException, DataSourceException, NotFoundException {
@@ -167,7 +168,7 @@ public class ProductManagementController {
 				new Object[] { "product model", "key", productModelKey });
 	}
 
-	@RequestMapping(value = "/getProductModelConfigurationByPrefix", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/productModelConfigurations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ProductModelDTO getProductModelConfigurationByPrefix(@QueryParam("packagerModelKey") String packagerModelKey,
 			@QueryParam("productModelPrefix") String productModelPrefix)
 			throws PackagerException, DataSourceException, NotFoundException {

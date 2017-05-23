@@ -4,13 +4,12 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
 
-import javax.ws.rs.QueryParam;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -79,8 +78,8 @@ public class AsynchronousPackagerManagementController {
 	@Autowired
 	private TranslocateProductInstancesAsync translocateProductInstancesAsync;
 
-	@RequestMapping(value = "/findActionTicket", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ActionTicket findActionTicket(@QueryParam("actionId") String actionId)
+	@RequestMapping(value = "/actionTicket/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ActionTicket findActionTicket(@PathVariable("id") String actionId)
 			throws NotFoundException, PackagerException, DataSourceException {
 
 		if ((actionId == null) || (actionId.trim().length() == 0)) {
