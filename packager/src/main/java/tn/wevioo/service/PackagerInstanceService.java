@@ -49,4 +49,7 @@ public interface PackagerInstanceService {
 	public Map<Long, List<Long>> getPackagerInstanceIdsWithProductInstanceIds(List<String> retailerPackagerIds,
 			Integer searchFrequency) throws DataSourceException;
 
+	public void generateSqlScriptToDeletePackagers(List<PackagerRequest> requests, String workspace, String finalName)
+			throws PackagerException, DataSourceException, NotFoundException, NotRespectedRulesException;
+
 }

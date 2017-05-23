@@ -30,12 +30,11 @@ import tn.wevioo.exceptions.RestTemplateException;
 import tn.wevioo.model.AbstractFacade;
 import tn.wevioo.model.packager.action.PackagerInstanceAction;
 import tn.wevioo.model.request.DeletePackagersRequest;
-import tn.wevioo.model.request.GenerateSqlScriptToImportExistingPackagersRequest;
+import tn.wevioo.model.request.GenerateSqlScriptRequest;
 import tn.wevioo.model.request.ImportProductReferencesRequest;
 import tn.wevioo.model.request.PackagerRequest;
 import tn.wevioo.model.request.ProductRequest;
 import tn.wevioo.model.request.UpdatePackagerStatesRequest;
-import tn.wevioo.model.request.generateSqlScriptToImportProductReferencesRequest;
 import tn.wevioo.service.PackagerInstanceService;
 import tn.wevioo.service.ProductInstanceService;
 import tn.wevioo.service.ProductModelProductDriverPortService;
@@ -265,8 +264,7 @@ public class BackOfficePackagerManagementController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/generateSqlScriptToImportExistingPackagers", method = RequestMethod.POST)
-	public void generateSqlScriptToImportExistingPackagers(
-			@RequestBody GenerateSqlScriptToImportExistingPackagersRequest request)
+	public void generateSqlScriptToImportExistingPackagers(@RequestBody GenerateSqlScriptRequest request)
 			throws PackagerException, DataSourceException, NotFoundException, NotRespectedRulesException {
 
 		packagerInstanceService.setSearchFrequency(1);
@@ -275,11 +273,18 @@ public class BackOfficePackagerManagementController extends AbstractFacade {
 	}
 
 	@RequestMapping(value = "/generateSqlScriptToImportProductReferences", method = RequestMethod.POST)
-	public void generateSqlScriptToImportProductReferences(
-			@RequestBody generateSqlScriptToImportProductReferencesRequest request)
+	public void generateSqlScriptToImportProductReferences(@RequestBody GenerateSqlScriptRequest request)
 			throws PackagerException, NotFoundException, NotRespectedRulesException, DataSourceException {
 		packagerInstanceService.generateSqlScriptToImportProductReferences(request.getRequests(),
 				request.getWorkspace(), request.getFinalName());
+
+	}
+
+	@RequestMapping(value = "/generateSqlScriptToDeletePackagers", method = RequestMethod.POST)
+	public void generateSqlScriptToDeletePackagers(@RequestBody GenerateSqlScriptRequest request)
+			throws PackagerException, DataSourceException, NotFoundException, NotRespectedRulesException {
+		packagerInstanceService.generateSqlScriptToDeletePackagers(request.getRequests(), request.getWorkspace(),
+				request.getFinalName());
 
 	}
 

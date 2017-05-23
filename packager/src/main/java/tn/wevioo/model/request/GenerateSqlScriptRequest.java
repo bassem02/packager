@@ -2,7 +2,7 @@ package tn.wevioo.model.request;
 
 import java.util.List;
 
-public class GenerateSqlScriptToImportExistingPackagersRequest {
+public class GenerateSqlScriptRequest {
 	List<PackagerRequest> requests;
 
 	String workspace;

@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import nordnet.architecture.exceptions.explicit.DataSourceException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
@@ -22,10 +24,9 @@ import tn.wevioo.service.PackagerInstanceService;
  * The class DeletePackagersSqlExporter allows generating a SQL file deleting an
  * important set of packager instances. All related entities (product intances,
  * references, diagnostics, delivery demands...) are deleted too.
- * 
- * @author vberezan
- * @since 2.11.0
  */
+
+@Component
 public class DeletePackagersSqlExporter extends SqlExporter {
 
 	/**
@@ -87,7 +88,7 @@ public class DeletePackagersSqlExporter extends SqlExporter {
 	 * INEXISTENT value is used by default, to prevent executing the script
 	 * everywhere.
 	 */
-	public final static String USE_DB_DEFAULT = "use INEXISTENT;";
+	public final static String USE_DB_DEFAULT = "use nn_packager_management_recette;";
 
 	/**
 	 * Packager buffer writer.
@@ -132,6 +133,7 @@ public class DeletePackagersSqlExporter extends SqlExporter {
 	/**
 	 * Packager instance service.
 	 */
+	@Autowired
 	private PackagerInstanceService packagerInstanceService = null;
 
 	/**
@@ -164,6 +166,7 @@ public class DeletePackagersSqlExporter extends SqlExporter {
 			packagersBuffer = getTemporaryFile();
 		}
 
+		setSearchFrequency(1);
 		Map<Long, List<Long>> preparedIds = null;
 		try {
 			preparedIds = packagerInstanceService.getPackagerInstanceIdsWithProductInstanceIds(retailerPackagerIds,

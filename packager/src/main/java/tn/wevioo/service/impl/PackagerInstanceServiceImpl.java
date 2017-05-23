@@ -39,6 +39,7 @@ import tn.wevioo.entities.ProductInstanceReference;
 import tn.wevioo.entities.ProductModel;
 import tn.wevioo.exceptions.PackagerException;
 import tn.wevioo.exceptions.RestTemplateException;
+import tn.wevioo.exporter.sql.DeletePackagersSqlExporter;
 import tn.wevioo.exporter.sql.ImportExistingPackagerSqlExporter;
 import tn.wevioo.exporter.sql.ImportProductReferencesSqlExporter;
 import tn.wevioo.model.packager.action.PackagerInstanceAction;
@@ -92,6 +93,9 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 
 	@Autowired
 	ImportProductReferencesSqlExporter exporterProductReferences;
+
+	@Autowired
+	DeletePackagersSqlExporter exporterDeletePackagers;
 
 	protected Integer searchFrequency;
 
@@ -685,6 +689,67 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 		}
 
 		return result;
+	}
+
+	@Override
+	public void generateSqlScriptToDeletePackagers(List<PackagerRequest> requests, String workspace, String finalName)
+			throws PackagerException, DataSourceException, NotFoundException, NotRespectedRulesException {
+		if ((requests == null) || (requests.size() == 0)) {
+			throw new NullException(NullCases.NULL_EMPTY, "packager requests");
+		}
+		if (workspace == null || workspace.trim().length() == 0) {
+			throw new NullException(NullCases.NULL_EMPTY, "workspace");
+		}
+		if (finalName == null || finalName.trim().length() == 0) {
+			throw new NullException(NullCases.NULL_EMPTY, "finalName");
+		}
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Preparing requests to delete...");
+		}
+
+		List<String> retailerPackagerIds = this.prepareRequestsToDeletePackagers(requests);
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Starting SQL export...");
+		}
+
+		exporterDeletePackagers.setWorkspace(workspace);
+		exporterDeletePackagers.setFinalName(finalName);
+		exporterDeletePackagers.append(retailerPackagerIds);
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Requests imported.");
+			LOGGER.info("Closing files...");
+		}
+
+		exporterDeletePackagers.close();
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Files closed.");
+		}
+
+	}
+
+	private List<String> prepareRequestsToDeletePackagers(List<PackagerRequest> requests)
+			throws NotRespectedRulesException {
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Preparing requests to delete packagers...");
+		}
+
+		List<String> retailerPackagerIds = new ArrayList<String>();
+
+		for (PackagerRequest request : requests) {
+			request.validate(PackagerInstanceAction.DELETE);
+			retailerPackagerIds.add(request.getRetailerPackagerId());
+		}
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Requests prepared.");
+		}
+
+		return retailerPackagerIds;
 	}
 
 }

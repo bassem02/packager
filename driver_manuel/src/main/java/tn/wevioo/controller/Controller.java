@@ -42,7 +42,7 @@ public class Controller {
 	@Autowired
 	private ParametersService parametersService;
 
-	@RequestMapping(value = "/getProduct/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/products/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public Product getProduct(@PathVariable("id") long id) throws NotFoundException {
 
 		return productService.findById(id);
