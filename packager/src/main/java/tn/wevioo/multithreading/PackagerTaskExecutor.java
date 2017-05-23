@@ -8,9 +8,6 @@ import tn.wevioo.model.request.PackagerRequest;
 /**
  * The interface PackagerTaskExecutor defines all the methods required to
  * perform a task on a packager instance.
- * 
- * @author THUGUERRE
- * @since 2.0.0
  */
 public interface PackagerTaskExecutor extends TaskExecutor {
 

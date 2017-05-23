@@ -168,7 +168,7 @@ public class ProductManagementController {
 				new Object[] { "product model", "key", productModelKey });
 	}
 
-	@RequestMapping(value = "/productModelConfigurations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/productModelConfigurationsByPrefix", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ProductModelDTO getProductModelConfigurationByPrefix(@QueryParam("packagerModelKey") String packagerModelKey,
 			@QueryParam("productModelPrefix") String productModelPrefix)
 			throws PackagerException, DataSourceException, NotFoundException {

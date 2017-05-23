@@ -7,9 +7,6 @@ import tn.wevioo.entities.Retailer;
  * information related to a packager action. The data contained in this class
  * are not dependent from the packager they come from, which can be modified
  * after the action has been stored.
- * 
- * @author vberezan
- * @since 2.5.2
  */
 public class ActionPackagerHeader {
 

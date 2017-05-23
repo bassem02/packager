@@ -7,9 +7,6 @@ import tn.wevioo.entities.ProductActionHistory;
 /**
  * This class compares two {@link ProductActionHistory} objects by creation
  * date.
- * 
- * @author vberezan
- * @since 1.0.0
  */
 public class ProductActionHistoryCreationDateComparator implements Comparator<ProductActionHistory> {
 

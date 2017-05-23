@@ -12,9 +12,6 @@ import tn.wevioo.xml.PackagerXmlMerger;
  * The class {@link PackagerXmlMergerImpl} provides a specific implementation of
  * {@link PackagerXmlMerger}, dedicated to Packager Xml Management and based on
  * XmlMerge engine.
- * 
- * @author THUGUERRE
- * @since 2.0.0
  */
 public class PackagerXmlMergerImpl extends XmlMergeImpl implements PackagerXmlMerger {
 

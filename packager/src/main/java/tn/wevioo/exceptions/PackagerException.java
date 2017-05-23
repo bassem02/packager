@@ -9,18 +9,18 @@ import nordnet.architecture.exceptions.helper.ExceptionMessageHelper;
 import nordnet.architecture.exceptions.utils.ErrorCode;
 
 /**
- * The {@link PackagerException} exception should be thrown when a general exception occurs inside the Packager project.
+ * The {@link PackagerException} exception should be thrown when a general
+ * exception occurs inside the Packager project.
  * <p>
- * It has also been designed in order to manage the exceptions thrown during multithreaded actions. Consequently, it is
- * able to support several causes, instead of only once. The existing constructors taking only one cause have been kept
- * for convenience.
+ * It has also been designed in order to manage the exceptions thrown during
+ * multithreaded actions. Consequently, it is able to support several causes,
+ * instead of only once. The existing constructors taking only one cause have
+ * been kept for convenience.
  * <p>
- * The {@link PackagerException} is based on error codes for which correspond specific exception messages. These
- * messages have to be contained in a file located in the project classpath directories. Please refer to the
+ * The {@link PackagerException} is based on error codes for which correspond
+ * specific exception messages. These messages have to be contained in a file
+ * located in the project classpath directories. Please refer to the
  * {@link ExceptionMessageHelper} to be aware of this file loading conditions.
- * 
- * @author THUGUERRE
- * @since 2.0.0
  */
 public class PackagerException extends NNException {
 
@@ -30,15 +30,17 @@ public class PackagerException extends NNException {
 	private static final long serialVersionUID = -8556778449412780557L;
 
 	/**
-	 * This attribute contains all the causes which have caused the throwing of the current exception. In the a large
-	 * part of the different cases, only one cause will be contained in this list. However, for multithreaded actions,
-	 * this list could contain several causes.
+	 * This attribute contains all the causes which have caused the throwing of
+	 * the current exception. In the a large part of the different cases, only
+	 * one cause will be contained in this list. However, for multithreaded
+	 * actions, this list could contain several causes.
 	 */
 	private List<Throwable> causes = new ArrayList<Throwable>();
 
 	/**
-	 * The constructor {@link #PackagerException(ErrorCode)} instantiates a new {@link PackagerException}. It only calls
-	 * the corresponding parent constructor.
+	 * The constructor {@link #PackagerException(ErrorCode)} instantiates a new
+	 * {@link PackagerException}. It only calls the corresponding parent
+	 * constructor.
 	 * 
 	 * @param errorCode
 	 *            The error code to set to this exception.
@@ -50,8 +52,9 @@ public class PackagerException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #PackagerException(ErrorCode, Object[])} instantiates a new {@link PackagerException}. It
-	 * only calls the corresponding parent constructor.
+	 * The constructor {@link #PackagerException(ErrorCode, Object[])}
+	 * instantiates a new {@link PackagerException}. It only calls the
+	 * corresponding parent constructor.
 	 * 
 	 * @param errorCode
 	 *            The error code to set to this exception.
@@ -65,8 +68,9 @@ public class PackagerException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #PackagerException(ErrorCode, Throwable)} instantiates a new {@link PackagerException}. It
-	 * only calls the corresponding parent constructor.
+	 * The constructor {@link #PackagerException(ErrorCode, Throwable)}
+	 * instantiates a new {@link PackagerException}. It only calls the
+	 * corresponding parent constructor.
 	 * 
 	 * @param errorCode
 	 *            The error code to set to this exception.
@@ -84,8 +88,9 @@ public class PackagerException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #PackagerException(ErrorCode, List)} instantiates a new {@link PackagerException}. It only
-	 * calls the corresponding parent constructor, managing correctly the different received causes.
+	 * The constructor {@link #PackagerException(ErrorCode, List)} instantiates
+	 * a new {@link PackagerException}. It only calls the corresponding parent
+	 * constructor, managing correctly the different received causes.
 	 * 
 	 * @param errorCode
 	 *            The error code to set to this exception.
@@ -103,8 +108,10 @@ public class PackagerException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #PackagerException(ErrorCode, Object[], Throwable)} instantiates a new
-	 * {@link PackagerException}. It only calls the corresponding parent constructor.
+	 * The constructor
+	 * {@link #PackagerException(ErrorCode, Object[], Throwable)} instantiates a
+	 * new {@link PackagerException}. It only calls the corresponding parent
+	 * constructor.
 	 * 
 	 * @param errorCode
 	 *            The error code to set to this exception.
@@ -124,8 +131,9 @@ public class PackagerException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #PackagerException(ErrorCode, Object[], List)} instantiates a new
-	 * {@link PackagerException}. It only calls the corresponding parent constructor, managing correctly the different
+	 * The constructor {@link #PackagerException(ErrorCode, Object[], List)}
+	 * instantiates a new {@link PackagerException}. It only calls the
+	 * corresponding parent constructor, managing correctly the different
 	 * received causes.
 	 * 
 	 * @param errorCode
@@ -146,13 +154,15 @@ public class PackagerException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #PackagerException(ErrorCode, String)} instantiates a new {@link PackagerException}. It
-	 * only calls the corresponding parent constructor.
+	 * The constructor {@link #PackagerException(ErrorCode, String)}
+	 * instantiates a new {@link PackagerException}. It only calls the
+	 * corresponding parent constructor.
 	 * 
 	 * @param errorCode
 	 *            The error code to set to this exception.
 	 * @param message
-	 *            The message to set, despite of the one loaded thanks to the error code.
+	 *            The message to set, despite of the one loaded thanks to the
+	 *            error code.
 	 */
 	public PackagerException(ErrorCode errorCode, String message) {
 
@@ -161,13 +171,15 @@ public class PackagerException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #PackagerException(ErrorCode, String, Throwable)} instantiates a new
-	 * {@link PackagerException}. It only calls the corresponding parent constructor.
+	 * The constructor {@link #PackagerException(ErrorCode, String, Throwable)}
+	 * instantiates a new {@link PackagerException}. It only calls the
+	 * corresponding parent constructor.
 	 * 
 	 * @param errorCode
 	 *            The error code to set to this exception.
 	 * @param message
-	 *            The message to set, despite of the one loaded thanks to the error code.
+	 *            The message to set, despite of the one loaded thanks to the
+	 *            error code.
 	 * @param cause
 	 *            The cause which is the origin of this exception.
 	 */
@@ -182,8 +194,9 @@ public class PackagerException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #PackagerException(NNException)} instantiates a new {@link PackagerException}. It only
-	 * calls the corresponding parent constructor.
+	 * The constructor {@link #PackagerException(NNException)} instantiates a
+	 * new {@link PackagerException}. It only calls the corresponding parent
+	 * constructor.
 	 * 
 	 * @param cause
 	 *            The cause which is the origin of this exception.
@@ -199,8 +212,9 @@ public class PackagerException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #PackagerException(NNImplicitException)} instantiates a new {@link PackagerException}. It
-	 * only calls the corresponding parent constructor.
+	 * The constructor {@link #PackagerException(NNImplicitException)}
+	 * instantiates a new {@link PackagerException}. It only calls the
+	 * corresponding parent constructor.
 	 * 
 	 * @param cause
 	 *            The cause which is the origin of this exception.
@@ -216,14 +230,16 @@ public class PackagerException extends NNException {
 	}
 
 	/**
-	 * The method {@link #getCause()} returns the cause which is the origin of this current {@link PackagerException}.
-	 * As this class has been designed to manage multiple causes, the behavior of this method depends on the number of
-	 * initialized causes:
+	 * The method {@link #getCause()} returns the cause which is the origin of
+	 * this current {@link PackagerException}. As this class has been designed
+	 * to manage multiple causes, the behavior of this method depends on the
+	 * number of initialized causes:
 	 * <ul>
 	 * <li>no cause : the method returns null,</li>
 	 * <li>one cause : the method returns the cause itself,</li>
-	 * <li>several causes : the method returns a {@link Throwable} object, whose message results in the concatenation of
-	 * all the message of all the owned causes.
+	 * <li>several causes : the method returns a {@link Throwable} object, whose
+	 * message results in the concatenation of all the message of all the owned
+	 * causes.
 	 * </ul>
 	 * 
 	 * @return The throwable cause.

@@ -9,15 +9,14 @@ import nordnet.architecture.exceptions.helper.ExceptionMessageHelper;
 import nordnet.architecture.exceptions.utils.ErrorCode;
 
 /**
- * The {@link DeliveryException} exception should be thrown when an exception occurs while managing a delivery process,
- * as computing the delivery request or contacting the Web Service NetDelivery.
+ * The {@link DeliveryException} exception should be thrown when an exception
+ * occurs while managing a delivery process, as computing the delivery request
+ * or contacting the Web Service NetDelivery.
  * <p>
- * The {@link DeliveryException} is based on error codes for which correspond specific exception messages. These
- * messages have to be contained in a file located in the project classpath directories. Please refer to the
+ * The {@link DeliveryException} is based on error codes for which correspond
+ * specific exception messages. These messages have to be contained in a file
+ * located in the project classpath directories. Please refer to the
  * {@link ExceptionMessageHelper} to be aware of this file loading conditions.
- * 
- * @author THUGUERRE
- * @since 2.0.0
  */
 public class DeliveryException extends NNException {
 
@@ -27,15 +26,17 @@ public class DeliveryException extends NNException {
 	private static final long serialVersionUID = -8556778449412780557L;
 
 	/**
-	 * This attribute contains all the causes which have caused the throwing of the current exception. In the a large
-	 * part of the different cases, only one cause will be contained in this list. However, for multithreaded actions,
-	 * this list could contain several causes.
+	 * This attribute contains all the causes which have caused the throwing of
+	 * the current exception. In the a large part of the different cases, only
+	 * one cause will be contained in this list. However, for multithreaded
+	 * actions, this list could contain several causes.
 	 */
 	private List<Throwable> causes = new ArrayList<Throwable>();
 
 	/**
-	 * The constructor {@link #DeliveryException(ErrorCode)} instantiates a new {@link DeliveryException}. It only calls
-	 * the corresponding parent constructor.
+	 * The constructor {@link #DeliveryException(ErrorCode)} instantiates a new
+	 * {@link DeliveryException}. It only calls the corresponding parent
+	 * constructor.
 	 * 
 	 * @param errorCode
 	 *            The error code to set to this exception.
@@ -47,8 +48,9 @@ public class DeliveryException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #DeliveryException(ErrorCode, Object[])} instantiates a new {@link DeliveryException}. It
-	 * only calls the corresponding parent constructor.
+	 * The constructor {@link #DeliveryException(ErrorCode, Object[])}
+	 * instantiates a new {@link DeliveryException}. It only calls the
+	 * corresponding parent constructor.
 	 * 
 	 * @param errorCode
 	 *            The error code to set to this exception.
@@ -62,8 +64,9 @@ public class DeliveryException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #DeliveryException(ErrorCode, Throwable)} instantiates a new {@link DeliveryException}. It
-	 * only calls the corresponding parent constructor.
+	 * The constructor {@link #DeliveryException(ErrorCode, Throwable)}
+	 * instantiates a new {@link DeliveryException}. It only calls the
+	 * corresponding parent constructor.
 	 * 
 	 * @param errorCode
 	 *            The error code to set to this exception.
@@ -81,8 +84,9 @@ public class DeliveryException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #DeliveryException(ErrorCode, List)} instantiates a new {@link DeliveryException}. It only
-	 * calls the corresponding parent constructor, managing correctly the different received causes.
+	 * The constructor {@link #DeliveryException(ErrorCode, List)} instantiates
+	 * a new {@link DeliveryException}. It only calls the corresponding parent
+	 * constructor, managing correctly the different received causes.
 	 * 
 	 * @param errorCode
 	 *            The error code to set to this exception.
@@ -100,8 +104,10 @@ public class DeliveryException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #DeliveryException(ErrorCode, Object[], Throwable)} instantiates a new
-	 * {@link DeliveryException}. It only calls the corresponding parent constructor.
+	 * The constructor
+	 * {@link #DeliveryException(ErrorCode, Object[], Throwable)} instantiates a
+	 * new {@link DeliveryException}. It only calls the corresponding parent
+	 * constructor.
 	 * 
 	 * @param errorCode
 	 *            The error code to set to this exception.
@@ -121,8 +127,9 @@ public class DeliveryException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #DeliveryException(ErrorCode, Object[], List)} instantiates a new
-	 * {@link DeliveryException}. It only calls the corresponding parent constructor, managing correctly the different
+	 * The constructor {@link #DeliveryException(ErrorCode, Object[], List)}
+	 * instantiates a new {@link DeliveryException}. It only calls the
+	 * corresponding parent constructor, managing correctly the different
 	 * received causes.
 	 * 
 	 * @param errorCode
@@ -143,13 +150,15 @@ public class DeliveryException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #DeliveryException(ErrorCode, String)} instantiates a new {@link DeliveryException}. It
-	 * only calls the corresponding parent constructor.
+	 * The constructor {@link #DeliveryException(ErrorCode, String)}
+	 * instantiates a new {@link DeliveryException}. It only calls the
+	 * corresponding parent constructor.
 	 * 
 	 * @param errorCode
 	 *            The error code to set to this exception.
 	 * @param message
-	 *            The message to set, despite of the one loaded thanks to the error code.
+	 *            The message to set, despite of the one loaded thanks to the
+	 *            error code.
 	 */
 	public DeliveryException(ErrorCode errorCode, String message) {
 
@@ -158,13 +167,15 @@ public class DeliveryException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #DeliveryException(ErrorCode, String, Throwable)} instantiates a new
-	 * {@link DeliveryException}. It only calls the corresponding parent constructor.
+	 * The constructor {@link #DeliveryException(ErrorCode, String, Throwable)}
+	 * instantiates a new {@link DeliveryException}. It only calls the
+	 * corresponding parent constructor.
 	 * 
 	 * @param errorCode
 	 *            The error code to set to this exception.
 	 * @param message
-	 *            The message to set, despite of the one loaded thanks to the error code.
+	 *            The message to set, despite of the one loaded thanks to the
+	 *            error code.
 	 * @param cause
 	 *            The cause which is the origin of this exception.
 	 */
@@ -179,8 +190,9 @@ public class DeliveryException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #DeliveryException(NNException)} instantiates a new {@link DeliveryException}. It only
-	 * calls the corresponding parent constructor.
+	 * The constructor {@link #DeliveryException(NNException)} instantiates a
+	 * new {@link DeliveryException}. It only calls the corresponding parent
+	 * constructor.
 	 * 
 	 * @param cause
 	 *            The cause which is the origin of this exception.
@@ -196,8 +208,9 @@ public class DeliveryException extends NNException {
 	}
 
 	/**
-	 * The constructor {@link #DeliveryException(NNImplicitException)} instantiates a new {@link DeliveryException}. It
-	 * only calls the corresponding parent constructor.
+	 * The constructor {@link #DeliveryException(NNImplicitException)}
+	 * instantiates a new {@link DeliveryException}. It only calls the
+	 * corresponding parent constructor.
 	 * 
 	 * @param cause
 	 *            The cause which is the origin of this exception.
@@ -213,14 +226,16 @@ public class DeliveryException extends NNException {
 	}
 
 	/**
-	 * The method {@link #getCause()} returns the cause which is the origin of this current {@link DeliveryException}.
-	 * As this class has been designed to manage multiple causes, the behavior of this method depends on the number of
-	 * initialized causes:
+	 * The method {@link #getCause()} returns the cause which is the origin of
+	 * this current {@link DeliveryException}. As this class has been designed
+	 * to manage multiple causes, the behavior of this method depends on the
+	 * number of initialized causes:
 	 * <ul>
 	 * <li>no cause : the method returns null,</li>
 	 * <li>one cause : the method returns the cause itself,</li>
-	 * <li>several causes : the method returns a {@link Throwable} object, whose message results in the concatenation of
-	 * all the message of all the owned causes.
+	 * <li>several causes : the method returns a {@link Throwable} object, whose
+	 * message results in the concatenation of all the message of all the owned
+	 * causes.
 	 * </ul>
 	 * 
 	 * @return The throwable cause.

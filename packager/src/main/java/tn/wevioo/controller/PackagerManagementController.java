@@ -288,7 +288,7 @@ public class PackagerManagementController extends AbstractFacade {
 
 	}
 
-	@RequestMapping(value = "/packagerModels", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/packagerModel", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public PackagerModelDTO getPackagerModel(@QueryParam("packagerModelKey") String packagerModelKey)
 			throws NotFoundException, PackagerException, DataSourceException {
 		PackagerModel packagerModel = packagerModelService.findByRetailerKey(packagerModelKey);

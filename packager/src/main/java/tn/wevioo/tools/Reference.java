@@ -7,10 +7,6 @@ import nordnet.drivers.tools.ReferenceKeys;
 /**
  * The class Reference represents a couple key/value defining a reference for a
  * product.
- * 
- * @author bflorea
- * @since 3.0.0
- * 
  */
 public class Reference {
 

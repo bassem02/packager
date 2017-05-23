@@ -1,22 +1,20 @@
 package tn.wevioo.model.feasibility;
 
 /**
- * The class FeasibilityResult allows providing a result when verifying if an action is possible or not.
- * 
- * @author vberezan
- * @since 2.0.0
+ * The class FeasibilityResult allows providing a result when verifying if an
+ * action is possible or not.
  */
 public class FeasibilityResult {
 
 	/**
-	 * If the action, tested by the feasibility verification, is possible, this attribute must be set to true. False,
-	 * else.
+	 * If the action, tested by the feasibility verification, is possible, this
+	 * attribute must be set to true. False, else.
 	 */
 	private Boolean possible;
 
 	/**
-	 * The explanation why the action is not possible. If the action is possible, nothing guarantees this attribute is
-	 * not null.
+	 * The explanation why the action is not possible. If the action is
+	 * possible, nothing guarantees this attribute is not null.
 	 */
 	private String motive;
 

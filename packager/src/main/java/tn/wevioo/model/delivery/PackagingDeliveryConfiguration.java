@@ -3,21 +3,20 @@ package tn.wevioo.model.delivery;
 import tn.wevioo.model.packager.PackagingConfiguration;
 
 /**
- * The class PackagingDeliveryConfiguration models the configuration for deliveries on packagings : for each product
- * model a packager model packages, a delivery configuration can be set into the database.
+ * The class PackagingDeliveryConfiguration models the configuration for
+ * deliveries on packagings : for each product model a packager model packages,
+ * a delivery configuration can be set into the database.
  * <p>
- * For example, the packager model "Astra Prestige" proposes two products: a satellite Internet connection and a
- * firewall. Each of these two relations is modelized in the database by a Packaging Configuration. On the one regarding
- * the satellite Internet connection, we will set a satellite aerial and a modem, as delivery configuration. On the
- * other one regarding the firewall, we will set a CD installer. Each of these three references have to be delivered to
- * the final NordNet customer.
+ * For example, the packager model "Astra Prestige" proposes two products: a
+ * satellite Internet connection and a firewall. Each of these two relations is
+ * modelized in the database by a Packaging Configuration. On the one regarding
+ * the satellite Internet connection, we will set a satellite aerial and a
+ * modem, as delivery configuration. On the other one regarding the firewall, we
+ * will set a CD installer. Each of these three references have to be delivered
+ * to the final NordNet customer.
  * <p>
- * The class PackagingDeliveryConfiguration modelizes the relationship between the delivery reference and the packaging
- * configuration.
- * 
- * 
- * @author vberezan
- * @since 2.0.0
+ * The class PackagingDeliveryConfiguration modelizes the relationship between
+ * the delivery reference and the packaging configuration.
  */
 public class PackagingDeliveryConfiguration {
 

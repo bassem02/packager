@@ -1,15 +1,13 @@
 package tn.wevioo.model.delivery;
 
 /**
- * The class DeliveryReference models all the deliverable references, which are known by the NetDelivery system, and
- * which can be linked to certain products.
+ * The class DeliveryReference models all the deliverable references, which are
+ * known by the NetDelivery system, and which can be linked to certain products.
  * <p>
- * When adding a new delivery reference into the packager database, the administrator must ensure the regarded reference
- * is well known and spelled, as in the NetDeliverySystem.
+ * When adding a new delivery reference into the packager database, the
+ * administrator must ensure the regarded reference is well known and spelled,
+ * as in the NetDeliverySystem.
  * <p>
- * 
- * @author vberezan
- * @since 2.0.0
  */
 public class DeliveryReference {
 

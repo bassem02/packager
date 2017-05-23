@@ -16,13 +16,6 @@ spring:
     hibernate:
       naming:
         strategy: org.hibernate.cfg.ImprovedNamingStrategy
-authentication:
-  datasource:
-    url: jdbc:mysql://127.0.0.1:3306/test_authentification_manager?useSSL=false
-    username: root
-    password: 
-    driverClassName: com.mysql.jdbc.Driver
-    validation-query: select 1;
 server:
   port: 8092
   

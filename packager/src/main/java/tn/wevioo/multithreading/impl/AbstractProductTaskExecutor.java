@@ -38,11 +38,6 @@ import tn.wevioo.service.WebServiceUserService;
  * order to perform safely commit and rollback action. Consequently, this class
  * and all its inheriting children are not designed to perform operation on the
  * packager database. However, if required, some solutions exist.
- * 
- * @author THUGUERRE
- * @author vberezan
- * 
- * @since 2.0.0
  */
 
 @Component

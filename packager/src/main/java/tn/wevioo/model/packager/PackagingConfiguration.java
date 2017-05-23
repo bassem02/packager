@@ -2,23 +2,20 @@ package tn.wevioo.model.packager;
 
 import java.util.Set;
 
-import tn.wevioo.entities.*;
+import tn.wevioo.entities.PackagerModel;
+import tn.wevioo.entities.ProductModel;
 import tn.wevioo.model.delivery.PackagingDeliveryConfiguration;
 
 /**
- * The class PackagingConfiguration configures the relationship between a PackagerModel and a ProductModel. It defines
- * under which conditions (instance occurrence, shipping properties, ...) the product model can be packaged into the
- * packager model.
+ * The class PackagingConfiguration configures the relationship between a
+ * PackagerModel and a ProductModel. It defines under which conditions (instance
+ * occurrence, shipping properties, ...) the product model can be packaged into
+ * the packager model.
  * <p>
- * As a product model can be packaged into several packager models, several instances of this class can reference
- * several times the same product model.
+ * As a product model can be packaged into several packager models, several
+ * instances of this class can reference several times the same product model.
  * <p>
  * This class maps the table 'packager_model_product_model' into the database.
- * 
- * @author THUGUERRE
- * @author vberezan
- * 
- * @since 2.0.0
  */
 public class PackagingConfiguration {
 
@@ -28,14 +25,16 @@ public class PackagingConfiguration {
 	private Long id;
 
 	/**
-	 * This attribute defines the minimal number of product instance the regarded packager model must contain. Of
-	 * course, these product instances respect the specified product model.
+	 * This attribute defines the minimal number of product instance the
+	 * regarded packager model must contain. Of course, these product instances
+	 * respect the specified product model.
 	 */
 	private Integer minimumInstances;
 
 	/**
-	 * This attribute defines the maximal number of product instances the regarded packager model must contain. Of
-	 * course, these product instances respect the specified product model. If null, the number of instances is
+	 * This attribute defines the maximal number of product instances the
+	 * regarded packager model must contain. Of course, these product instances
+	 * respect the specified product model. If null, the number of instances is
 	 * unlimited.
 	 */
 	private Integer maximumInstances;
@@ -48,8 +47,8 @@ public class PackagingConfiguration {
 	/**
 	 * The product model which is packaged into the regarded packager model.
 	 */
-	
-	private tn.wevioo.entities.ProductModel  productModel;
+
+	private tn.wevioo.entities.ProductModel productModel;
 
 	/**
 	 * Delivery configuration.

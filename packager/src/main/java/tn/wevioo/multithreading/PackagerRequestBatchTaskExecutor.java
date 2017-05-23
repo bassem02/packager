@@ -5,10 +5,6 @@ import tn.wevioo.model.request.PackagerRequest;
 /**
  * The interface BatchTaskExecutor defines all the methods required to implement
  * an auto-executable task executor, dedicated to batch execution.
- * 
- * @author bflorea
- * @since 2.9.2
- * 
  */
 public interface PackagerRequestBatchTaskExecutor {
 

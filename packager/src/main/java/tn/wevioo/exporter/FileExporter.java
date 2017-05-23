@@ -15,10 +15,6 @@ import tn.wevioo.exceptions.PackagerException;
 /**
  * The class FileExporter provides all methods required to implement an exporter
  * providing result under a file format.
- * 
- * @author bflorea
- * @since 2.10.0
- * 
  */
 public abstract class FileExporter implements PackagerExporter {
 

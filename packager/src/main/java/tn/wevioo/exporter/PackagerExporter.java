@@ -6,10 +6,6 @@ import tn.wevioo.model.request.PackagerRequest;
 
 /**
  * PackagerExporter interface.
- * 
- * @author bflorea
- * @since 2.10.0
- * 
  */
 public interface PackagerExporter {
 

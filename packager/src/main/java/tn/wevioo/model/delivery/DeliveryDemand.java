@@ -20,9 +20,6 @@ import tn.wevioo.entities.ProductInstance;
  * NetDelivery. It is stored anyway into the database in order to keep in mind
  * this refusal. In this case, no product instance is linked to the current
  * delivery demand.
- * 
- * @author vberezan
- * @since 2.0.0
  */
 public class DeliveryDemand {
 

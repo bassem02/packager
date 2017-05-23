@@ -3,15 +3,14 @@ package tn.wevioo.model.delivery;
 import tn.wevioo.entities.PackagerModel;
 
 /**
- * The class PackagerDeliveryConfiguration models the configuration for deliveries on packager models : for each
- * packager model, additional delivery references can be added, without any relationship with the packaging
+ * The class PackagerDeliveryConfiguration models the configuration for
+ * deliveries on packager models : for each packager model, additional delivery
+ * references can be added, without any relationship with the packaging
  * configuration (contrary to the class PackagingDeliveryConfiguration).
  * <p>
- * For example, for each packager model in the "prestige" range, an USB key is offered. This does not depend on the
- * packaging configuration, but on the packager model itself.
- * 
- * @author vberezan
- * @since 2.0.0
+ * For example, for each packager model in the "prestige" range, an USB key is
+ * offered. This does not depend on the packaging configuration, but on the
+ * packager model itself.
  */
 public class PackagerDeliveryConfiguration {
 

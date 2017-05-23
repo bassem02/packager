@@ -7,10 +7,6 @@ import tn.wevioo.multithreading.TaskController;
 /**
  * The class BatchController provides a full implementation of a task
  * controller, specifically dedicated to batch execution.
- * 
- * @author bflorea
- * @since 2.9.2
- * 
  */
 
 @Component

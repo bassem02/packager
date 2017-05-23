@@ -8,9 +8,6 @@ import tn.wevioo.model.request.ProductRequest;
 /**
  * The interface ProductTaskExecutor defines all the methods required to perform
  * a task on a product instance.
- * 
- * @author THUGUERRE
- * @since 2.0.0
  */
 public interface ProductTaskExecutor extends TaskExecutor {
 

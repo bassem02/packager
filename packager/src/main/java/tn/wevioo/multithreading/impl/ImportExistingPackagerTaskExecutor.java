@@ -18,9 +18,6 @@ import tn.wevioo.service.WebServiceUserService;
  * The class ImportExistingPackagerTaskExecutor implements the packager request
  * batch task executor required to import an existing packager instance from a
  * packager request.
- * 
- * @author bflorea
- * @since 2.9.2
  */
 
 @Component

@@ -35,11 +35,6 @@ import tn.wevioo.multithreading.ProductTaskExecutor;
  * <p>
  * This implementation must NOT be configured as a singleton in Spring
  * configuration, but as prototype scope.
- * 
- * @author THUGUERRE
- * @author vberezan
- * 
- * @since 2.0.0
  */
 
 @Component

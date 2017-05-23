@@ -9,10 +9,6 @@ import tn.wevioo.model.request.PackagerRequest;
 /**
  * The class ActivatePackagerAsync implements the action which perform a
  * packager activation asynchronously.
- * 
- * @author mleahu
- * @author vberezan
- * @since 2.0.0
  */
 
 @Component

@@ -4,15 +4,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * The class {@link AdminLogger} has been designed in order to send easily report to Packager application's
- * administrators. All business processes which have to warn administrators about something wrong or anything else, can
- * use this class' methods, setting the right message to send.
+ * The class {@link AdminLogger} has been designed in order to send easily
+ * report to Packager application's administrators. All business processes which
+ * have to warn administrators about something wrong or anything else, can use
+ * this class' methods, setting the right message to send.
  * <p>
- * This class is supposed to be correctly configured by log4j in order to send reports to administrators by email, for
- * example.
- * 
- * @author THUGUERRE
- * @since 2.8.2
+ * This class is supposed to be correctly configured by log4j in order to send
+ * reports to administrators by email, for example.
  */
 public class AdminLogger {
 
@@ -22,7 +20,8 @@ public class AdminLogger {
 	private static final Log LOGGER = LogFactory.getLog(AdminLogger.class);
 
 	/**
-	 * The method {@link #error(String, Throwable)} allows logging a message to the administrator at an error level.
+	 * The method {@link #error(String, Throwable)} allows logging a message to
+	 * the administrator at an error level.
 	 * 
 	 * @param message
 	 *            Message to log.
@@ -35,7 +34,8 @@ public class AdminLogger {
 	}
 
 	/**
-	 * The method {@link #error(String, Throwable)} allows logging a message to the administrator at an error level.
+	 * The method {@link #error(String, Throwable)} allows logging a message to
+	 * the administrator at an error level.
 	 * 
 	 * @param message
 	 *            Message to log.
@@ -50,7 +50,8 @@ public class AdminLogger {
 	}
 
 	/**
-	 * The method {@link #fatal(String, Throwable)} allows logging a message to the administrator at an fatal level.
+	 * The method {@link #fatal(String, Throwable)} allows logging a message to
+	 * the administrator at an fatal level.
 	 * 
 	 * @param message
 	 *            Message to log.
@@ -63,7 +64,8 @@ public class AdminLogger {
 	}
 
 	/**
-	 * The method {@link #fatal(String, Throwable)} allows logging a message to the administrator at an fatal level.
+	 * The method {@link #fatal(String, Throwable)} allows logging a message to
+	 * the administrator at an fatal level.
 	 * 
 	 * @param message
 	 *            Message to log.
@@ -78,7 +80,8 @@ public class AdminLogger {
 	}
 
 	/**
-	 * The method {@link #info(String, Throwable)} allows logging a message to the administrator at an info level.
+	 * The method {@link #info(String, Throwable)} allows logging a message to
+	 * the administrator at an info level.
 	 * 
 	 * @param message
 	 *            Message to log.
@@ -91,7 +94,8 @@ public class AdminLogger {
 	}
 
 	/**
-	 * The method {@link #info(String, Throwable)} allows logging a message to the administrator at an info level.
+	 * The method {@link #info(String, Throwable)} allows logging a message to
+	 * the administrator at an info level.
 	 * 
 	 * @param message
 	 *            Message to log.
@@ -104,9 +108,10 @@ public class AdminLogger {
 			LOGGER.info(message, ex);
 		}
 	}
-	
+
 	/**
-	 * The method {@link #warn(String, Throwable)} allows logging a message to the administrator at an warn level.
+	 * The method {@link #warn(String, Throwable)} allows logging a message to
+	 * the administrator at an warn level.
 	 * 
 	 * @param message
 	 *            Message to log.
@@ -119,7 +124,8 @@ public class AdminLogger {
 	}
 
 	/**
-	 * The method {@link #warn(String, Throwable)} allows logging a message to the administrator at an warn level.
+	 * The method {@link #warn(String, Throwable)} allows logging a message to
+	 * the administrator at an warn level.
 	 * 
 	 * @param message
 	 *            Message to log.

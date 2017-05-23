@@ -25,9 +25,6 @@ import tn.wevioo.entities.PackagerInstance;
  * request is parsed from the database, recomposed into a whole DeliveryRequest
  * object and then used to re-compute the final delivery request which will be
  * asked to the NetDelivery system.
- * 
- * @author vberezan
- * @since 2.0.0
  */
 public class FailedDeliveryDemand {
 

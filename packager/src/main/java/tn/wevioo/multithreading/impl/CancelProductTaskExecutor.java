@@ -27,11 +27,6 @@ import tn.wevioo.service.ProductModelProductDriverPortService;
  * This class is fully designed to be multithreaded in an upper task executor.
  * It must NOT be defined as a singleton in the Spring configuration, but as
  * scope prototype.
- * 
- * @author THUGUERRE
- * @author vberezan
- * 
- * @since 2.0.0
  */
 
 @Component

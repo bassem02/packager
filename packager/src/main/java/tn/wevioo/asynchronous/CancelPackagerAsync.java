@@ -9,10 +9,6 @@ import tn.wevioo.model.request.PackagerRequest;
 /**
  * The class CancelPackagerAsync implements the action which perform a packager
  * cancelation asynchronously.
- * 
- * @author mleahu
- * @author vberezan
- * @since 2.0.0
  */
 
 @Component

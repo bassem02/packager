@@ -9,10 +9,6 @@ import tn.wevioo.model.request.ProductRequest;
 /**
  * The class CancelProductAsync implements the action which perform a product
  * cancelation asynchronously.
- * 
- * @author mleahu
- * @author vberezan
- * @since 2.0.0
  */
 
 @Component

@@ -8,9 +8,6 @@ import tn.wevioo.exceptions.PackagerException;
  * The interface TaskExecutor defines all the methods required to execute a
  * certain task, whatever its final implementation or aim. It has been designed
  * in order to provide a base for multithreading actions.
- * 
- * @author THUGUERRE
- * @since 2.0.0
  */
 public interface TaskExecutor {
 

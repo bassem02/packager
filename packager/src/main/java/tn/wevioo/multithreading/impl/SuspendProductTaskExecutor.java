@@ -26,11 +26,6 @@ import tn.wevioo.service.ProductModelProductDriverPortService;
  * <p>
  * It must NOT be defined as a singleton in the Spring configuration, but as
  * scope prototype.
- * 
- * @author THUGUERRE
- * @author vberezan
- * 
- * @since 2.0.0
  */
 
 @Component

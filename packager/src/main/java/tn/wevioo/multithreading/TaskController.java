@@ -1,18 +1,14 @@
 package tn.wevioo.multithreading;
 
 /**
- * The interface TaskController defines all the methods required to control a set of tasks which are performed in a
- * multithreaded way.
- * 
- * @author bflorea
- * @since 2.9.2
- * 
+ * The interface TaskController defines all the methods required to control a
+ * set of tasks which are performed in a multithreaded way.
  */
 public interface TaskController {
 
 	/**
-	 * The method startNewTask allows warning the controller that a new task is starting and should be waited for before
-	 * continuing the execution.
+	 * The method startNewTask allows warning the controller that a new task is
+	 * starting and should be waited for before continuing the execution.
 	 */
 	public void startNewTask();
 
@@ -22,16 +18,19 @@ public interface TaskController {
 	public void endNewTask();
 
 	/**
-	 * The method areTaskFinished returns true if all tasks which have started have now ended. False else.
+	 * The method areTaskFinished returns true if all tasks which have started
+	 * have now ended. False else.
 	 * 
 	 * @return true if all tasks which have started have now ended. False else.
 	 */
 	public boolean areTaskFinished();
 
 	/**
-	 * The method getNbrTasksToEnd returns the number of task which are currently running and are not finished yet.
+	 * The method getNbrTasksToEnd returns the number of task which are
+	 * currently running and are not finished yet.
 	 * 
-	 * @return returns the number of task which are currently running and are not finished yet.
+	 * @return returns the number of task which are currently running and are
+	 *         not finished yet.
 	 */
 	public Integer getNbrTasksToEnd();
 
