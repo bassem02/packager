@@ -242,6 +242,7 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 		pi.setPackagerModel(packagerModel);
 		pi.setRetailer(webServiceUserService.getWebserviceUser().getRetailer());
 		pi.setCreationDate(new Date());
+		pi.setLastUpdate(new Date());
 
 		actionHistory.addDestination(pi);
 
@@ -252,6 +253,7 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 			pri.setProviderProductId(pr.getProviderProductId());
 			pri.setProductModel(productModel);
 			pri.setCreationDate(new Date());
+			pri.setLastUpdate(new Date());
 
 			actionHistory.addProductAction(new ProductActionHistory(ProductInstanceAction.IMPORT, null, pri,
 					pr.getProperties(), webServiceUserService, productInstanceService));
@@ -369,7 +371,6 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 
 				List<ProductInstance> productInstances = productInstanceService
 						.findByProviderProductIds(providerProductIds.subList(fromIndex, toIndex), productModel);
-				System.out.println("productInstances " + providerProductIds.subList(fromIndex, toIndex).get(0));
 				if (productInstances != null && productInstances.size() > 0) {
 					throw new NotRespectedRulesException(new ErrorCode("0.2.1.1.9"),
 							new Object[] { productInstances.get(0).getProviderProductId() });
@@ -453,7 +454,6 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 
 		exporterPackager.setWorkspace(workspace);
 		exporterPackager.setFinalName(finalName);
-		System.out.println("zz " + packagerInstanceDao.getMaxIdPackagerInstance());
 		exporterPackager.setIdPackagerInstance(packagerInstanceDao.getMaxIdPackagerInstance());
 		exporterPackager.setIdPackagerActionHistory(packagerActionHistoryService.getMaxIdPackagerActionHistory());
 		exporterPackager.setIdProductInstance(productInstanceService.getMaxIdProductInstance());

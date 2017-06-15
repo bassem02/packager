@@ -3,10 +3,8 @@ package tn.wevioo.dto.request;
 import java.util.List;
 
 /**
- * The class FProductRequest allows providing action requests on a product instance.
- * 
- * @author THUGUERRE
- * @since 2.0.0
+ * The class FProductRequest allows providing action requests on a product
+ * instance.
  */
 public class ProductRequestDTO {
 
@@ -16,7 +14,8 @@ public class ProductRequestDTO {
 	private Long productId;
 
 	/**
-	 * The product model key to which the current product instance must be after the action has been performed.
+	 * The product model key to which the current product instance must be after
+	 * the action has been performed.
 	 */
 	private String model;
 

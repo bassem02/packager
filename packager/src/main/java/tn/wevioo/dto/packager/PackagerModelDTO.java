@@ -8,9 +8,6 @@ import tn.wevioo.dto.product.ProductModelDTO;
 /**
  * The class FPackagerModel allows retrieving the information about an existent
  * packager model.
- * 
- * @author vberezan
- * @since 2.0.0
  */
 public class PackagerModelDTO {
 

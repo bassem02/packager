@@ -1,16 +1,16 @@
 package tn.wevioo.dto.packager.action;
 
 /**
- * The enumeration PackagerInstanceAction defines all the possible business actions which can be performed over a
- * packager instance. Some other technical actions (such as clearCache, or updateReferences) are possible, but are not
+ * The enumeration PackagerInstanceAction defines all the possible business
+ * actions which can be performed over a packager instance. Some other technical
+ * actions (such as clearCache, or updateReferences) are possible, but are not
  * represented in this enumeration.
  * <p/>
- * For the moment the possible actions are: - CREATE, - ACTIVATE, - SUSPEND, - REACTIVATE, - RESET, - CANCEL, - DELETE,
- * - CHANGE_PROPERTIES, - SPLIT, - SPLIT_SOURCE, - SPLIT_DESTINATION, - MERGE, - MERGE_SOURCE, - MERGE_DESTINATION, -
- * TRANSFORM, - TRANSLOCATE_PRODUCT, - IMPORT, - IMPORT_REFERENCES.
- * 
- * @author bflorea
- * @since 2.6.2
+ * For the moment the possible actions are: - CREATE, - ACTIVATE, - SUSPEND, -
+ * REACTIVATE, - RESET, - CANCEL, - DELETE, - CHANGE_PROPERTIES, - SPLIT, -
+ * SPLIT_SOURCE, - SPLIT_DESTINATION, - MERGE, - MERGE_SOURCE, -
+ * MERGE_DESTINATION, - TRANSFORM, - TRANSLOCATE_PRODUCT, - IMPORT, -
+ * IMPORT_REFERENCES.
  */
 public enum PackagerInstanceActionDTO {
 

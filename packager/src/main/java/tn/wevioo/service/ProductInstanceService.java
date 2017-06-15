@@ -33,4 +33,7 @@ public interface ProductInstanceService {
 
 	public long getMaxIdProductInstance();
 
+	public ProductPropertiesDTO convertToProductPropertiesDTO(ProductInstance productInstance)
+			throws DriverException, NotFoundException, RestTemplateException;
+
 }

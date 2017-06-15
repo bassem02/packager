@@ -1,10 +1,8 @@
 package tn.wevioo.dto.request;
 
 /**
- * The class FProductReferenceRequest represents the Facade Object for an ProductReference request.
- * 
- * @author vberezan
- * @since 2.6.2
+ * The class FProductReferenceRequest represents the Facade Object for an
+ * ProductReference request.
  */
 public class ProductReferenceRequestDTO {
 

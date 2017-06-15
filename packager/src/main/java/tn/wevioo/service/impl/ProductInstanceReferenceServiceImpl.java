@@ -16,8 +16,6 @@ public class ProductInstanceReferenceServiceImpl implements ProductInstanceRefer
 		productInstanceReferenceDTO.setCreationDate(productInstanceReference.getCreationDate());
 		productInstanceReferenceDTO.setReferenceType(productInstanceReference.getDiscriminatorType());
 		productInstanceReferenceDTO.setReferenceValue(productInstanceReference.getDiscriminatorValue());
-		// BeanUtils.copyProperties(productInstanceReference,
-		// productInstanceReferenceDTO);
 		return productInstanceReferenceDTO;
 	}
 

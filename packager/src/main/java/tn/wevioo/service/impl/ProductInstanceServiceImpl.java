@@ -160,4 +160,30 @@ public class ProductInstanceServiceImpl implements ProductInstanceService {
 		return productInstanceDAO.getMaxIdProductInstance();
 	}
 
+	@Override
+	public ProductPropertiesDTO convertToProductPropertiesDTO(ProductInstance productInstance)
+			throws DriverException, NotFoundException, RestTemplateException {
+		ProductPropertiesDTO productPropertiesDTO = new ProductPropertiesDTO();
+		productPropertiesDTO.setProductId(productInstance.getIdProductInstance().longValue());
+		productPropertiesDTO.setProductModel(productInstance.getProductModel().getRetailerKey());
+		productPropertiesDTO.setProviderProductId(productInstance.getProviderProductId());
+		productPropertiesDTO.setCurrentState(productInstance.getCurrentState(productModelProductDriverPortService));
+
+		List<ProductInstanceReferenceDTO> productInstanceReferenceDTOs = new ArrayList<ProductInstanceReferenceDTO>();
+		for (ProductInstanceReference productInstanceReference : productInstance.getProductInstanceReferences()) {
+			productInstanceReferenceDTOs.add(productInstanceReferenceService.convertToDTO(productInstanceReference));
+		}
+		productPropertiesDTO.setReferences(productInstanceReferenceDTOs);
+
+		List<ProductInstanceDiagnosticDTO> productInstanceDiagnosticDTOs = new ArrayList<ProductInstanceDiagnosticDTO>();
+		for (ProductInstanceDiagnostic productInstanceDiagnostic : productInstance.getProductInstanceDiagnostics()) {
+			productInstanceDiagnosticDTOs.add(productInstanceDiagnosticService.convertToDTO(productInstanceDiagnostic));
+		}
+		productPropertiesDTO.setDiagnostics(productInstanceDiagnosticDTOs);
+		productPropertiesDTO.setProperties(productInstance.getProductProperties(productModelProductDriverPortService));
+
+		return productPropertiesDTO;
+
+	}
+
 }

@@ -2034,4 +2034,77 @@ public class PackagerInstance implements java.io.Serializable {
 		return request;
 	}
 
+	public static FeasibilityResult isMergePossible(PackagerRequest source1, PackagerRequest source2,
+			PackagerTransformationRequest destination, PackagerInstanceService packagerInstanceService,
+			ProductModelProductDriverPortService productModelProductDriverPortService,
+			PackagerModelService packagerModelService, ProductModelService productModelService,
+			ManualDriverFactory manualDriverFactory, ProductInstanceService productInstanceService)
+			throws PackagerException, DriverException, DataSourceException, NotFoundException, MalformedXMLException,
+			NotRespectedRulesException, RestTemplateException, SAXException, IOException, ParserConfigurationException,
+			TransformerException {
+
+		if (source1 == null) {
+			throw new NullException(NullCases.NULL, "source1 parameter");
+		}
+		if (source1.getRetailerPackagerId() == null || source1.getRetailerPackagerId().trim().length() == 0) {
+			throw new NullException(NullCases.NULL_EMPTY, "source1 packager id parameter");
+		}
+
+		if (source2 == null) {
+			throw new NullException(NullCases.NULL, "source2 parameter");
+		}
+		if (source2.getRetailerPackagerId() == null || source2.getRetailerPackagerId().trim().length() == 0) {
+			throw new NullException(NullCases.NULL_EMPTY, "source2 packager id parameter");
+		}
+
+		if (destination == null) {
+			throw new NullException(NullCases.NULL, "destination parameter");
+		}
+
+		if (destination.getDestinationRetailerPackagerId() == null
+				|| destination.getDestinationRetailerPackagerId().trim().length() == 0) {
+			throw new NullException(NullCases.NULL_EMPTY, "destination retailer packager id parameter");
+		}
+
+		if (!packagerInstanceService.isRetailerPackagerIdFree(destination.getDestinationRetailerPackagerId())) {
+			NotRespectedRulesException ex = new NotRespectedRulesException(new ErrorCode("0.2.1.1.9"),
+					new Object[] { destination.getDestinationRetailerPackagerId() });
+			return new FeasibilityResult(false, ex.getMessage());
+		}
+
+		try {
+			PackagerInstance sourcePackager1 = packagerInstanceService
+					.findByRetailerPackagerId(source1.getRetailerPackagerId());
+			PackagerInstance sourcePackager2 = packagerInstanceService
+					.findByRetailerPackagerId(source2.getRetailerPackagerId());
+			source1 = sourcePackager1.prepareRequestToMergeSource(source1, destination,
+					productModelProductDriverPortService);
+			source2 = sourcePackager2.prepareRequestToMergeSource(source2, destination,
+					productModelProductDriverPortService);
+			destination = PackagerInstance.prepareRequestToMergeDestination(source1, source2, destination,
+					packagerInstanceService, packagerModelService, productModelProductDriverPortService,
+					productModelService, manualDriverFactory);
+		} catch (NotFoundException e) {
+			return new FeasibilityResult(false, e.getMessage());
+		} catch (MalformedXMLException e) {
+			return new FeasibilityResult(false, e.getMessage());
+		} catch (NotRespectedRulesException e) {
+			return new FeasibilityResult(false, e.getMessage());
+		}
+
+		for (ProductRequest pr : destination.getChangeProductRequests()) {
+			ProductInstance pi = productInstanceService.findById(pr.getProductId().intValue());
+			if (pr.getProperties() != null) {
+				FeasibilityResult result = pi.isPropertiesChangePossible(pr.getProperties(),
+						productModelProductDriverPortService);
+				if (!result.getPossible()) {
+					return result;
+				}
+			}
+		}
+
+		return new FeasibilityResult(true, null);
+
+	}
+
 }

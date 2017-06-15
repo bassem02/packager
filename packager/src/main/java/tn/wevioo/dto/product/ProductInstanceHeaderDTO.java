@@ -4,18 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The class FProductInstanceHeader allows providing information to the Packager's users about a product instance. This
- * class has been designed in order to be returned quickly by the facade. Consequently, the inner information could have
- * been cached or computed since a long time, and nothing guarantees there is no desynchronization with the provider
- * system. However, the whole system has been designed to minimize this risk.
- * 
- * @author THUGUERRE
- * @since 2.0.0
+ * The class FProductInstanceHeader allows providing information to the
+ * Packager's users about a product instance. This class has been designed in
+ * order to be returned quickly by the facade. Consequently, the inner
+ * information could have been cached or computed since a long time, and nothing
+ * guarantees there is no desynchronization with the provider system. However,
+ * the whole system has been designed to minimize this risk.
  */
 public class ProductInstanceHeaderDTO {
 
 	/**
-	 * The product instance identifier under which the current product instance is known into the packager system.
+	 * The product instance identifier under which the current product instance
+	 * is known into the packager system.
 	 */
 	private Long productId;
 
@@ -25,8 +25,8 @@ public class ProductInstanceHeaderDTO {
 	private String productModel;
 
 	/**
-	 * The identifier under which the current product instance is known into the provider system. This information
-	 * should not be used into process system.
+	 * The identifier under which the current product instance is known into the
+	 * provider system. This information should not be used into process system.
 	 */
 	private String providerProductId;
 

@@ -32,8 +32,6 @@ public class PackagerConfig {
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
 			org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder builder,
 			@Qualifier("datasource") DataSource dataSource) {
-		// return
-		// builder.dataSource(dataSource).packages("tn.wevioo.entities").persistenceUnit("").build();
 		return builder.dataSource(dataSource).packages("tn.wevioo.entities").build();
 	}
 

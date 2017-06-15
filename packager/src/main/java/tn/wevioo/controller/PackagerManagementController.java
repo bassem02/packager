@@ -20,7 +20,6 @@ import nordnet.architecture.exceptions.explicit.DataSourceException;
 import nordnet.architecture.exceptions.explicit.MalformedXMLException;
 import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
-import nordnet.architecture.exceptions.explicit.ResourceAccessException;
 import nordnet.architecture.exceptions.implicit.NullException;
 import nordnet.architecture.exceptions.implicit.NullException.NullCases;
 import nordnet.drivers.contract.exceptions.DriverException;
@@ -52,7 +51,6 @@ import tn.wevioo.service.ProductInstanceService;
 import tn.wevioo.service.ProductModelProductDriverPortService;
 import tn.wevioo.service.ProductModelService;
 import tn.wevioo.service.WebServiceUserService;
-import tn.wevioo.xml.impl.PackagerXmlMergerImpl;
 
 @RestController
 public class PackagerManagementController extends AbstractFacade {
@@ -265,7 +263,7 @@ public class PackagerManagementController extends AbstractFacade {
 
 		for (ProductInstance pi : packagerInstance.getProducts()) {
 			ProductPropertiesDTO productPropertiesDTO = new ProductPropertiesDTO();
-			productPropertiesDTO.setProperties(pi.getProductProperties(productModelProductDriverPortService));
+			productPropertiesDTO = productInstanceService.convertToProductPropertiesDTO(pi);
 			result.add(productPropertiesDTO);
 		}
 
@@ -483,63 +481,23 @@ public class PackagerManagementController extends AbstractFacade {
 		return packagerInstanceService.convertToDTO(packagerInstance);
 	}
 
-	@RequestMapping(value = "/testMerge", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public String testMerge() throws MalformedXMLException, NotRespectedRulesException, ParserConfigurationException,
-			SAXException, IOException, TransformerException, NotFoundException, ResourceAccessException {
+	@RequestMapping(value = "/isMergePackagerPossible", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public FeasibilityResult isMergePackagerPossible(@RequestBody MergePackagersRequest request)
+			throws PackagerException, DriverException, DataSourceException, NotFoundException, MalformedXMLException,
+			NotRespectedRulesException, RestTemplateException, SAXException, IOException, ParserConfigurationException,
+			TransformerException {
+		FeasibilityResult fResult = new FeasibilityResult();
 
-		PackagerXmlMergerImpl packagerXmlMergerImpl = new PackagerXmlMergerImpl();
-
-		String xml2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><manual:productProperties xmlns:gtypes=\"http://www.nordnet.com/generic/types\"\nxmlns:manual=\"http://www.nordnet.com/manualDriver\"\nxmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\nxsi:schemaLocation=\"http://www.nordnet.com/manualDriver nordnet-manual-driver.xsd\"><manual:hexacle>1432</manual:hexacle><manual:idClient>idclient</manual:idClient><manual:typeProduct>test</manual:typeProduct><manual:infoCompl>compl</manual:infoCompl></manual:productProperties>";
-		String xml1 = "<manual:productProperties xmlns:manual=\"http://www.nordnet.com/manualDriver\"><manual:typeProduct>Wimax axione</manual:typeProduct></manual:productProperties>";
-
-		// return XmlMerger.merge(xml2, xml1);
-
-		return packagerXmlMergerImpl.merge(xml2, xml1);
+		try {
+			FeasibilityResult result = PackagerInstance.isMergePossible(request.getSource1(), request.getSource2(),
+					request.getDestination(), packagerInstanceService, productModelProductDriverPortService,
+					packagerModelService, productModelService, manualDriverFactory, productInstanceService);
+			return result;
+		} catch (NullException e) {
+			fResult.setMotive(e.getMessage());
+			fResult.setPossible(false);
+			return fResult;
+		}
 	}
-
-	// @RequestMapping(value = "/createNewDeliveryDemand", method =
-	// RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	// public void createNewDeliveryDemand(@RequestBody PackagerRequest request)
-	// throws NotRespectedRulesException,
-	// PackagerException, DeliveryException, NotFoundException,
-	// DataSourceException, DriverException {
-	//
-	// if (request == null) {
-	// throw new NullException(NullCases.NULL, "request parameter");
-	// }
-	//
-	// if (request.getDeliveryRequest() == null) {
-	// throw new NullException(NullCases.NULL, "request.deliveryRequest
-	// parameter");
-	// }
-	//
-	// if (!request.getDeliveryRequest().isSendDelivery()) {
-	// throw new DeliveryException(new ErrorCode("1.2.2.26"));
-	// }
-	//
-	// PackagerInstance packagerInstance = packagerInstanceService
-	// .findByRetailerPackagerId(request.getRetailerPackagerId());
-	// PackagerActionHistory packagerHistory = new
-	// PackagerActionHistory(PackagerInstanceAction.NEW_DELIVERY_DEMAND,
-	// webServiceUserService);
-	//
-	// try {
-	// packagerInstance.createAndSendDeliveryDemand(request.getDeliveryRequest(),
-	// false, packagerHistory);
-	// } catch (ConverterException e) {
-	// Throwable originalEx = super.findOriginalException(e);
-	// if (originalEx instanceof NNException) {
-	// throw new PackagerException((NNException) originalEx);
-	// } else if (originalEx instanceof NNImplicitException) {
-	// throw new PackagerException((NNImplicitException) originalEx);
-	// }
-	//
-	// throw new PackagerException(e);
-	// }
-	//
-	// packagerInstanceService.saveOrUpdate(packagerInstance);
-	// packagerActionHistoryService.saveOrUpdate(packagerHistory);
-	//
-	// }
 
 }

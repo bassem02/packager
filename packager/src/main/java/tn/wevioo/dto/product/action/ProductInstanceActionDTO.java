@@ -1,12 +1,10 @@
 package tn.wevioo.dto.product.action;
 
 /**
- * The enumeration ProductInstanceAction defines all the possible business actions which can be performed on a product
- * instance. Some other technical actions (such as clearCache, or updateReferences) are possible, but are not
+ * The enumeration ProductInstanceAction defines all the possible business
+ * actions which can be performed on a product instance. Some other technical
+ * actions (such as clearCache, or updateReferences) are possible, but are not
  * represented in this enumeration.
- * 
- * @author bflorea
- * @since 2.6.2
  */
 public enum ProductInstanceActionDTO {
 

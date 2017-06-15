@@ -10,9 +10,6 @@ import tn.wevioo.dto.product.ProductInstanceDTO;
  * The class FPackagerInstance allows providing information to the Packager's
  * users about a full packager instance. All the provided information is
  * guaranteed to have been retrieved instantly.
- * 
- * @author THUGUERRE
- * @since 2.0.0
  */
 public class PackagerInstanceDTO {
 

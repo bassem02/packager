@@ -7,9 +7,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 /**
  * The class FProductInstanceReference represents the Facade Object for an
  * Instance reference.
- * 
- * @author vberezan
- * @since 2.0.0
  */
 public class ProductInstanceReferenceDTO {
 

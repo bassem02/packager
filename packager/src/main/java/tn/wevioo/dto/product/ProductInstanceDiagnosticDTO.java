@@ -10,9 +10,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * guaranteed to be up to date. However, nothing guarantees the database is up
  * to date regarding the true provider system.
  * 
- * @author bflorea
- * @since 2.9.0
- * 
  */
 public class ProductInstanceDiagnosticDTO {
 

@@ -7,11 +7,9 @@ import java.util.List;
 import nordnet.drivers.contract.types.State;
 
 /**
- * The class FProductInstance allows providing information to the Packager's users about a product instance. All the
- * provided information is guaranteed to have been retrieved instantly.
- * 
- * @author THUGUERRE
- * @since 2.0.0
+ * The class FProductInstance allows providing information to the Packager's
+ * users about a product instance. All the provided information is guaranteed to
+ * have been retrieved instantly.
  */
 public class ProductInstanceDTO implements Serializable {
 
@@ -21,13 +19,14 @@ public class ProductInstanceDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * The product instance identifier under which the current product instance is known into the packager system.
+	 * The product instance identifier under which the current product instance
+	 * is known into the packager system.
 	 */
 	private Long productId;
 
 	/**
-	 * The identifier under which the current product instance is known into the provider system. This information
-	 * should not be used into process system.
+	 * The identifier under which the current product instance is known into the
+	 * provider system. This information should not be used into process system.
 	 */
 	private String providerProductId;
 
@@ -42,8 +41,9 @@ public class ProductInstanceDTO implements Serializable {
 	private String productModel;
 
 	/**
-	 * The product instance's customer identifiers. These identifiers allows the user to connect to its product (if
-	 * required). They could be a license key, a login and passwords...
+	 * The product instance's customer identifiers. These identifiers allows the
+	 * user to connect to its product (if required). They could be a license
+	 * key, a login and passwords...
 	 */
 	private String customerProductIdentifiers;
 

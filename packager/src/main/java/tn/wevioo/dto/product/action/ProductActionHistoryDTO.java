@@ -12,9 +12,6 @@ import tn.wevioo.dto.product.ProductInstanceDTO;
  * kept as long as possible in the database, even if the corresponding target
  * products are deleted. This class maps the database table
  * 'product_action_history'.
- * 
- * @author vberezan
- * @since 2.5.2
  */
 public class ProductActionHistoryDTO {
 

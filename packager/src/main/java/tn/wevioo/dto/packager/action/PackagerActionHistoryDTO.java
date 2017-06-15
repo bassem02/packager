@@ -14,9 +14,6 @@ import tn.wevioo.dto.product.action.ProductActionHistoryDTO;
  * be kept as long as possible in the database, even if the corresponding target
  * packagers are deleted. This class maps the database table
  * 'packager_action_history'.
- * 
- * @author bflorea
- * @since 2.6.2
  */
 public class PackagerActionHistoryDTO {
 

@@ -15,9 +15,6 @@ import tn.wevioo.dto.product.ProductInstanceHeaderDTO;
  * information could have been cached or computed since a long time, and nothing
  * guarantees there is no desynchronization with the provider system. However,
  * the whole system has been designed to minimize this risk.
- * 
- * @author THUGUERRE
- * @since 2.0.0
  */
 public class PackagerInstanceHeaderDTO {
 

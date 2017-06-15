@@ -6,8 +6,6 @@ package tn.wevioo.dto.product;
  * been retrieved quasi-instantly. However, a possible delta is possible,
  * regarding the cache system.
  * 
- * @author vberezan
- * @since 2.0.0
  */
 public class ProductPropertiesDTO extends ProductInstanceDTO {
 
