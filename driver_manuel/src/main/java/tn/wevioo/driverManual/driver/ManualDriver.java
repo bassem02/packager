@@ -1,4 +1,4 @@
-package tn.wevioo.driverManual;
+package tn.wevioo.driverManual.driver;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -38,10 +38,10 @@ import tn.wevioo.driverManual.configuration.ManualConfiguration;
 import tn.wevioo.driverManual.configuration.ManualInternalConfiguration;
 import tn.wevioo.driverManual.entities.Product;
 import tn.wevioo.driverManual.entities.type.StateProduct;
-import tn.wevioo.driverManual.properties.CustomerProductIdentifiers;
-import tn.wevioo.driverManual.properties.ProductProperties;
-import tn.wevioo.driverManual.properties.UsageProperties;
 import tn.wevioo.driverManual.service.ProductService;
+import tn.wevioo.driverManual.utils.properties.CustomerProductIdentifiers;
+import tn.wevioo.driverManual.utils.properties.ProductProperties;
+import tn.wevioo.driverManual.utils.properties.UsageProperties;
 
 /**
  * The ManuelDriver driver class.

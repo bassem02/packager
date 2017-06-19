@@ -32,7 +32,7 @@ public class ProductModelProductDriverPortServiceImpl implements ProductModelPro
 	}
 
 	@Override
-	public ProductModelProductDriverPort findById(int id) throws NotFoundException {
+	public ProductModelProductDriverPort findById(Integer id) throws NotFoundException {
 
 		if (((Integer) id == null)) {
 			throw new NullException(NullCases.NULL_EMPTY, "id parameter");

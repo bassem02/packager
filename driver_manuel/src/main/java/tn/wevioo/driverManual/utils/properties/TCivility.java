@@ -1,4 +1,4 @@
-package tn.wevioo.driverManual.properties;
+package tn.wevioo.driverManual.utils.properties;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;

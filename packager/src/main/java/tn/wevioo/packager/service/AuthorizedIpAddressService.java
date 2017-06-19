@@ -6,13 +6,7 @@ import nordnet.architecture.exceptions.explicit.NotFoundException;
 import tn.wevioo.packager.entities.AuthorizedIpAddress;
 import tn.wevioo.packager.entities.WebServiceUser;
 
-public interface AuthorizedIpAddressService {
-
-	public AuthorizedIpAddress saveOrUpdate(AuthorizedIpAddress authorizedIpAddress);
-
-	public void delete(AuthorizedIpAddress authorizedIpAddress);
-
-	public AuthorizedIpAddress findById(int id) throws NotFoundException;
+public interface AuthorizedIpAddressService extends CrudService<AuthorizedIpAddress, Integer> {
 
 	public AuthorizedIpAddress findByWebServiceUser(WebServiceUser webServiceUser);
 

@@ -22,8 +22,8 @@ import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
 import nordnet.drivers.contract.exceptions.DriverException;
 import nordnet.drivers.contract.types.Action;
 import nordnet.drivers.contract.types.FeasibilityTestResult;
-import tn.wevioo.driverManual.ManualDriver;
-import tn.wevioo.driverManual.ManualDriverFactory;
+import tn.wevioo.driverManual.driver.ManualDriver;
+import tn.wevioo.driverManual.driver.ManualDriverFactory;
 import tn.wevioo.driverManual.entities.Product;
 import tn.wevioo.driverManual.service.ParametersService;
 import tn.wevioo.driverManual.service.ProductService;
@@ -57,7 +57,8 @@ public class Controller {
 	}
 
 	@RequestMapping(value = "/getReferences", method = RequestMethod.GET)
-	public List<tn.wevioo.driverManual.tools.Reference> getReferences(@QueryParam("ppid") String ppid) throws DriverException {
+	public List<tn.wevioo.driverManual.tools.Reference> getReferences(@QueryParam("ppid") String ppid)
+			throws DriverException {
 
 		return manualDriver.getReference(ppid);
 	}

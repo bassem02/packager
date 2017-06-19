@@ -30,7 +30,7 @@ public class AuthorizedIpAddressServiceImpl implements AuthorizedIpAddressServic
 	}
 
 	@Override
-	public AuthorizedIpAddress findById(int id) throws NotFoundException {
+	public AuthorizedIpAddress findById(Integer id) throws NotFoundException {
 
 		return authorizedIpAddressDao.findOne(id);
 	}

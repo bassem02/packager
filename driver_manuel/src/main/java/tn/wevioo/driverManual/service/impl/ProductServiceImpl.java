@@ -368,4 +368,10 @@ public class ProductServiceImpl implements ProductService {
 		productHistoryService.saveOrUpdate(productHistory);
 	}
 
+	@Override
+	public Product findById(Integer id) throws NotFoundException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

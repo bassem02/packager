@@ -30,7 +30,7 @@ public class PackagerActionHistoryServiceImpl implements PackagerActionHistorySe
 	}
 
 	@Override
-	public PackagerActionHistory findById(int id) throws NotFoundException {
+	public PackagerActionHistory findById(Integer id) throws NotFoundException {
 
 		if (((Integer) id == null)) {
 			throw new NullException(NullCases.NULL_EMPTY, "id parameter");

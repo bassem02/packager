@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(entityManagerFactoryRef = "entityManagerFactory", basePackages = { "tn.wevioo.dao" })
+@EnableJpaRepositories(entityManagerFactoryRef = "entityManagerFactory", basePackages = { "tn.wevioo.packager.dao" })
 public class PackagerConfig {
 
 	@Primary
@@ -32,7 +32,7 @@ public class PackagerConfig {
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
 			org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder builder,
 			@Qualifier("datasource") DataSource dataSource) {
-		return builder.dataSource(dataSource).packages("tn.wevioo.entities").build();
+		return builder.dataSource(dataSource).packages("tn.wevioo.packager.entities").build();
 	}
 
 	@Primary

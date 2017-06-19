@@ -117,7 +117,7 @@ public class PackagerInstanceServiceImpl implements PackagerInstanceService {
 	}
 
 	@Override
-	public PackagerInstance findById(int id) throws NotFoundException {
+	public PackagerInstance findById(Integer id) throws NotFoundException {
 		if (((Integer) id == null)) {
 			throw new NullException(NullCases.NULL_EMPTY, "id parameter");
 		}

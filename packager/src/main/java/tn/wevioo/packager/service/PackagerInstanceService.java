@@ -14,17 +14,9 @@ import tn.wevioo.packager.exceptions.PackagerException;
 import tn.wevioo.packager.exceptions.RestTemplateException;
 import tn.wevioo.packager.model.request.PackagerRequest;
 
-public interface PackagerInstanceService {
-
-	public PackagerInstance saveOrUpdate(PackagerInstance packagerInstance);
-
-	public void delete(PackagerInstance packagerInstance);
-
-	public PackagerInstance findById(int id) throws NotFoundException;
+public interface PackagerInstanceService extends CrudService<PackagerInstance, Integer> {
 
 	public PackagerInstance findByRetailerPackagerId(String retailerPackagerId) throws NotFoundException;
-
-	public List<PackagerInstance> findAll();
 
 	public PackagerInstanceDTO convertToDTO(PackagerInstance packagerInstance)
 			throws DriverException, RestTemplateException, NotFoundException;

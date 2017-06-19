@@ -30,7 +30,7 @@ public class EndUserHistoryServiceImpl implements EndUserHistoryService {
 	}
 
 	@Override
-	public EndUserHistory findById(int id) throws NotFoundException {
+	public EndUserHistory findById(Integer id) throws NotFoundException {
 		if (((Integer) id == null)) {
 			throw new NullException(NullCases.NULL_EMPTY, "id parameter");
 		}

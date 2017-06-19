@@ -1,7 +1,5 @@
 package tn.wevioo.driverManual.service;
 
-import java.util.List;
-
 import nordnet.architecture.exceptions.explicit.DataSourceException;
 import nordnet.architecture.exceptions.explicit.NotFoundException;
 import nordnet.architecture.exceptions.explicit.NotRespectedRulesException;
@@ -9,15 +7,15 @@ import nordnet.architecture.exceptions.explicit.WebServiceException;
 import tn.wevioo.driverManual.entities.Product;
 import tn.wevioo.driverManual.entities.type.StateProduct;
 
-public interface ProductService {
+public interface ProductService extends CrudService<Product, Integer> {
 
-	Product saveOrUpdate(Product product);
-
-	void delete(Product product);
-
+	// Product saveOrUpdate(Product product);
+	//
+	// void delete(Product product);
+	//
 	Product findById(long id) throws NotFoundException;
 
-	List<Product> findAll();
+	// List<Product> findAll();
 
 	StateProduct getCurrentStatus(String providerProductId) throws NotRespectedRulesException, NotFoundException;
 

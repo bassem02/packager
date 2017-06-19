@@ -1,4 +1,4 @@
-package tn.wevioo.driverManual;
+package tn.wevioo.driverManual.driver;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -36,9 +36,9 @@ import nordnet.tools.idgenerator.exception.AlgorithmException;
 import tn.wevioo.driverManual.configuration.ManualConfiguration;
 import tn.wevioo.driverManual.configuration.ManualInternalConfiguration;
 import tn.wevioo.driverManual.entities.Product;
-import tn.wevioo.driverManual.properties.ProductProperties;
 import tn.wevioo.driverManual.service.ProductService;
 import tn.wevioo.driverManual.utils.AbstractValidator;
+import tn.wevioo.driverManual.utils.properties.ProductProperties;
 
 /**
  * This class implements all methods useful to manage instance of the Manual

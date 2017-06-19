@@ -31,7 +31,7 @@ public class ParametersServiceImpl implements ParametersService {
 	}
 
 	@Override
-	public Parameters findById(int id) throws NotFoundException {
+	public Parameters findById(Integer id) throws NotFoundException {
 		if (((Integer) id == null)) {
 			throw new NullException(NullCases.NULL_EMPTY, "id parameter");
 		}

@@ -10,15 +10,7 @@ import tn.wevioo.packager.entities.ProductInstance;
 import tn.wevioo.packager.entities.ProductModel;
 import tn.wevioo.packager.exceptions.RestTemplateException;
 
-public interface ProductInstanceService {
-
-	public ProductInstance saveOrUpdate(ProductInstance productInstance);
-
-	public void delete(ProductInstance productInstance);
-
-	public ProductInstance findById(int id) throws NotFoundException;
-
-	public List<ProductInstance> findAll();
+public interface ProductInstanceService extends CrudService<ProductInstance, Integer> {
 
 	public ProductInstanceDTO convertToDTO(ProductInstance findById)
 			throws DriverException, RestTemplateException, NotFoundException;
